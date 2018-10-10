@@ -71,3 +71,6 @@ C:\Users\asms-accpac-2\Desktop\SLWver1.1_Test\WebService\WebService\bin\Microsof
 C:\Users\asms-accpac-2\Desktop\SLWver1.1_Test\WebService\WebService\obj\Debug\WebService.csprojResolveAssemblyReference.cache
 C:\Users\asms-accpac-2\Desktop\SLWver1.1_Test\WebService\WebService\obj\Debug\WebService.dll
 C:\Users\asms-accpac-2\Desktop\SLWver1.1_Test\WebService\WebService\obj\Debug\WebService.pdb
+C:\Users\asms-accpac-2\Desktop\SLWver1.1_Test\WebService\WebService\bin\System.Web.Cors.dll
+C:\Users\asms-accpac-2\Desktop\SLWver1.1_Test\WebService\WebService\bin\System.Web.Http.Cors.dll
+C:\Users\asms-accpac-2\Desktop\SLWver1.1_Test\WebService\WebService\bin\System.Web.Http.Cors.xml

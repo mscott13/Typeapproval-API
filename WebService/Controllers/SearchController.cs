@@ -5,13 +5,15 @@ using System.Net;
 using WebService.Database;
 using WebService.Models;
 using System.Collections.Generic;
+using System.Web.Http.Cors;
 
 namespace WebService.Controllers
 {
+    [EnableCors("*", "*", "*")]
     public class SearchController : ApiController
     {
         [HttpGet]
-        public HttpResponseMessage GetTypeApprovalDetails([FromUri]String Dealer, [FromUri]String Model)
+        public HttpResponseMessage TypeApprovalDetails([FromUri]String Dealer, [FromUri]String Model)
         {
             SLW_DatabaseInfo db = new SLW_DatabaseInfo();
             if (Dealer == null)
@@ -24,7 +26,23 @@ namespace WebService.Controllers
             }
 
             List<TypeApprovalDetails> data = db.GetTypeApprovalInfo(Dealer, Model);
-            return Request.CreateResponse(HttpStatusCode.Accepted, data);
+            return Request.CreateResponse(HttpStatusCode.OK, data);
+        }
+
+        [HttpGet]
+        public HttpResponseMessage Manufacturers([FromUri]String q)
+        {
+            SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+            List<string> data = db.GetManufacturers(q);
+            return Request.CreateResponse(HttpStatusCode.OK, data);
+        }
+
+        [HttpGet]
+        public HttpResponseMessage Models([FromUri]String q)
+        {
+            SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+            List<string> data = db.GetModels(q);
+            return Request.CreateResponse(HttpStatusCode.OK, data);
         }
     }
 }
