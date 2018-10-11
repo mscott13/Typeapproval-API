@@ -17,7 +17,37 @@ namespace WebService.Controllers
         [HttpPost]
         public HttpResponseMessage Register([FromBody]Models.NewUser user)
         {
-            return null;
+            Utilities.PasswordManager mgr = new Utilities.PasswordManager();
+            SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+            bool valid_user_type = false;
+
+            List<UserType> user_types = db.GetUserTypes();
+            for (int i = 0; i < user_types.Count; i++)
+            {
+                if (user_types[i].user_type == user.user_type)
+                {
+                    valid_user_type = true;
+                }
+            }
+
+            if (valid_user_type)
+            {
+                if (!db.CheckUserExist(user.username))
+                {
+                    string hash = mgr.GetHash(user.password);
+                    db.CreateNewUser(user.username, user.first_name, user.last_name, DateTime.Now, user.user_type, DateTime.Now, (DateTime)System.Data.SqlTypes.SqlDateTime.MinValue, hash, false);
+                    return Request.CreateResponse(HttpStatusCode.OK, "user created");
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.Unauthorized, "user exists");
+                }
+
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, "invalid user type");
+            }
         }
 
         [HttpPost]
@@ -33,7 +63,9 @@ namespace WebService.Controllers
 
                 if (passed)
                 {
-                    return Request.CreateResponse(HttpStatusCode.OK, new Models.LoginResult("credentials verified", mgr.GenerateNewAccessKey(login.username)));
+                    string access_key = mgr.GenerateNewAccessKey(login.username);
+                    db.SetNewAccessKey(login.username, access_key);
+                    return Request.CreateResponse(HttpStatusCode.OK, new Models.LoginResult("credentials verified", access_key));
                 }
                 else
                 {
@@ -47,28 +79,51 @@ namespace WebService.Controllers
         }
 
         [HttpPost]
-        public HttpResponseMessage Delete([FromBody]String access)
+        public HttpResponseMessage Delete([FromBody]Delete delete)
         {
-            int user_type_requirement = 2;
-            Utilities.PasswordManager mgr = new Utilities.PasswordManager();
             SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+            KeyDetail key_detail = db.GetKeyDetail(delete.key);
 
-            if (db.GetUserType(access) == user_type_requirement)
+            if (IsKeyValid(key_detail))
             {
-                //delete user
+                int user_type_requirement = 9;
+                Utilities.PasswordManager mgr = new Utilities.PasswordManager();
+                
+
+                if (db.GetUserType(delete.key) == user_type_requirement)
+                {
+                    if (db.CheckUserExist(delete.user))
+                    {
+                        db.DeleteUser(delete.user);
+                        return Request.CreateResponse(HttpStatusCode.OK, "user deleted");
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.Unauthorized, "invalid user");
+                    }
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.Unauthorized, "unauthorized");
+                }
             }
             else
             {
-                return Request.CreateResponse(HttpStatusCode.Unauthorized, "unauthorized");
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, "access key invalid");
             }
-            return null;
         }
 
-        [HttpGet]
-        public HttpResponseMessage test([FromUri]string s)
+        private bool IsKeyValid(KeyDetail key_detail)
         {
-            Utilities.PasswordManager mgr = new Utilities.PasswordManager();
-            return Request.CreateResponse(HttpStatusCode.OK, mgr.GenerateNewAccessKey("mscott"));
+            var key_expiry = key_detail.last_detected_activity.AddMinutes(key_detail.max_inactivity_length);
+            if (key_expiry >= DateTime.Now)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

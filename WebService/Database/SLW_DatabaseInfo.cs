@@ -269,15 +269,18 @@ namespace WebService.Database
                 reader.Read();
                 if (Convert.ToInt32(reader["count"]) > 0)
                 {
+                    conn.Close();
                     return true;
                 }
                 else
                 {
+                    conn.Close();
                     return false;
                 }
             }
             else
             {
+                conn.Close();
                 return false;
             }
         }
@@ -324,7 +327,80 @@ namespace WebService.Database
                 reader.Read();
                 user_type = Convert.ToInt32(reader["user_type"]);
             }
+
+            conn.Close();
             return user_type;
+        }
+
+        public List<UserType> GetUserTypes()
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader reader = null;
+            cmd.CommandText = "sp_getUserTypes";
+            List<UserType> user_types = new List<UserType>();
+
+            cmd.Connection = conn;
+            conn.Open();
+            reader = cmd.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    user_types.Add(new UserType(Convert.ToInt32(reader["user_type"]), reader["description"].ToString()));
+                }
+
+                conn.Close();
+                return user_types;
+            }
+            else
+            {
+                conn.Close();
+                return user_types;
+            }
+        }
+
+        public void SetNewUserType(int user_type, string description)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandText = "sp_newUserType @user_type, @description";
+
+            cmd.Parameters.AddWithValue("@user_type", user_type);
+            cmd.Parameters.AddWithValue("@description", description);
+
+            cmd.Connection = conn;
+            conn.Open();
+            cmd.ExecuteNonQuery();
+            conn.Close();
+        }
+
+        public KeyDetail GetKeyDetail(string key)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader reader = null;
+            cmd.CommandText = "sp_getKeyDetail @key";
+            cmd.Parameters.AddWithValue("@key", key);
+
+            cmd.Connection = conn;
+            conn.Open();
+            reader = cmd.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                reader.Read();
+               
+                KeyDetail key_detail = new KeyDetail(Convert.ToInt32(reader["user_id"]), reader["access_key"].ToString(), Convert.ToDateTime(reader["last_detected_activity"]), Convert.ToInt32(reader["max_inactivity_mins"]));
+                conn.Close();
+                return key_detail;
+            }
+            else
+            {
+                conn.Close();
+                return new KeyDetail();
+            }
         }
     }
 }

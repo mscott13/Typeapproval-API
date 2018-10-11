@@ -160,11 +160,14 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\ApiAccess.cs" />
+    <Compile Include="Models\Delete.cs" />
+    <Compile Include="Models\KeyDetail.cs" />
     <Compile Include="Models\Login.cs" />
     <Compile Include="Models\LoginResult.cs" />
     <Compile Include="Models\NewUser.cs" />
     <Compile Include="Models\TypeApprovalDetails.cs" />
+    <Compile Include="Models\UserCredentials.cs" />
+    <Compile Include="Models\UserTypes.cs" />
     <Compile Include="Other\CustomTransform.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\Log.cs" />
