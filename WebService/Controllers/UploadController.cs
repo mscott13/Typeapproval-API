@@ -38,6 +38,7 @@ namespace WebService.Controllers
                     File.Move(file.LocalFileName, rename);
                 }
 
+                Global.progress("completed");
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception e)

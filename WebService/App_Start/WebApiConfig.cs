@@ -18,6 +18,13 @@ namespace WebService
                 defaults: new { id = RouteParameter.Optional }
             );
             config.Formatters.Remove(config.Formatters.XmlFormatter);
+            Global.progress = Progress.ReportProgress;
         }
+    }
+
+    public class Global
+    {
+        public delegate void DeliverProgress(string progress);
+        public static DeliverProgress progress;
     }
 }
