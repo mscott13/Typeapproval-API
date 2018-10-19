@@ -65,16 +65,16 @@ namespace WebService.Controllers
                 {
                     string access_key = mgr.GenerateNewAccessKey(login.username);
                     db.SetNewAccessKey(login.username, access_key);
-                    return Request.CreateResponse(HttpStatusCode.OK, new Models.LoginResult("credentials verified", access_key));
+                    return Request.CreateResponse(HttpStatusCode.OK, new Models.LoginResult("credentials verified", access_key, credentials.user_type));
                 }
                 else
                 {
-                    return Request.CreateResponse(HttpStatusCode.Unauthorized, new Models.LoginResult("incorrect credentials", ""));
+                    return Request.CreateResponse(HttpStatusCode.Unauthorized, new Models.LoginResult("incorrect credentials", "", -1));
                 }
             }
             else
             {
-                return Request.CreateResponse(HttpStatusCode.Unauthorized, new LoginResult("invalid user", ""));
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, new LoginResult("invalid user", "", -1));
             }
         }
 

@@ -25,6 +25,7 @@
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -154,7 +155,9 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\DefaultController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
+    <Compile Include="Controllers\UploadController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Database\SLW_DatabaseInfo.cs" />
     <Compile Include="Global.asax.cs">
@@ -179,6 +182,7 @@
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Views\Web.config" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -188,11 +192,16 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Uploads\" />
     <Folder Include="Views\Search\" />
+    <Folder Include="Views\Upload\" />
     <Folder Include="Views\User\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Default\Index.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
