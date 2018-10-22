@@ -13,12 +13,10 @@ namespace WebService.Hubs
 
         public CrossDomainHub ():
             this(NotificationTicker.Instance)
-        {
-
-        }
+        {}
 
         public CrossDomainHub(NotificationTicker notificationTicker)
-        {
+        { 
             _notificationTicker = notificationTicker;
         }
 
@@ -44,13 +42,13 @@ namespace WebService.Hubs
 
         public override Task OnConnected()
         {
-            string name = Context.User.Identity.Name;
             //update database to show who is online
             return base.OnConnected();
         }
-
+             
         public override Task OnDisconnected(bool stopCalled)
         {
+            _notificationTicker.BroadcastCurrentClients();
             string name = Context.User.Identity.Name;
             //update database to show who is offline
             return base.OnDisconnected(stopCalled);

@@ -3,14 +3,18 @@ using System.Collections.Generic;
 using WebService.Models;
 using System.Data;
 using System.Data.SqlClient;
+using System.Globalization;
+using System.Security.Cryptography;
+using System.Text;
+using WebService.Other;
 
 namespace WebService.Database
 {
     public class SLW_DatabaseInfo
     {
-        string SLW_dbConn = @"Data Source=SMA-DBSRV\ASMSDEV;Initial Catalog=SLW_Database;Integrated Security=True";
+        string SLW_dbConn = Constants.databaseConnection;
 
-        //Type approval search
+        // Type approval search
         public List<TypeApprovalDetails> GetTypeApprovalInfo(string Dealer, string Model)
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
@@ -168,7 +172,7 @@ namespace WebService.Database
             return group;
         }
 
-        //User management
+        // User management
         public UserCredentials GetUserCredentials(string user)
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
@@ -285,13 +289,13 @@ namespace WebService.Database
             }
         }
 
-        public void CreateNewUser(string username, string first_name, string last_name, DateTime created_date, int user_type, DateTime last_password_change_date,
-                                  DateTime last_login_date, string hash, bool password_reset_required)
+        public void NewUser(string username, string first_name, string last_name, DateTime created_date, int user_type, DateTime last_password_change_date,
+                                  DateTime last_login_date, string hash, bool password_reset_required, string email, string company)
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
             cmd.CommandText = "sp_createUser @username, @first_name, @last_name, @created_date, @user_type, @last_password_change_date, " +
-                              "@last_login_date, @hash, @password_reset_required";
+                              "@last_login_date, @hash, @password_reset_required, @email, @company";
 
             cmd.Parameters.AddWithValue("@username", username);
             cmd.Parameters.AddWithValue("@first_name", first_name);
@@ -302,6 +306,8 @@ namespace WebService.Database
             cmd.Parameters.AddWithValue("@last_login_date", last_login_date);
             cmd.Parameters.AddWithValue("@hash", hash);
             cmd.Parameters.AddWithValue("@password_reset_required", password_reset_required);
+            cmd.Parameters.AddWithValue("@email", email);
+            cmd.Parameters.AddWithValue("@company", company);
 
             cmd.Connection = conn;
             conn.Open();
@@ -401,6 +407,66 @@ namespace WebService.Database
                 conn.Close();
                 return new KeyDetail();
             }
+        }
+
+        // Notifications
+        public List<Notification> GetUnreadNotifications()
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader reader = null;
+            cmd.CommandText = "sp_getUnreadNotifications";
+            List<Notification> notifications = new List<Notification>();
+
+            cmd.Connection = conn;
+            conn.Open();
+            reader = cmd.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    notifications.Add(new Notification(reader["notification_id"].ToString(), Convert.ToDateTime(reader["received_date"]),
+                                      Convert.ToDateTime(reader["read_date"]), reader["type"].ToString(), reader["target_user"].ToString(), 
+                                      Convert.ToBoolean(reader["status_read"]), reader["message"].ToString()));
+                }
+                 
+            }
+            conn.Close();
+            return notifications;
+        }
+
+        public void NotifySpecific(string message, string target_user, string type)
+        {
+            string datetime = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture);
+            StringBuilder builder = new StringBuilder();
+
+            using (SHA256 hash = SHA256.Create())
+            {
+                byte[] bytes = hash.ComputeHash(Encoding.UTF8.GetBytes(datetime + message + target_user));
+
+                for(int i=0; i<bytes.Length; i++)
+                {
+                    builder.Append(bytes[i].ToString("x2"));
+                }
+            }
+
+            var result = builder.ToString();
+
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandText = "sp_newMessage @notification_id, @received_date, @type, @target_user, @status_read, @message";
+            cmd.Parameters.AddWithValue("@notification_id", result);
+            cmd.Parameters.AddWithValue("@received_date", DateTime.Now);
+            cmd.Parameters.AddWithValue("@type", type);
+            cmd.Parameters.AddWithValue("@target_user", target_user);
+            cmd.Parameters.AddWithValue("@status_read", false);
+            cmd.Parameters.AddWithValue("@message", message);
+
+            cmd.Connection = conn;
+            conn.Open();
+            cmd.ExecuteNonQuery();
+            conn.Close();
         }
     }
 }

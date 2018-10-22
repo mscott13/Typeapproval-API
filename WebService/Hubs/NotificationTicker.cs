@@ -9,7 +9,6 @@ namespace WebService.Hubs
 {
     public class NotificationTicker
     {
-        // Singleton instance
         private readonly static Lazy<NotificationTicker> _instance = new Lazy<NotificationTicker>(
             () => new NotificationTicker(GlobalHost.ConnectionManager.GetHubContext<CrossDomainHub>().Clients));
 
@@ -21,7 +20,6 @@ namespace WebService.Hubs
         private NotificationTicker(IHubConnectionContext<dynamic> clients)
         {
             Clients = clients;
-            
             LoadNotifications();
         }
 
@@ -30,6 +28,7 @@ namespace WebService.Hubs
             _timer = new Timer(UpdateNotifications, null, _updateInterval, _updateInterval);
             client_ids.TryAdd(client_ids.Count.ToString(), signalRUsers);
             BroadcastState("started");
+            BroadcastCurrentClients();
         }
 
         public static NotificationTicker Instance
@@ -69,7 +68,8 @@ namespace WebService.Hubs
             {
                 foreach (var notification in _notifications.Values)
                 {
-                    BroadcastNotifications(notification);
+                   //BroadcastNotifications(notification);
+                    BroadCastNotificationSpecific(client_ids["0"].srClientId, 1);
                 }
             }
         }
@@ -79,9 +79,19 @@ namespace WebService.Hubs
             Clients.All.state(state);
         }
 
+        public void BroadcastCurrentClients()
+        {
+            Clients.All.clientList(client_ids);
+        }
+
         private void BroadcastNotifications(Notification notification)
         {
             Clients.All.notify(notification);
+        }
+
+        private void BroadCastNotificationSpecific(string clientID, int count)
+        {
+            Clients.Client(clientID).notify(count);
         }
     }
 }

@@ -1,22 +1,24 @@
-﻿using System;
+﻿using Microsoft.AspNet.SignalR;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Http;
-using System.Net.Http;
-using System.Web.Http.Cors;
 using System.Net;
+using System.Net.Http;
+using System.Web.Http;
 using WebService.Database;
+using WebService.Hubs;
 using WebService.Models;
 
 namespace WebService.Controllers
 {
-   
+
     public class UserController : ApiController
     {
         [HttpPost]
         public HttpResponseMessage Register([FromBody]Models.NewUser user)
         {
+            //can be used to call client functions
+            var connection = GlobalHost.ConnectionManager.GetHubContext<CrossDomainHub>();
+
             Utilities.PasswordManager mgr = new Utilities.PasswordManager();
             SLW_DatabaseInfo db = new SLW_DatabaseInfo();
             bool valid_user_type = false;
@@ -35,14 +37,13 @@ namespace WebService.Controllers
                 if (!db.CheckUserExist(user.username))
                 {
                     string hash = mgr.GetHash(user.password);
-                    db.CreateNewUser(user.username, user.first_name, user.last_name, DateTime.Now, user.user_type, DateTime.Now, (DateTime)System.Data.SqlTypes.SqlDateTime.MinValue, hash, false);
+                    db.NewUser(user.username, user.first_name, user.last_name, DateTime.Now, user.user_type, DateTime.Now, (DateTime)System.Data.SqlTypes.SqlDateTime.MinValue, hash, false, user.email, user.company);
                     return Request.CreateResponse(HttpStatusCode.OK, "user created");
                 }
                 else
                 {
                     return Request.CreateResponse(HttpStatusCode.Unauthorized, "user exists");
                 }
-
             }
             else
             {
@@ -88,7 +89,6 @@ namespace WebService.Controllers
             {
                 int user_type_requirement = 9;
                 Utilities.PasswordManager mgr = new Utilities.PasswordManager();
-                
 
                 if (db.GetUserType(delete.key) == user_type_requirement)
                 {

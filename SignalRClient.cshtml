@@ -20,18 +20,22 @@
         $.getScript('http://localhost:54367/Scripts/jquery.signalR-2.3.0.min.js', function () {
             $.getScript('http://localhost:54367/signalr/hubs', function () {
                 $.connection.hub.url = 'http://localhost:54367/signalr';
-                var myHub = $.connection.crossDomainHub;
+                var hub = $.connection.crossDomainHub;
 
-                myHub.client.state = function (state) {
-                    alert(state);
+                hub.client.state = function (state) {
+                    console.log(state);
                 }
 
-                myHub.client.notify = function (notification) {
+                hub.client.notify = function (notification) {
                     console.log(notification);
                 }
 
+                hub.client.clientList = function (clients) {
+                    console.log(clients);
+                }
+
                 $.connection.hub.start().done(function () {
-                    myHub.server.initialize("mscott");
+                    hub.server.initialize("mscott");
                 });
             });
         });
