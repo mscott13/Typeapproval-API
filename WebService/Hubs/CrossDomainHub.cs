@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace WebService.Hubs
 {
@@ -26,15 +27,39 @@ namespace WebService.Hubs
             return _notificationTicker.GetNotifications();
         }
 
-        public void Initialize()
+        public void Initialize(string username)
         {
-            _notificationTicker.InitializeNotifications();
+            SignalRUsers signalRUsers = new SignalRUsers();
+            signalRUsers.srClientId = Context.ConnectionId;
+            signalRUsers.username = username;
+
+            _notificationTicker.InitializeNotifications(signalRUsers);
         }
 
         public void StartTimer()
         {
             Clients.All.showTime(DateTime.UtcNow.ToLongTimeString());
             Thread.Sleep(TimeSpan.FromSeconds(1));
+        }
+
+        public override Task OnConnected()
+        {
+            string name = Context.User.Identity.Name;
+            //update database to show who is online
+            return base.OnConnected();
+        }
+
+        public override Task OnDisconnected(bool stopCalled)
+        {
+            string name = Context.User.Identity.Name;
+            //update database to show who is offline
+            return base.OnDisconnected(stopCalled);
+        }
+
+        public override Task OnReconnected()
+        {
+            string name = Context.User.Identity.Name;
+            return base.OnReconnected();
         }
     }
 }

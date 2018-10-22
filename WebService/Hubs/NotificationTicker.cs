@@ -16,16 +16,19 @@ namespace WebService.Hubs
         private Timer _timer;
         private readonly TimeSpan _updateInterval = TimeSpan.FromMilliseconds(500);
         private readonly ConcurrentDictionary<string, Notification> _notifications = new ConcurrentDictionary<string, Notification>();
+        private readonly ConcurrentDictionary<string, SignalRUsers> client_ids = new ConcurrentDictionary<string, SignalRUsers>();
 
         private NotificationTicker(IHubConnectionContext<dynamic> clients)
         {
             Clients = clients;
+            
             LoadNotifications();
         }
 
-        public void InitializeNotifications()
+        public void InitializeNotifications(SignalRUsers signalRUsers)
         {
             _timer = new Timer(UpdateNotifications, null, _updateInterval, _updateInterval);
+            client_ids.TryAdd(client_ids.Count.ToString(), signalRUsers);
             BroadcastState("started");
         }
 
