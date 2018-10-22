@@ -11,22 +11,31 @@ using System.Web;
 using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
+using Microsoft.AspNet.SignalR;
+using Microsoft.AspNet.SignalR.Infrastructure;
+using WebService.Hubs;
+using WebService.Other;
 
 namespace WebService.Controllers
 {
-    [EnableCors("*", "*", "*")]
     public class UploadController : ApiController
     {
         [HttpPost]
         public async Task<HttpResponseMessage> Multiple()
         {
+          
             if (!Request.Content.IsMimeMultipartContent())
             {
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
             }
 
-            string root = HttpContext.Current.Server.MapPath("~/Uploads");
+            string root = HttpContext.Current.Server.MapPath("~/TA_APPLICATIONS");
             string rename = "";
+
+            if (!Directory.Exists(root))
+            {
+                Directory.CreateDirectory(root);
+            }
             var provider = new MultipartFormDataStreamProvider(root);
 
             try
@@ -35,10 +44,12 @@ namespace WebService.Controllers
                 foreach (MultipartFileData file in provider.FileData)
                 {
                     rename = root + @"\" + file.Headers.ContentDisposition.FileName.Replace("\"", "");
-                    File.Move(file.LocalFileName, rename);
+                    if (!File.Exists(rename))
+                    {
+                        File.Move(file.LocalFileName, rename);
+                    }
                 }
 
-                Global.progress("completed");
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception e)

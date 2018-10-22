@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
+using System.Web.Http.Cors;
 
 namespace WebService
 {
@@ -10,7 +11,6 @@ namespace WebService
         public static void Register(HttpConfiguration config)
         {
             config.MapHttpAttributeRoutes();
-            config.EnableCors();
 
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",
@@ -18,13 +18,6 @@ namespace WebService
                 defaults: new { id = RouteParameter.Optional }
             );
             config.Formatters.Remove(config.Formatters.XmlFormatter);
-            Global.progress = Progress.ReportProgress;
         }
-    }
-
-    public class Global
-    {
-        public delegate void DeliverProgress(string progress);
-        public static DeliverProgress progress;
     }
 }

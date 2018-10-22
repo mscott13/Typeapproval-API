@@ -9,7 +9,6 @@ using System.Web.Http.Cors;
 
 namespace WebService.Controllers
 {
-    [EnableCors("*", "*", "*")]
     public class SearchController : ApiController
     {
         [HttpGet]

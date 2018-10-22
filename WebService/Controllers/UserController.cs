@@ -11,7 +11,7 @@ using WebService.Models;
 
 namespace WebService.Controllers
 {
-    [EnableCors("*", "*", "*")]
+   
     public class UserController : ApiController
     {
         [HttpPost]

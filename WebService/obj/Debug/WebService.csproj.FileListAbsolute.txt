@@ -165,3 +165,11 @@ C:\Users\Mark Scott\Desktop\Git repositories\Typeapproval-API\WebService\bin\Mic
 C:\Users\Mark Scott\Desktop\Git repositories\Typeapproval-API\WebService\bin\Microsoft.Owin.xml
 C:\Users\Mark Scott\Desktop\Git repositories\Typeapproval-API\WebService\bin\Microsoft.Owin.Host.SystemWeb.xml
 C:\Users\Mark Scott\Desktop\Git repositories\Typeapproval-API\WebService\bin\Microsoft.Owin.Security.xml
+C:\Users\Mark Scott\Desktop\Git repositories\Typeapproval-API\WebService\bin\Microsoft.Owin.Cors.dll
+C:\Users\Mark Scott\Desktop\Git repositories\Typeapproval-API\WebService\bin\Microsoft.Owin.Host.HttpListener.dll
+C:\Users\Mark Scott\Desktop\Git repositories\Typeapproval-API\WebService\bin\Microsoft.Owin.Hosting.dll
+C:\Users\Mark Scott\Desktop\Git repositories\Typeapproval-API\WebService\bin\System.Web.Http.Owin.dll
+C:\Users\Mark Scott\Desktop\Git repositories\Typeapproval-API\WebService\bin\Microsoft.Owin.Cors.xml
+C:\Users\Mark Scott\Desktop\Git repositories\Typeapproval-API\WebService\bin\Microsoft.Owin.Host.HttpListener.xml
+C:\Users\Mark Scott\Desktop\Git repositories\Typeapproval-API\WebService\bin\Microsoft.Owin.Hosting.xml
+C:\Users\Mark Scott\Desktop\Git repositories\Typeapproval-API\WebService\bin\System.Web.Http.Owin.xml

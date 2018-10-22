@@ -1,0 +1,40 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>SignalRClient</title>
+</head>
+
+
+<body>
+    <div id="dateTime"></div>
+    <script src="~/Scripts/jquery-3.3.1.js"></script>
+
+    <script type="text/javascript">
+            $.getScript('http://localhost:54367/Scripts/jquery.signalR-2.3.0.min.js', function () {
+                $.getScript('http://localhost:54367/signalr/hubs', function () {
+                    $.connection.hub.url = 'http://localhost:54367/signalr';
+                    var myHub = $.connection.crossDomainHub;
+
+                    myHub.client.state = function (state){
+                        alert(state);
+                    }
+
+                    myHub.client.notify = function (notification) {
+                        console.log(notification);
+                    }
+
+                    $.connection.hub.start().done(function () {
+                        myHub.server.initialize();
+                    });
+                });
+            });
+        </script>
+</body>
+</html>

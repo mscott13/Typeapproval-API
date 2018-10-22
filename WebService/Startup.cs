@@ -1,15 +1,15 @@
 ﻿using Microsoft.Owin;
 using Owin;
-using WebService;
 
-[assembly: OwinStartup(typeof(WebService.Startup))]
-namespace WebService
+[assembly: OwinStartup(typeof(WebService.Startup), "Configuration")]
+
+namespace WebService.R.configure
 {
     public class Startup
     {
         public void Configuration(IAppBuilder app)
         {
-            app.MapSignalR();
+            WebService.Startup.Configuration(app);
         }
     }
 }
