@@ -57,25 +57,33 @@ namespace WebService.Controllers
             Utilities.PasswordManager mgr = new Utilities.PasswordManager();
             SLW_DatabaseInfo db = new SLW_DatabaseInfo();
 
-            if (db.CheckUserExist(login.username))
+            if (login != null)
             {
-                UserCredentials credentials = db.GetUserCredentials(login.username);
-                bool passed = mgr.VerifyCredentials(login.password, credentials.hash);
 
-                if (passed)
+                if (db.CheckUserExist(login.username))
                 {
-                    string access_key = mgr.GenerateNewAccessKey(login.username);
-                    db.SetNewAccessKey(login.username, access_key);
-                    return Request.CreateResponse(HttpStatusCode.OK, new Models.LoginResult("credentials verified", access_key, credentials.user_type));
+                    UserCredentials credentials = db.GetUserCredentials(login.username);
+                    bool passed = mgr.VerifyCredentials(login.password, credentials.hash);
+
+                    if (passed)
+                    {
+                        string access_key = mgr.GenerateNewAccessKey(login.username);
+                        db.SetNewAccessKey(login.username, access_key);
+                        return Request.CreateResponse(HttpStatusCode.OK, new Models.LoginResult("credentials verified", access_key, credentials.user_type, credentials.name));
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.Unauthorized, new Models.LoginResult("incorrect credentials", "", -1, ""));
+                    }
                 }
                 else
                 {
-                    return Request.CreateResponse(HttpStatusCode.Unauthorized, new Models.LoginResult("incorrect credentials", "", -1));
+                    return Request.CreateResponse(HttpStatusCode.Unauthorized, new LoginResult("invalid user", "", -1, ""));
                 }
             }
             else
             {
-                return Request.CreateResponse(HttpStatusCode.Unauthorized, new LoginResult("invalid user", "", -1));
+                return Request.CreateResponse(HttpStatusCode.BadRequest, new LoginResult("bad request", "", -1, ""));
             }
         }
 

@@ -188,7 +188,7 @@ namespace WebService.Database
             if (reader.HasRows)
             {
                 reader.Read();
-                UserCredentials credentials = new UserCredentials(reader["hash"].ToString(), Convert.ToBoolean(reader["password_reset_required"]), Convert.ToInt32(reader["user_type"]));
+                UserCredentials credentials = new UserCredentials(reader["hash"].ToString(), Convert.ToBoolean(reader["password_reset_required"]), Convert.ToInt32(reader["user_type"]), reader["name"].ToString());
                 conn.Close();
                 return credentials;
             }
