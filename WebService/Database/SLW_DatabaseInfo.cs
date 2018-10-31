@@ -469,8 +469,31 @@ namespace WebService.Database
             conn.Close();
         }
 
-        //CompanyInfo
+        //ClientCompanyData
+        public List<ClientCompany> getClientDetails(int clientId)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader reader = null;
+            cmd.CommandText = "sp_getClientDetails @clientId";
+            cmd.Parameters.AddWithValue("@clientId", clientId);
+            cmd.Connection = conn;
+            List<ClientCompany> clientCompanies = new List<ClientCompany>();
 
+            conn.Open();
+            reader = cmd.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    clientCompanies.Add(new ClientCompany(reader["clientId"].ToString(), reader["clientCompany"].ToString(), reader["clientTelNum"].ToString(),
+                                                          reader["address"].ToString(), reader["clientFaxNum"].ToString(), "city/town", "contact person", reader["nationality"].ToString()));
+                }
+            }
+            conn.Close();
+            return clientCompanies;
+        }
         
     }
 }

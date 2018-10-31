@@ -185,6 +185,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\DataController.cs" />
     <Compile Include="Controllers\DefaultController.cs" />
     <Compile Include="Controllers\NotifyController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
@@ -198,6 +199,7 @@
     <Compile Include="Hubs\Notification.cs" />
     <Compile Include="Hubs\NotificationTicker.cs" />
     <Compile Include="Hubs\SignalRUsers.cs" />
+    <Compile Include="Models\ClientCompany.cs" />
     <Compile Include="Models\Delete.cs" />
     <Compile Include="Models\KeyDetail.cs" />
     <Compile Include="Models\Login.cs" />
@@ -233,6 +235,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Uploads\" />
+    <Folder Include="Views\Data\" />
     <Folder Include="Views\Notifiy\" />
   </ItemGroup>
   <ItemGroup>
