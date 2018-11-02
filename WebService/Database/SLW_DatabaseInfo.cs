@@ -172,6 +172,24 @@ namespace WebService.Database
             return group;
         }
 
+        public ApplicationSearchResultMain GetMultiSearchApplicationResults(string q)
+        {
+            List<string> manufaturers = GetManufacturers(q);
+            List<string> models = GetModels(q);
+            List<SearchCategory> items = new List<SearchCategory>();
+            for (int i = 0; i < manufaturers.Count; i++)
+            {
+                items.Add(new SearchCategory(manufaturers[i], "#", "", "manufacturers"));
+            }
+
+            for (int i = 0; i < models.Count; i++)
+            {
+                items.Add(new SearchCategory(models[i], "#", "", "models"));
+            }
+            
+            return new ApplicationSearchResultMain(items);
+        }
+
         // User management
         public UserCredentials GetUserCredentials(string user)
         {
@@ -290,12 +308,12 @@ namespace WebService.Database
         }
 
         public void NewUser(string username, string first_name, string last_name, DateTime created_date, int user_type, DateTime last_password_change_date,
-                                  DateTime last_login_date, string hash, bool password_reset_required, string email, string company)
+                                  DateTime last_login_date, string hash, bool password_reset_required, string email, string company, int clientId)
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
             cmd.CommandText = "sp_createUser @username, @first_name, @last_name, @created_date, @user_type, @last_password_change_date, " +
-                              "@last_login_date, @hash, @password_reset_required, @email, @company";
+                              "@last_login_date, @hash, @password_reset_required, @email, @company, @clientId";
 
             cmd.Parameters.AddWithValue("@username", username);
             cmd.Parameters.AddWithValue("@first_name", first_name);
@@ -308,6 +326,7 @@ namespace WebService.Database
             cmd.Parameters.AddWithValue("@password_reset_required", password_reset_required);
             cmd.Parameters.AddWithValue("@email", email);
             cmd.Parameters.AddWithValue("@company", company);
+            cmd.Parameters.AddWithValue("@clientId", clientId);
 
             cmd.Connection = conn;
             conn.Open();
@@ -469,13 +488,38 @@ namespace WebService.Database
             conn.Close();
         }
 
-        //ClientCompanyData
-        public List<ClientCompany> getClientDetails(int clientId)
+        //Data
+        public List<ClientCompany> getClientDetails(string query)
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
             SqlDataReader reader = null;
-            cmd.CommandText = "sp_getClientDetails @clientId";
+            cmd.CommandText = "sp_getClientDetails @clientCompany";
+            cmd.Parameters.AddWithValue("@clientCompany", query);
+            cmd.Connection = conn;
+            List<ClientCompany> clientCompanies = new List<ClientCompany>();
+
+            conn.Open();
+            reader = cmd.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    clientCompanies.Add(new ClientCompany(reader["clientId"].ToString(), reader["clientCompany"].ToString(), reader["clientTelNum"].ToString(),
+                                                          reader["address"].ToString(), reader["clientFaxNum"].ToString(), "city/town", "contact person", reader["nationality"].ToString()));
+                }
+            }
+            conn.Close();
+            return clientCompanies;
+        }
+
+        public List<ClientCompany> getClientDetail(int clientId)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader reader = null;
+            cmd.CommandText = "sp_getClientDetail @clientCompany";
             cmd.Parameters.AddWithValue("@clientId", clientId);
             cmd.Connection = conn;
             List<ClientCompany> clientCompanies = new List<ClientCompany>();
@@ -494,6 +538,5 @@ namespace WebService.Database
             conn.Close();
             return clientCompanies;
         }
-        
     }
 }

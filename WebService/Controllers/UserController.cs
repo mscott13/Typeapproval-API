@@ -16,38 +16,45 @@ namespace WebService.Controllers
         [HttpPost]
         public HttpResponseMessage Register([FromBody]Models.NewUser user)
         {
-            //can be used to call client functions
-            var connection = GlobalHost.ConnectionManager.GetHubContext<CrossDomainHub>();
-
-            Utilities.PasswordManager mgr = new Utilities.PasswordManager();
-            SLW_DatabaseInfo db = new SLW_DatabaseInfo();
-            bool valid_user_type = false;
-
-            List<UserType> user_types = db.GetUserTypes();
-            for (int i = 0; i < user_types.Count; i++)
+            if (user != null)
             {
-                if (user_types[i].user_type == user.user_type)
+                //can be used to call client functions
+                var connection = GlobalHost.ConnectionManager.GetHubContext<CrossDomainHub>();
+
+                Utilities.PasswordManager mgr = new Utilities.PasswordManager();
+                SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+                bool valid_user_type = false;
+
+                List<UserType> user_types = db.GetUserTypes();
+                for (int i = 0; i < user_types.Count; i++)
                 {
-                    valid_user_type = true;
+                    if (user_types[i].user_type == user.user_type)
+                    {
+                        valid_user_type = true;
+                    }
                 }
-            }
 
-            if (valid_user_type)
-            {
-                if (!db.CheckUserExist(user.username))
+                if (valid_user_type)
                 {
-                    string hash = mgr.GetHash(user.password);
-                    db.NewUser(user.username, user.first_name, user.last_name, DateTime.Now, user.user_type, DateTime.Now, (DateTime)System.Data.SqlTypes.SqlDateTime.MinValue, hash, false, user.email, user.company);
-                    return Request.CreateResponse(HttpStatusCode.OK, "user created");
+                    if (!db.CheckUserExist(user.username))
+                    {
+                        string hash = mgr.GetHash(user.password);
+                        db.NewUser(user.username, user.first_name, user.last_name, DateTime.Now, user.user_type, DateTime.Now, (DateTime)System.Data.SqlTypes.SqlDateTime.MinValue, hash, false, user.email, user.company, user.clientId);
+                        return Request.CreateResponse(HttpStatusCode.OK, "user created");
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.Unauthorized, "user exists");
+                    }
                 }
                 else
                 {
-                    return Request.CreateResponse(HttpStatusCode.Unauthorized, "user exists");
+                    return Request.CreateResponse(HttpStatusCode.Unauthorized, "invalid user type");
                 }
             }
             else
             {
-                return Request.CreateResponse(HttpStatusCode.Unauthorized, "invalid user type");
+                return Request.CreateResponse(HttpStatusCode.BadRequest, "bad request");
             }
         }
 

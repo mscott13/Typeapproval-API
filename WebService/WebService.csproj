@@ -199,14 +199,17 @@
     <Compile Include="Hubs\Notification.cs" />
     <Compile Include="Hubs\NotificationTicker.cs" />
     <Compile Include="Hubs\SignalRUsers.cs" />
+    <Compile Include="Models\ApplicationSearchResultMain.cs" />
     <Compile Include="Models\ClientCompany.cs" />
     <Compile Include="Models\Delete.cs" />
+    <Compile Include="Models\Form.cs" />
     <Compile Include="Models\KeyDetail.cs" />
     <Compile Include="Models\Login.cs" />
     <Compile Include="Models\LoginResult.cs" />
     <Compile Include="Models\NewUser.cs" />
     <Compile Include="Models\Notification.cs" />
     <Compile Include="Models\Message.cs" />
+    <Compile Include="Models\SearchCategory.cs" />
     <Compile Include="Models\TypeApprovalDetails.cs" />
     <Compile Include="Models\UserCredentials.cs" />
     <Compile Include="Models\UserTypes.cs" />

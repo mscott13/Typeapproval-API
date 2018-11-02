@@ -13,13 +13,24 @@ namespace WebService.Controllers
 {
     public class DataController : ApiController
     {
-        [HttpPost]
-        public HttpResponseMessage ClientCompanyList([FromBody]dynamic obj)
+        [HttpGet]
+        public HttpResponseMessage ClientCompanyList([FromUri]string q)
         {
             SLW_DatabaseInfo db = new SLW_DatabaseInfo();
-            int clientId = obj.clientId;
-            string access_key = obj.access_key;
-            return Request.CreateResponse(HttpStatusCode.OK, db.getClientDetails(clientId));
+            return Request.CreateResponse(HttpStatusCode.OK, db.getClientDetails(q));
+        }
+
+        [HttpGet]
+        public HttpResponseMessage CheckName([FromUri]string q)
+        {
+            SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+            return Request.CreateResponse(HttpStatusCode.OK, db.CheckUserExist(q));
+        }
+
+        [HttpPost]
+        public HttpResponseMessage NewApplication([FromBody] string model)
+        {
+            return null;
         }
     }
 }

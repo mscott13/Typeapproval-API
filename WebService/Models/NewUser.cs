@@ -24,5 +24,6 @@ namespace WebService.Models
         public int    user_type  { get; set; }
         public string email      { get; set; }
         public string company    { get; set; }
+        public int clientId      { get; set; }
     }
 }
