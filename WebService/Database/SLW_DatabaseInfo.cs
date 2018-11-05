@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using WebService.Models;
 using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
+using WebService.Models;
 using WebService.Other;
 
 namespace WebService.Database
@@ -41,7 +41,7 @@ namespace WebService.Database
                     details.Remarks = reader["Remarks"].ToString();
                     details.issueDate = reader.GetDateTime(6);
                     details.keyTypeApprovalID = Convert.ToInt32(reader["keyTypeApprovalID"]);
-                    details.TableInfo = getTypeApprovalTableInfo(Convert.ToInt32(reader["keyTypeApprovalID"]));
+                    details.TableInfo = GetTypeApprovalTableInfo(Convert.ToInt32(reader["keyTypeApprovalID"]));
                     data.Add(details);
                 }
             }
@@ -51,7 +51,7 @@ namespace WebService.Database
             return data;
         }
 
-        public DataTable getTypeApprovalTableInfo(int id)
+        public DataTable GetTypeApprovalTableInfo(int id)
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
@@ -179,14 +179,14 @@ namespace WebService.Database
             List<SearchCategory> items = new List<SearchCategory>();
             for (int i = 0; i < manufaturers.Count; i++)
             {
-                items.Add(new SearchCategory(manufaturers[i], "#", "", "manufacturers"));
+                items.Add(new SearchCategory(manufaturers[i], "#", "", "Manufacturers"));
             }
 
             for (int i = 0; i < models.Count; i++)
             {
-                items.Add(new SearchCategory(models[i], "#", "", "models"));
+                items.Add(new SearchCategory(models[i], "#", "", "Models"));
             }
-            
+
             return new ApplicationSearchResultMain(items);
         }
 
@@ -416,8 +416,8 @@ namespace WebService.Database
             if (reader.HasRows)
             {
                 reader.Read();
-               
-                KeyDetail key_detail = new KeyDetail(Convert.ToInt32(reader["user_id"]), reader["access_key"].ToString(), Convert.ToDateTime(reader["last_detected_activity"]), Convert.ToInt32(reader["max_inactivity_mins"]));
+
+                KeyDetail key_detail = new KeyDetail(Convert.ToInt32(reader["user_id"]), reader["username"].ToString(), reader["access_key"].ToString(), Convert.ToDateTime(reader["last_detected_activity"]), Convert.ToInt32(reader["max_inactivity_mins"]));
                 conn.Close();
                 return key_detail;
             }
@@ -446,10 +446,10 @@ namespace WebService.Database
                 while (reader.Read())
                 {
                     notifications.Add(new Notification(reader["notification_id"].ToString(), Convert.ToDateTime(reader["received_date"]),
-                                      Convert.ToDateTime(reader["read_date"]), reader["type"].ToString(), reader["target_user"].ToString(), 
+                                      Convert.ToDateTime(reader["read_date"]), reader["type"].ToString(), reader["target_user"].ToString(),
                                       Convert.ToBoolean(reader["status_read"]), reader["message"].ToString()));
                 }
-                 
+
             }
             conn.Close();
             return notifications;
@@ -464,7 +464,7 @@ namespace WebService.Database
             {
                 byte[] bytes = hash.ComputeHash(Encoding.UTF8.GetBytes(datetime + message + target_user));
 
-                for(int i=0; i<bytes.Length; i++)
+                for (int i = 0; i < bytes.Length; i++)
                 {
                     builder.Append(bytes[i].ToString("x2"));
                 }
@@ -489,7 +489,7 @@ namespace WebService.Database
         }
 
         //Data
-        public List<ClientCompany> getClientDetails(string query)
+        public List<ClientCompany> GetClientDetails(string query)
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
@@ -514,29 +514,134 @@ namespace WebService.Database
             return clientCompanies;
         }
 
-        public List<ClientCompany> getClientDetail(int clientId)
+        public ClientCompany GetClientDetail(int clientId)
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
             SqlDataReader reader = null;
-            cmd.CommandText = "sp_getClientDetail @clientCompany";
+            cmd.CommandText = "sp_getClientDetail @clientId";
             cmd.Parameters.AddWithValue("@clientId", clientId);
             cmd.Connection = conn;
-            List<ClientCompany> clientCompanies = new List<ClientCompany>();
+            ClientCompany clientCompany;
 
             conn.Open();
             reader = cmd.ExecuteReader();
 
             if (reader.HasRows)
             {
-                while (reader.Read())
-                {
-                    clientCompanies.Add(new ClientCompany(reader["clientId"].ToString(), reader["clientCompany"].ToString(), reader["clientTelNum"].ToString(),
-                                                          reader["address"].ToString(), reader["clientFaxNum"].ToString(), "city/town", "contact person", reader["nationality"].ToString()));
-                }
+                reader.Read();
+                clientCompany = new ClientCompany(reader["clientId"].ToString(), reader["clientCompany"].ToString(), reader["clientTelNum"].ToString(), "address", "fax", "city_town", "contact_person", "nationality");
+                conn.Close();
+                return clientCompany;
+            }
+            else
+            {
+                conn.Close();
+                return null;
+            }
+        }
+
+        public AssignedCompany GetAssignedCompany(string username)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader reader = null;
+            cmd.CommandText = " sp_getAssignedCompany @username";
+            cmd.Parameters.AddWithValue("@username", username);
+            cmd.Connection = conn;
+            AssignedCompany company = new AssignedCompany();
+
+            conn.Open();
+            reader = cmd.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                reader.Read();
+                company.clientId = Convert.ToInt32(reader["clientId"]);
+                company.company = reader["company"].ToString();
+                conn.Close();
+                return company;
+            }
+            else
+            {
+                conn.Close();
+                return null;
+            }
+        }
+
+        public void SaveApplication(Form form)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandText = "sp_saveFormDetails @applicationId, @username, @applicant_name, @applicant_tel, @applicant_address," +
+                              "@applicant_fax, @applicant_city_town, @applicant_contact_person, @applicant_nationality, " +
+                              "@manufacturer_name, @manufacturer_tel, @manufacturer_address, @manufacturer_fax," +
+                              "@manufacturer_contact_person, @equipment_type, @equipment_description," +
+                              "@product_identification, @ref#, @make, @software, @type_of_equipment," +
+                              "@other, @antenna_type, @antenna_gain, @channel_separation, @aspect," +
+                              "@compatibility, @security, @equipment_comm_type, @fee_code";
+
+            cmd.Parameters.AddWithValue("@applicationId", form.applicationId);
+            cmd.Parameters.AddWithValue("@username", form.username);
+            cmd.Parameters.AddWithValue("@applicant_name", form.applicant_name);
+            cmd.Parameters.AddWithValue("@applicant_tel", form.applicant_tel);
+            cmd.Parameters.AddWithValue("@applicant_address", form.applicant_address);
+            cmd.Parameters.AddWithValue("@applicant_fax", form.applicant_fax);
+            cmd.Parameters.AddWithValue("@applicant_city_town", form.applicant_city_town);
+            cmd.Parameters.AddWithValue("@applicant_contact_person", form.applicant_contact_person);
+            cmd.Parameters.AddWithValue("@applicant_nationality", form.applicant_nationality);
+            cmd.Parameters.AddWithValue("@manufacturer_name", form.manufacturer_name);
+            cmd.Parameters.AddWithValue("@manufacturer_tel", form.manufacturer_tel);
+            cmd.Parameters.AddWithValue("@manufacturer_address", form.manufacturer_address);
+            cmd.Parameters.AddWithValue("@manufacturer_fax", form.manufacturer_fax);
+            cmd.Parameters.AddWithValue("@manufacturer_contact_person", form.manufacturer_contact_person);
+            cmd.Parameters.AddWithValue("@equipment_type", form.equipment_type);
+            cmd.Parameters.AddWithValue("@equipment_description", form.equipment_description);
+            cmd.Parameters.AddWithValue("@product_identification", form.product_identification);
+            cmd.Parameters.AddWithValue("@ref#", form.refNum);
+            cmd.Parameters.AddWithValue("@make", form.make);
+            cmd.Parameters.AddWithValue("@software", form.software);
+            cmd.Parameters.AddWithValue("@type_of_equipment", form.type_of_equipment);
+            cmd.Parameters.AddWithValue("@other", form.other);
+            cmd.Parameters.AddWithValue("@antenna_type", form.antenna_type);
+            cmd.Parameters.AddWithValue("@antenna_gain", form.antenna_gain);
+            cmd.Parameters.AddWithValue("@channel_separation", form.channel_separation);
+            cmd.Parameters.AddWithValue("@aspect", form.aspect);
+            cmd.Parameters.AddWithValue("@compatibility", form.compatibility);
+            cmd.Parameters.AddWithValue("@security", form.security);
+            cmd.Parameters.AddWithValue("@equipment_comm_type", form.equipment_comm_type);
+            cmd.Parameters.AddWithValue("@fee_code", form.fee_code);
+
+            cmd.Connection = conn;
+            conn.Open();
+            cmd.ExecuteNonQuery();
+            conn.Close();
+
+            SaveFrequencies(form.frequencies);
+        }
+
+        private void SaveFrequencies(List<Frequency> frequencies)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandText = "sp_saveFrequencyDetails @applicationId, @sequence, @lower_freq, @upper_freq, @power, @tolerance, @emmission_desig, @freq_type";
+            cmd.Connection = conn;
+            conn.Open();
+
+            for (int i = 0; i < frequencies.Count; i++)
+            {
+                cmd.Parameters.AddWithValue("@applicationId", frequencies[i].application_id);
+                cmd.Parameters.AddWithValue("@sequence", frequencies[i].sequence);
+                cmd.Parameters.AddWithValue("@lower_freq", frequencies[i].lower_freq);
+                cmd.Parameters.AddWithValue("@upper_freq", frequencies[i].upper_freq);
+                cmd.Parameters.AddWithValue("@power", frequencies[i].power);
+                cmd.Parameters.AddWithValue("@emmission_desig", frequencies[i].emmission_desig);
+                cmd.Parameters.AddWithValue("@freq_type", frequencies[i].freq_type);
+
+                cmd.ExecuteNonQuery();
+                cmd.Parameters.Clear();
             }
             conn.Close();
-            return clientCompanies;
         }
     }
 }

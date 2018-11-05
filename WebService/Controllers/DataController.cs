@@ -17,7 +17,7 @@ namespace WebService.Controllers
         public HttpResponseMessage ClientCompanyList([FromUri]string q)
         {
             SLW_DatabaseInfo db = new SLW_DatabaseInfo();
-            return Request.CreateResponse(HttpStatusCode.OK, db.getClientDetails(q));
+            return Request.CreateResponse(HttpStatusCode.OK, db.GetClientDetails(q));
         }
 
         [HttpGet]
@@ -28,9 +28,20 @@ namespace WebService.Controllers
         }
 
         [HttpPost]
-        public HttpResponseMessage NewApplication([FromBody] string model)
+        public HttpResponseMessage ApplicantInfo([FromBody]dynamic data)
         {
-            return null;
+            SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+            AssignedCompany company = db.GetAssignedCompany(db.GetKeyDetail((string)data.access_key).username);
+
+            if (company == null)
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, "empty");
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, db.GetClientDetail(company.clientId));
+            }
+            
         }
     }
 }

@@ -42,7 +42,6 @@ namespace WebService.Hubs
 
         public override Task OnConnected()
         {
-            //update database to show who is online
             return base.OnConnected();
         }
              
@@ -50,7 +49,6 @@ namespace WebService.Hubs
         {
             _notificationTicker.BroadcastCurrentClients();
             string name = Context.User.Identity.Name;
-            //update database to show who is offline
             return base.OnDisconnected(stopCalled);
         }
 
