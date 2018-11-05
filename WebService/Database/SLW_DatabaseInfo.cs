@@ -507,7 +507,7 @@ namespace WebService.Database
                 while (reader.Read())
                 {
                     clientCompanies.Add(new ClientCompany(reader["clientId"].ToString(), reader["clientCompany"].ToString(), reader["clientTelNum"].ToString(),
-                                                          reader["address"].ToString(), reader["clientFaxNum"].ToString(), "city/town", "contact person", reader["nationality"].ToString()));
+                                                          reader["address"].ToString(), reader["clientFaxNum"].ToString(), "", "", reader["nationality"].ToString()));
                 }
             }
             conn.Close();
@@ -530,7 +530,7 @@ namespace WebService.Database
             if (reader.HasRows)
             {
                 reader.Read();
-                clientCompany = new ClientCompany(reader["clientId"].ToString(), reader["clientCompany"].ToString(), reader["clientTelNum"].ToString(), "address", "fax", "city_town", "contact_person", "nationality");
+                clientCompany = new ClientCompany(reader["clientId"].ToString(), reader["clientCompany"].ToString(), reader["clientTelNum"].ToString(), reader["address"].ToString(), reader["clientFaxNum"].ToString(), "", "", reader["nationality"].ToString());
                 conn.Close();
                 return clientCompany;
             }
@@ -576,7 +576,8 @@ namespace WebService.Database
             cmd.CommandText = "sp_saveFormDetails @applicationId, @username, @applicant_name, @applicant_tel, @applicant_address," +
                               "@applicant_fax, @applicant_city_town, @applicant_contact_person, @applicant_nationality, " +
                               "@manufacturer_name, @manufacturer_tel, @manufacturer_address, @manufacturer_fax," +
-                              "@manufacturer_contact_person, @equipment_type, @equipment_description," +
+                              "@manufacturer_contact_person, @provider_name, @provider_telephone, @provider_address, @provider_fax, @provider_contact_person," +
+                              " @equipment_type, @equipment_description," +
                               "@product_identification, @ref#, @make, @software, @type_of_equipment," +
                               "@other, @antenna_type, @antenna_gain, @channel_separation, @aspect," +
                               "@compatibility, @security, @equipment_comm_type, @fee_code";
@@ -595,6 +596,11 @@ namespace WebService.Database
             cmd.Parameters.AddWithValue("@manufacturer_address", form.manufacturer_address);
             cmd.Parameters.AddWithValue("@manufacturer_fax", form.manufacturer_fax);
             cmd.Parameters.AddWithValue("@manufacturer_contact_person", form.manufacturer_contact_person);
+            cmd.Parameters.AddWithValue("@provider_name", form.provider_name);
+            cmd.Parameters.AddWithValue("@provider_telephone", form.provider_telephone);
+            cmd.Parameters.AddWithValue("@provider_address", form.provider_address);
+            cmd.Parameters.AddWithValue("@provider_fax", form.provider_fax);
+            cmd.Parameters.AddWithValue("@provider_contact_person", form.provider_contact_person);
             cmd.Parameters.AddWithValue("@equipment_type", form.equipment_type);
             cmd.Parameters.AddWithValue("@equipment_description", form.equipment_description);
             cmd.Parameters.AddWithValue("@product_identification", form.product_identification);
