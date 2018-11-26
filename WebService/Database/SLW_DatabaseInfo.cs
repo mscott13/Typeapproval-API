@@ -87,7 +87,7 @@ namespace WebService.Database
             return data;
         }
 
-        public List<String> GetManufacturers(string query)
+        public List<string> GetManufacturers(string query)
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
