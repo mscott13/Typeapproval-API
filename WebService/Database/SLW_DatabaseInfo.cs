@@ -179,12 +179,12 @@ namespace WebService.Database
             List<SearchCategory> items = new List<SearchCategory>();
             for (int i = 0; i < manufaturers.Count; i++)
             {
-                items.Add(new SearchCategory(manufaturers[i], "#", "", "Manufacturers"));
+                items.Add(new SearchCategory(manufaturers[i], "http://localhost:63616/search?dealer="+manufaturers[i]+"&model=", "", "Manufacturers"));
             }
 
             for (int i = 0; i < models.Count; i++)
             {
-                items.Add(new SearchCategory(models[i], "#", "", "Models"));
+                items.Add(new SearchCategory(models[i], "http://localhost:63616/search?dealer=&model="+models[i], "", "Models"));
             }
 
             return new ApplicationSearchResultMain(items);
