@@ -15,6 +15,7 @@ using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Infrastructure;
 using WebService.Hubs;
 using WebService.Other;
+using Newtonsoft.Json;
 
 namespace WebService.Controllers
 {
@@ -41,6 +42,19 @@ namespace WebService.Controllers
             try
             {
                 await Request.Content.ReadAsMultipartAsync(provider);
+                Dictionary<string, object> keyValuePairs = new Dictionary<string, object>();
+ 
+                foreach (var key in provider.FormData.AllKeys)
+                {
+                    foreach (var data in provider.FormData.GetValues(key))
+                    {
+                        keyValuePairs.Add(key, data);
+                    }
+                }
+
+                string json = keyValuePairs["json_form"].ToString();
+                Form form = JsonConvert.DeserializeObject<Form>(json);
+
                 foreach (MultipartFileData file in provider.FileData)
                 {
                     rename = root + @"\" + file.Headers.ContentDisposition.FileName.Replace("\"", "");
