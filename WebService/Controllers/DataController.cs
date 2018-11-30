@@ -43,5 +43,11 @@ namespace WebService.Controllers
             }
             
         }
+
+        [HttpPost]
+        public HttpResponseMessage UpdateApplication([FromBody] dynamic data)
+        {
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
     }
 }

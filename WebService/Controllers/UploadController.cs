@@ -16,6 +16,7 @@ using Microsoft.AspNet.SignalR.Infrastructure;
 using WebService.Hubs;
 using WebService.Other;
 using Newtonsoft.Json;
+using WebService.Utilities;
 
 namespace WebService.Controllers
 {
@@ -55,6 +56,12 @@ namespace WebService.Controllers
                 string json = keyValuePairs["json_form"].ToString();
                 Form form = JsonConvert.DeserializeObject<Form>(json);
 
+                SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+                string application_id = Generator.guid();
+                form.application_id = application_id;
+
+                db.SaveApplication(form);
+
                 foreach (MultipartFileData file in provider.FileData)
                 {
                     rename = root + @"\" + file.Headers.ContentDisposition.FileName.Replace("\"", "");
@@ -64,7 +71,7 @@ namespace WebService.Controllers
                     }
                 }
 
-                return Request.CreateResponse(HttpStatusCode.OK);
+                return Request.CreateResponse(HttpStatusCode.OK, application_id);
             }
             catch (Exception e)
             {

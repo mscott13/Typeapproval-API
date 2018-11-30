@@ -8,7 +8,7 @@ namespace WebService.Models
     public class Form
     {
         public string access_key { get; set; }
-        public string applicationId { get; set; }
+        public string application_id { get; set; }
         public string username { get; set; }
         public string applicant_name { get; set; }
         public string applicant_tel { get; set; }
@@ -37,12 +37,14 @@ namespace WebService.Models
         public string other { get; set; }
         public string antenna_type { get; set; }
         public string antenna_gain { get; set; }
-        public string channel_separation { get; set; }
+        public string channel { get; set; }
+        public string separation { get; set; }
         public string aspect { get; set; }
         public string compatibility { get; set; }
         public string security { get; set; }
         public string equipment_comm_type { get; set; }
         public string fee_code { get; set; }
         public List<Frequency> frequencies { get; set; }
+        public bool completed { get; set; }
     }
 }

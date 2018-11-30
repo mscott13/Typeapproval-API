@@ -220,6 +220,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Hubs\startup.cs" />
     <Compile Include="startup.cs" />
+    <Compile Include="Utilities\Generator.cs" />
     <Compile Include="Utilities\Log.cs" />
     <Compile Include="Utilities\PasswordManager.cs" />
   </ItemGroup>

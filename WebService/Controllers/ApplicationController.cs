@@ -19,7 +19,7 @@ namespace WebService.Controllers
             KeyDetail keyDetail = db.GetKeyDetail(form.access_key);
 
             string applicationId = string.Format("{0}_{1:N}", "ta", Guid.NewGuid());
-            form.applicationId = applicationId;
+            form.application_id = applicationId;
 
             //db.SaveApplication(form);
             return Request.CreateResponse(HttpStatusCode.OK, "saved: "+applicationId); ;

@@ -579,10 +579,10 @@ namespace WebService.Database
                               "@manufacturer_contact_person, @provider_name, @provider_telephone, @provider_address, @provider_fax, @provider_contact_person," +
                               " @equipment_type, @equipment_description," +
                               "@product_identification, @ref#, @make, @software, @type_of_equipment," +
-                              "@other, @antenna_type, @antenna_gain, @channel_separation, @aspect," +
+                              "@other, @antenna_type, @antenna_gain, @channel,@separation, @aspect," +
                               "@compatibility, @security, @equipment_comm_type, @fee_code";
 
-            cmd.Parameters.AddWithValue("@applicationId", form.applicationId);
+            cmd.Parameters.AddWithValue("@applicationId", form.application_id);
             cmd.Parameters.AddWithValue("@username", form.username);
             cmd.Parameters.AddWithValue("@applicant_name", form.applicant_name);
             cmd.Parameters.AddWithValue("@applicant_tel", form.applicant_tel);
@@ -611,7 +611,8 @@ namespace WebService.Database
             cmd.Parameters.AddWithValue("@other", form.other);
             cmd.Parameters.AddWithValue("@antenna_type", form.antenna_type);
             cmd.Parameters.AddWithValue("@antenna_gain", form.antenna_gain);
-            cmd.Parameters.AddWithValue("@channel_separation", form.channel_separation);
+            cmd.Parameters.AddWithValue("@channel", form.channel);
+            cmd.Parameters.AddWithValue("@separation", form.separation);
             cmd.Parameters.AddWithValue("@aspect", form.aspect);
             cmd.Parameters.AddWithValue("@compatibility", form.compatibility);
             cmd.Parameters.AddWithValue("@security", form.security);
