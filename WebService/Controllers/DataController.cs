@@ -7,7 +7,7 @@ using System.Web;
 using System.Web.Http;
 using WebService.Models;
 using WebService.Database;
-
+using WebService.Utilities;
 
 namespace WebService.Controllers
 {
@@ -41,13 +41,26 @@ namespace WebService.Controllers
             {
                 return Request.CreateResponse(HttpStatusCode.OK, db.GetClientDetail(company.clientId));
             }
-            
         }
 
         [HttpPost]
-        public HttpResponseMessage UpdateApplication([FromBody] dynamic data)
+        public HttpResponseMessage CreateApplication([FromBody] Form data)
         {
-            return Request.CreateResponse(HttpStatusCode.OK);
+            if (data.application_id != null && data.application_id != "")
+            {
+                SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+                db.SaveApplication(data);
+                return Request.CreateResponse(HttpStatusCode.OK, "updated");
+            }
+            else
+            {
+                string application_id = Generator.guid();
+                SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+
+                data.application_id = application_id;
+                db.SaveApplication(data);
+                return Request.CreateResponse(HttpStatusCode.OK, application_id);
+            }
         }
     }
 }

@@ -31,7 +31,7 @@ namespace WebService.Controllers
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
             }
 
-            string root = HttpContext.Current.Server.MapPath("~/TA_APPLICATIONS");
+            string root = HttpContext.Current.Server.MapPath("~/applications");
             string rename = "";
 
             if (!Directory.Exists(root))
@@ -64,7 +64,12 @@ namespace WebService.Controllers
 
                 foreach (MultipartFileData file in provider.FileData)
                 {
-                    rename = root + @"\" + file.Headers.ContentDisposition.FileName.Replace("\"", "");
+                    rename = root + @"\"+form.username+@"\" + file.Headers.ContentDisposition.FileName.Replace("\"", "");
+                    if (!Directory.Exists(root + @"\" + form.username))
+                    {
+                        Directory.CreateDirectory(root + @"\" + form.username);
+                    }
+
                     if (!File.Exists(rename))
                     {
                         File.Move(file.LocalFileName, rename);

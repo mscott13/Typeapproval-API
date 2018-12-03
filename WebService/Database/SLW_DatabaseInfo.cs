@@ -580,7 +580,7 @@ namespace WebService.Database
                               " @equipment_type, @equipment_description," +
                               "@product_identification, @ref#, @make, @software, @type_of_equipment," +
                               "@other, @antenna_type, @antenna_gain, @channel,@separation, @aspect," +
-                              "@compatibility, @security, @equipment_comm_type, @fee_code";
+                              "@compatibility, @security, @equipment_comm_type, @fee_code, @status";
 
             cmd.Parameters.AddWithValue("@applicationId", form.application_id);
             cmd.Parameters.AddWithValue("@username", form.username);
@@ -618,11 +618,17 @@ namespace WebService.Database
             cmd.Parameters.AddWithValue("@security", form.security);
             cmd.Parameters.AddWithValue("@equipment_comm_type", form.equipment_comm_type);
             cmd.Parameters.AddWithValue("@fee_code", form.fee_code);
+            cmd.Parameters.AddWithValue("@status", form.status);
 
             cmd.Connection = conn;
             conn.Open();
             cmd.ExecuteNonQuery();
             conn.Close();
+
+            for (int i = 0; i < form.frequencies.Count; i++)
+            {
+                form.frequencies[i].application_id = form.application_id;
+            }
 
             SaveFrequencies(form.frequencies);
         }
@@ -643,6 +649,7 @@ namespace WebService.Database
                 cmd.Parameters.AddWithValue("@upper_freq", frequencies[i].upper_freq);
                 cmd.Parameters.AddWithValue("@power", frequencies[i].power);
                 cmd.Parameters.AddWithValue("@emmission_desig", frequencies[i].emmission_desig);
+                cmd.Parameters.AddWithValue("@tolerance", frequencies[i].tolerance);
                 cmd.Parameters.AddWithValue("@freq_type", frequencies[i].freq_type);
 
                 cmd.ExecuteNonQuery();

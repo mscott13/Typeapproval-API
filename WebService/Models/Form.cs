@@ -45,6 +45,6 @@ namespace WebService.Models
         public string equipment_comm_type { get; set; }
         public string fee_code { get; set; }
         public List<Frequency> frequencies { get; set; }
-        public bool completed { get; set; }
+        public string status { get; set; }
     }
 }
