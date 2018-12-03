@@ -25,7 +25,8 @@ namespace WebService.Controllers
         [HttpPost]
         public async Task<HttpResponseMessage> Multiple()
         {
-          
+
+            string application_id = "";
             if (!Request.Content.IsMimeMultipartContent())
             {
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
@@ -55,10 +56,17 @@ namespace WebService.Controllers
 
                 string json = keyValuePairs["json_form"].ToString();
                 Form form = JsonConvert.DeserializeObject<Form>(json);
-
                 SLW_DatabaseInfo db = new SLW_DatabaseInfo();
-                string application_id = Generator.guid();
-                form.application_id = application_id;
+
+                if (form.application_id == null || form.application_id == "")
+                {
+                    application_id = Generator.guid();
+                    form.application_id = application_id;
+                }
+                else
+                {
+                    application_id = form.application_id;
+                }
 
                 db.SaveApplication(form);
 

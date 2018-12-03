@@ -635,6 +635,7 @@ namespace WebService.Database
 
         private void SaveFrequencies(List<Frequency> frequencies)
         {
+            DeleteFrequencies(frequencies[0].application_id);
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
             cmd.CommandText = "sp_saveFrequencyDetails @applicationId, @sequence, @lower_freq, @upper_freq, @power, @tolerance, @emmission_desig, @freq_type";
@@ -655,6 +656,20 @@ namespace WebService.Database
                 cmd.ExecuteNonQuery();
                 cmd.Parameters.Clear();
             }
+            conn.Close();
+        }
+
+        private void DeleteFrequencies(string application_id)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandText = "sp_deleteAllFreqs @applicationId";
+            cmd.Connection = conn;
+
+            conn.Open();
+            cmd.Parameters.AddWithValue("@applicationId", application_id);
+            cmd.ExecuteNonQuery();
+            cmd.Parameters.Clear();
             conn.Close();
         }
     }
