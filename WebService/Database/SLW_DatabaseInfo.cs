@@ -6,7 +6,7 @@ using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using WebService.Models;
-using WebService.Other;
+using WebService.Commons;
 
 namespace WebService.Database
 {
@@ -630,7 +630,10 @@ namespace WebService.Database
                 form.frequencies[i].application_id = form.application_id;
             }
 
-            SaveFrequencies(form.frequencies);
+            if (form.frequencies.Count > 0)
+            {
+                SaveFrequencies(form.frequencies);
+            }
         }
 
         private void SaveFrequencies(List<Frequency> frequencies)
@@ -671,6 +674,55 @@ namespace WebService.Database
             cmd.ExecuteNonQuery();
             cmd.Parameters.Clear();
             conn.Close();
+        }
+
+        public void SaveActivity(Models.UserActivity activity)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandText = "sp_newUserActivity @username, @type, @description, @extras, @priority";
+
+            cmd.Parameters.AddWithValue("@username", activity.username);
+            cmd.Parameters.AddWithValue("@type", activity.type);
+            cmd.Parameters.AddWithValue("@description", activity.description);
+            cmd.Parameters.AddWithValue("@extras", activity.extras);
+            cmd.Parameters.AddWithValue("@priority", activity.priority);
+            cmd.Connection = conn;
+
+            conn.Open();
+            cmd.ExecuteNonQuery();
+            conn.Close();
+        }
+
+        public List<Models.UserActivity> GetUserActivities(string _username_)
+        {
+            int _priority_ = 1;
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader reader = null;
+            cmd.CommandText = " sp_getUserActivity @username, @priority";
+
+            List<Models.UserActivity> userActivities = new List<Models.UserActivity>();
+            cmd.Parameters.AddWithValue("@username", _username_);
+            cmd.Parameters.AddWithValue("@priority", _priority_);
+            cmd.Connection = conn;
+
+            conn.Open();
+            reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                int sequence = Convert.ToInt32(reader["sequence"]);
+                int priority = Convert.ToInt32(reader["priority"]);
+                string username = reader["username"].ToString();
+                string type = reader["type"].ToString();
+                string created_date = Convert.ToDateTime(reader["created_date"]).ToShortTimeString();
+                string description = reader["description"].ToString();
+                string extras = reader["extras"].ToString();
+
+                userActivities.Add(new Models.UserActivity(username, type, description, extras, priority));
+            }
+            return userActivities;
         }
     }
 }

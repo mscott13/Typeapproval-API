@@ -76,10 +76,12 @@ namespace WebService.Controllers
                     {
                         string access_key = mgr.GenerateNewAccessKey(login.username);
                         db.SetNewAccessKey(login.username, access_key);
+                        Commons.UserActivity.Record(new UserActivity(login.username, Commons.Constants.ACCOUNT_TYPE,"login sucessful", ""));
                         return Request.CreateResponse(HttpStatusCode.OK, new Models.LoginResult("credentials verified", access_key, credentials.user_type, credentials.name, login.username));
                     }
                     else
                     {
+                        Commons.UserActivity.Record(new UserActivity(login.username, Commons.Constants.ACCOUNT_TYPE, "incorrect credentials. login failed", ""));
                         return Request.CreateResponse(HttpStatusCode.Unauthorized, new Models.LoginResult("incorrect credentials", "", -1, "", login.username));
                     }
                 }

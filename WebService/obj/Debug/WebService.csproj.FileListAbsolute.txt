@@ -149,7 +149,6 @@ C:\Users\Mark Scott\Desktop\Git repositories\Typeapproval-API\WebService\bin\Mic
 C:\Users\Mark Scott\Desktop\Git repositories\Typeapproval-API\WebService\bin\Microsoft.AI.ServerTelemetryChannel.xml
 C:\Users\Mark Scott\Desktop\Git repositories\Typeapproval-API\WebService\bin\Microsoft.AI.WindowsServer.xml
 C:\Users\Mark Scott\Desktop\Git repositories\Typeapproval-API\WebService\bin\Microsoft.AI.Web.xml
-C:\Users\Mark Scott\Desktop\Git repositories\Typeapproval-API\WebService\obj\Debug\WebService.csprojAssemblyReference.cache
 C:\Users\Mark Scott\Desktop\Git repositories\Typeapproval-API\WebService\obj\Debug\WebService.csproj.CoreCompileInputs.cache
 C:\Users\Mark Scott\Desktop\Git repositories\Typeapproval-API\WebService\obj\Debug\WebService.csproj.CopyComplete
 C:\Users\Mark Scott\Desktop\Git repositories\Typeapproval-API\WebService\obj\Debug\WebService.dll

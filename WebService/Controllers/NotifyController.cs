@@ -3,7 +3,7 @@ using System.Net.Http;
 using System.Web.Http;
 using WebService.Database;
 using WebService.Models;
-using WebService.Other;
+using WebService.Commons;
 
 namespace WebService.Controllers
 {

@@ -50,6 +50,8 @@ namespace WebService.Controllers
             {
                 SLW_DatabaseInfo db = new SLW_DatabaseInfo();
                 db.SaveApplication(data);
+
+                Commons.UserActivity.Record(new UserActivity(data.username, Commons.Constants.UPDATE, data.application_id, data.status));
                 return Request.CreateResponse(HttpStatusCode.OK, "updated");
             }
             else
@@ -59,7 +61,28 @@ namespace WebService.Controllers
 
                 data.application_id = application_id;
                 db.SaveApplication(data);
+
+                Commons.UserActivity.Record(new UserActivity(data.username, Commons.Constants.NEW_APPLICATION_TYPE, data.application_id, data.status));
                 return Request.CreateResponse(HttpStatusCode.OK, application_id);
+            }
+        }
+
+        [HttpPost]
+        public HttpResponseMessage GetUserActivities([FromBody] string access_key)
+        {
+            SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+            List<UserActivity> userActivities = new List<UserActivity>();
+
+            KeyDetail detail = db.GetKeyDetail(access_key);
+
+            if (detail.data_present)
+            {
+                userActivities = db.GetUserActivities(detail.username);
+                return Request.CreateResponse(HttpStatusCode.OK, userActivities);
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Forbidden, "invalid key");
             }
         }
     }

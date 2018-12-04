@@ -14,7 +14,6 @@ using System.Text.RegularExpressions;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Infrastructure;
 using WebService.Hubs;
-using WebService.Other;
 using Newtonsoft.Json;
 using WebService.Utilities;
 
@@ -69,6 +68,7 @@ namespace WebService.Controllers
                 }
 
                 db.SaveApplication(form);
+                Commons.UserActivity.Record(new UserActivity(form.username, Commons.Constants.SUBMISSION_TYPE, form.application_id, form.status));
 
                 foreach (MultipartFileData file in provider.FileData)
                 {
