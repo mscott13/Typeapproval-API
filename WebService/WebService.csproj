@@ -213,6 +213,7 @@
     <Compile Include="Models\NewUser.cs" />
     <Compile Include="Models\Notification.cs" />
     <Compile Include="Models\Message.cs" />
+    <Compile Include="Models\RecentDocuments.cs" />
     <Compile Include="Models\SearchCategory.cs" />
     <Compile Include="Models\TypeApprovalDetails.cs" />
     <Compile Include="Models\UserActivity.cs" />

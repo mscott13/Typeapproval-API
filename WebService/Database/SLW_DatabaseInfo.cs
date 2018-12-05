@@ -716,13 +716,40 @@ namespace WebService.Database
                 int priority = Convert.ToInt32(reader["priority"]);
                 string username = reader["username"].ToString();
                 string type = reader["type"].ToString();
-                string created_date = Convert.ToDateTime(reader["created_date"]).ToShortTimeString();
+                string created_date = Convert.ToDateTime(reader["created_date"]).ToShortDateString()+" "+ Convert.ToDateTime(reader["created_date"]).ToShortTimeString();
                 string description = reader["description"].ToString();
                 string extras = reader["extras"].ToString();
 
-                userActivities.Add(new Models.UserActivity(username, type, description, extras, priority));
+                userActivities.Add(new Models.UserActivity(username, type, description, extras, priority, created_date));
             }
             return userActivities;
+        }
+
+        public List<RecentDocuments> GetRecentDocuments(string _username_)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader reader = null;
+            cmd.CommandText = " sp_getRecentDocs @username, @days_range";
+
+            List<RecentDocuments> recentDocuments = new List<RecentDocuments>();
+            cmd.Parameters.AddWithValue("@username", _username_);
+            cmd.Parameters.AddWithValue("@days_range", 10);
+            cmd.Connection = conn;
+
+            conn.Open();
+            reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                string application_id = reader["application_id"].ToString();
+                string created_date = Convert.ToDateTime(reader["created_date"]).ToShortDateString()+" " + Convert.ToDateTime(reader["created_date"]).ToShortTimeString();
+                string last_update = Convert.ToDateTime(reader["last_updated"]).ToShortDateString() + " " + Convert.ToDateTime(reader["last_updated"]).ToShortTimeString();
+                string status = reader["status"].ToString();
+                recentDocuments.Add(new RecentDocuments(application_id, created_date, status,last_update));
+            }
+            conn.Close();
+            return recentDocuments;
         }
     }
 }
