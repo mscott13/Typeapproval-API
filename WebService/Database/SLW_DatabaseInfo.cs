@@ -719,8 +719,9 @@ namespace WebService.Database
                 string created_date = Convert.ToDateTime(reader["created_date"]).ToShortDateString()+" "+ Convert.ToDateTime(reader["created_date"]).ToShortTimeString();
                 string description = reader["description"].ToString();
                 string extras = reader["extras"].ToString();
+                string current_status = reader["current_status"].ToString();
 
-                userActivities.Add(new Models.UserActivity(username, type, description, extras, priority, created_date));
+                userActivities.Add(new Models.UserActivity(username, type, description, extras, priority, created_date, current_status));
             }
             return userActivities;
         }
@@ -746,10 +747,104 @@ namespace WebService.Database
                 string created_date = Convert.ToDateTime(reader["created_date"]).ToShortDateString()+" " + Convert.ToDateTime(reader["created_date"]).ToShortTimeString();
                 string last_update = Convert.ToDateTime(reader["last_updated"]).ToShortDateString() + " " + Convert.ToDateTime(reader["last_updated"]).ToShortTimeString();
                 string status = reader["status"].ToString();
-                recentDocuments.Add(new RecentDocuments(application_id, created_date, status,last_update));
+                string current_status = reader["current_status"].ToString();
+                recentDocuments.Add(new RecentDocuments(application_id, created_date, status,last_update, current_status));
             }
             conn.Close();
             return recentDocuments;
+        }
+
+        public Form GetApplication(string application_id)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader reader = null;
+            cmd.CommandText = "sp_getForm @application_id";
+
+            Form form = new Form();
+            cmd.Parameters.AddWithValue("@application_id", application_id);
+            cmd.Connection = conn;
+
+            conn.Open();
+            reader = cmd.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                reader.Read();
+                form.application_id = application_id;
+                form.applicant_name = reader["applicant_name"].ToString();
+                form.applicant_tel = reader["applicant_tel"].ToString();
+                form.applicant_address = reader["applicant_address"].ToString();
+                form.applicant_fax = reader["applicant_fax"].ToString();
+                form.applicant_contact_person = reader["applicant_contact_person"].ToString();
+                form.applicant_city_town = reader["applicant_city_town"].ToString();
+                form.applicant_nationality = reader["applicant_nationality"].ToString();
+                form.manufacturer_name = reader["manufacturer_name"].ToString();
+                form.manufacturer_tel = reader["manufacturer_tel"].ToString();
+                form.manufacturer_address = reader["manufacturer_address"].ToString();
+                form.manufacturer_fax = reader["manufacturer_fax"].ToString();
+                form.manufacturer_contact_person = reader["manufacturer_contact_person"].ToString();
+                form.provider_name = reader["provider_name"].ToString();
+                form.provider_telephone = reader["provider_telephone"].ToString();
+                form.provider_address = reader["provider_address"].ToString();
+                form.provider_fax = reader["provider_fax"].ToString();
+                form.provider_contact_person = reader["provider_contact_person"].ToString();
+                form.equipment_type = reader["equipment_type"].ToString();
+                form.equipment_description = reader["equipment_description"].ToString();
+                form.product_identification = reader["product_identifiation"].ToString();
+                form.refNum = reader["ref#"].ToString();
+                form.make = reader["make"].ToString();
+                form.software = reader["software"].ToString();
+                form.type_of_equipment = reader["type_of_equipment"].ToString();
+                form.other = reader["other"].ToString();
+                form.antenna_type = reader["antenna_type"].ToString();
+                form.antenna_gain = reader["antenna_gain"].ToString();
+                form.channel = reader["channel"].ToString();
+                form.separation = reader["separation"].ToString();
+                form.aspect = reader["aspect"].ToString();
+                form.compatibility = reader["compatibility"].ToString();
+                form.security = reader["security"].ToString();
+                form.equipment_comm_type = reader["equipment_comm_type"].ToString();
+                form.fee_code = reader["fee_code"].ToString();
+                form.status = reader["current_status"].ToString();
+            }
+            conn.Close();
+
+            form.frequencies = GetFrequencies(application_id);
+            return form;
+        }
+
+        public List<Frequency> GetFrequencies(string application_id)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader reader = null;
+            cmd.CommandText = "sp_getFrequencies @application_id";
+
+            List<Frequency> frequencies = new List<Frequency>();
+            cmd.Parameters.AddWithValue("@application_id", application_id);
+            cmd.Connection = conn;
+
+            conn.Open();
+            reader = cmd.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    int sequence = Convert.ToInt32(reader["sequence"]);
+                    string lower_freq = reader["lower_freq"].ToString();
+                    string upper_freq = reader["upper_freq"].ToString();
+                    string power = reader["power"].ToString();
+                    string tolerance = reader["tolerance"].ToString();
+                    string emmision_desig = reader["emmision_desig"].ToString();
+                    string freq_type = reader["emmision_desig"].ToString();
+
+                    frequencies.Add(new Frequency(application_id, sequence, lower_freq, upper_freq, power, tolerance, emmision_desig, freq_type));
+                }
+            }
+            conn.Close();
+            return frequencies;
         }
     }
 }

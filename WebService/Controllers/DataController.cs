@@ -103,5 +103,25 @@ namespace WebService.Controllers
                 return Request.CreateResponse(HttpStatusCode.Forbidden, "invalid key");
             }
         }
+
+        [HttpPost]
+        public HttpResponseMessage GetApplication([FromBody] dynamic data)
+        {
+            string access_key = (string)data.access_key;
+            string application_id = (string)data.application_id;
+
+            SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+            KeyDetail detail = db.GetKeyDetail(access_key);
+
+            if (detail.data_present)
+            {
+                Form form = db.GetApplication(application_id);
+                return Request.CreateResponse(HttpStatusCode.OK, form);
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Forbidden, "invalid key");
+            }
+        }
     }
 }

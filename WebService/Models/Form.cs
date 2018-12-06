@@ -7,6 +7,49 @@ namespace WebService.Models
 {
     public class Form
     {
+        public Form()
+        {
+            access_key = "";
+            application_id = "";
+            username = "";
+            applicant_name = "";
+            applicant_tel = "";
+            applicant_address = "";
+            applicant_fax = "";
+            applicant_city_town = "";
+            applicant_contact_person = "";
+            applicant_nationality = "";
+            manufacturer_name = "";
+            manufacturer_tel = "";
+            manufacturer_address = "";
+            manufacturer_fax = "";
+            manufacturer_contact_person = "";
+            provider_name = "";
+            provider_telephone = "";
+            provider_address = "";
+            provider_fax = "";
+            provider_contact_person = "";
+            equipment_type = "";
+            equipment_description = "";
+            product_identification = "";
+            refNum = "";
+            make = "";
+            software = "";
+            type_of_equipment = "";
+            other = "";
+            antenna_type = "";
+            antenna_gain = "";
+            channel = "";
+            separation = "";
+            aspect = "";
+            compatibility = "";
+            security = "";
+            equipment_comm_type = "";
+            fee_code = "";
+            List<Frequency> frequencies = new List<Frequency>();
+
+        }
+
         public string access_key { get; set; }
         public string application_id { get; set; }
         public string username { get; set; }
