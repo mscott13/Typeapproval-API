@@ -123,5 +123,23 @@ namespace WebService.Controllers
                 return Request.CreateResponse(HttpStatusCode.Forbidden, "invalid key");
             }
         }
+
+        [HttpPost]
+        public HttpResponseMessage GetSavedApplications([FromBody] dynamic data)
+        {
+            string access_key = (string)data;
+            SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+            KeyDetail detail = db.GetKeyDetail(access_key);
+
+            if (detail.data_present)
+            {
+                List<SavedApplications> savedApplications = db.GetSavedApplications(detail.username);
+                return Request.CreateResponse(HttpStatusCode.OK, savedApplications);
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Forbidden, "invalid key");
+            }
+        }
     }
 }

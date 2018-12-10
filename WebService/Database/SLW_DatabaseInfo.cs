@@ -754,6 +754,32 @@ namespace WebService.Database
             return recentDocuments;
         }
 
+        public List<SavedApplications> GetSavedApplications(string _username_)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader reader = null;
+            cmd.CommandText = " sp_getSavedApplications @username";
+
+            List<SavedApplications> savedApplications = new List<SavedApplications>();
+            cmd.Parameters.AddWithValue("@username", _username_);
+            cmd.Connection = conn;
+
+            conn.Open();
+            reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                string application_id = reader["application_id"].ToString();
+                string created_date = Convert.ToDateTime(reader["created_date"]).ToShortDateString() + " " + Convert.ToDateTime(reader["created_date"]).ToShortTimeString();
+                string last_update = Convert.ToDateTime(reader["last_updated"]).ToShortDateString() + " " + Convert.ToDateTime(reader["last_updated"]).ToShortTimeString();
+              
+                savedApplications.Add(new SavedApplications(application_id, created_date, last_update));
+            }
+            conn.Close();
+            return savedApplications;
+        }
+
         public Form GetApplication(string application_id)
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
@@ -838,7 +864,7 @@ namespace WebService.Database
                     string power = reader["power"].ToString();
                     string tolerance = reader["tolerance"].ToString();
                     string emmision_desig = reader["emmision_desig"].ToString();
-                    string freq_type = reader["emmision_desig"].ToString();
+                    string freq_type = reader["freq_type"].ToString();
 
                     frequencies.Add(new Frequency(application_id, sequence, lower_freq, upper_freq, power, tolerance, emmision_desig, freq_type));
                 }
