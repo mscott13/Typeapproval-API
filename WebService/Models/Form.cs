@@ -24,11 +24,6 @@ namespace WebService.Models
             manufacturer_address = "";
             manufacturer_fax = "";
             manufacturer_contact_person = "";
-            provider_name = "";
-            provider_telephone = "";
-            provider_address = "";
-            provider_fax = "";
-            provider_contact_person = "";
             equipment_type = "";
             equipment_description = "";
             product_identification = "";
@@ -65,11 +60,6 @@ namespace WebService.Models
         public string manufacturer_address { get; set; }
         public string manufacturer_fax { get; set; }
         public string manufacturer_contact_person { get; set; }
-        public string provider_name { get; set; }
-        public string provider_telephone { get; set; }
-        public string provider_address { get; set; }
-        public string provider_fax { get; set; }
-        public string provider_contact_person { get; set; }
         public string equipment_type { get; set; }
         public string equipment_description { get; set; }
         public string product_identification { get; set; }
