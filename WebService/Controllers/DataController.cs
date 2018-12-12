@@ -43,6 +43,20 @@ namespace WebService.Controllers
             }
         }
 
+        [HttpGet]
+        public HttpResponseMessage ManufacturersDetail([FromUri]string q)
+        {
+            if (q == null)
+            {
+                q = "";
+            }
+
+            SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+            List<Manufacturer> data = db.GetManufacturers(q);
+            return Request.CreateResponse(HttpStatusCode.OK, data);
+        }
+
+
         [HttpPost]
         public HttpResponseMessage CreateApplication([FromBody] Form data)
         {

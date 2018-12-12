@@ -37,7 +37,7 @@ namespace WebService.Controllers
             }
 
             SLW_DatabaseInfo db = new SLW_DatabaseInfo();
-            List<string> data = db.GetManufacturers(q);
+            List<string> data = db.GetManufacturersByName(q);
             return Request.CreateResponse(HttpStatusCode.OK, data);
         }
 
