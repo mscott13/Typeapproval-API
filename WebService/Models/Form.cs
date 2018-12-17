@@ -41,6 +41,8 @@ namespace WebService.Models
             security = "";
             equipment_comm_type = "";
             fee_code = "";
+            category = "";
+
             List<Frequency> frequencies = new List<Frequency>();
 
         }
@@ -79,5 +81,6 @@ namespace WebService.Models
         public string fee_code { get; set; }
         public List<Frequency> frequencies { get; set; }
         public string status { get; set; }
+        public string category { get; set; }
     }
 }

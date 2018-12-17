@@ -201,19 +201,24 @@
     <Compile Include="Hubs\Notification.cs" />
     <Compile Include="Hubs\NotificationTicker.cs" />
     <Compile Include="Hubs\SignalRUsers.cs" />
+    <Compile Include="Models\ApplicationCounters.cs" />
     <Compile Include="Models\ApplicationSearchResultMain.cs" />
     <Compile Include="Models\AssignedCompany.cs" />
     <Compile Include="Models\ClientCompany.cs" />
+    <Compile Include="Models\Dashboard.cs" />
     <Compile Include="Models\Delete.cs" />
     <Compile Include="Models\Form.cs" />
     <Compile Include="Models\Frequency.cs" />
     <Compile Include="Models\KeyDetail.cs" />
+    <Compile Include="Models\LicensedApplication.cs" />
     <Compile Include="Models\Login.cs" />
     <Compile Include="Models\LoginResult.cs" />
     <Compile Include="Models\Manufacturer.cs" />
     <Compile Include="Models\NewUser.cs" />
     <Compile Include="Models\Notification.cs" />
     <Compile Include="Models\Message.cs" />
+    <Compile Include="Models\PendingApproval.cs" />
+    <Compile Include="Models\RecentActivity.cs" />
     <Compile Include="Models\RecentDocuments.cs" />
     <Compile Include="Models\SavedApplications.cs" />
     <Compile Include="Models\SearchCategory.cs" />
@@ -249,7 +254,6 @@
   <ItemGroup>
     <Folder Include="Uploads\" />
     <Folder Include="Views\Data\" />
-    <Folder Include="Views\Form\" />
     <Folder Include="Views\Notifiy\" />
   </ItemGroup>
   <ItemGroup>

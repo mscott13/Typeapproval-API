@@ -68,6 +68,9 @@ namespace WebService.Controllers
                 }
 
                 db.SaveApplication(form);
+                form.category = Commons.Constants.TYPE_APPROVAL;
+                form.status = Commons.Constants.INCOMPLETE_TYPE;
+
                 Commons.UserActivity.Record(new UserActivity(form.username, Commons.Constants.SUBMISSION_TYPE, form.application_id, form.status));
 
                 foreach (MultipartFileData file in provider.FileData)

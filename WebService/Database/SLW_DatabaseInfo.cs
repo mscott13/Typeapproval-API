@@ -134,7 +134,7 @@ namespace WebService.Database
             }
             reader.Close();
             conn.Close();
-            
+
             return FixDuplicates(manufacturers);
         }
 
@@ -240,12 +240,12 @@ namespace WebService.Database
             List<SearchCategory> items = new List<SearchCategory>();
             for (int i = 0; i < manufaturers.Count; i++)
             {
-                items.Add(new SearchCategory(manufaturers[i], "http://localhost:63616/search?dealer="+manufaturers[i]+"&model=", "", "Manufacturers"));
+                items.Add(new SearchCategory(manufaturers[i], "http://localhost:63616/search?dealer=" + manufaturers[i] + "&model=", "", "Manufacturers"));
             }
 
             for (int i = 0; i < models.Count; i++)
             {
-                items.Add(new SearchCategory(models[i], "http://localhost:63616/search?dealer=&model="+models[i], "", "Models"));
+                items.Add(new SearchCategory(models[i], "http://localhost:63616/search?dealer=&model=" + models[i], "", "Models"));
             }
 
             return new ApplicationSearchResultMain(items);
@@ -641,7 +641,7 @@ namespace WebService.Database
                               "@equipment_type, @equipment_description," +
                               "@product_identification, @ref#, @make, @software, @type_of_equipment," +
                               "@other, @antenna_type, @antenna_gain, @channel,@separation, @aspect," +
-                              "@compatibility, @security, @equipment_comm_type, @fee_code, @status";
+                              "@compatibility, @security, @equipment_comm_type, @fee_code, @status, @category";
 
             cmd.Parameters.AddWithValue("@applicationId", form.application_id);
             cmd.Parameters.AddWithValue("@username", form.username);
@@ -675,6 +675,7 @@ namespace WebService.Database
             cmd.Parameters.AddWithValue("@equipment_comm_type", form.equipment_comm_type);
             cmd.Parameters.AddWithValue("@fee_code", form.fee_code);
             cmd.Parameters.AddWithValue("@status", form.status);
+            cmd.Parameters.AddWithValue("category", form.category);
 
             cmd.Connection = conn;
             conn.Open();
@@ -772,7 +773,7 @@ namespace WebService.Database
                 int priority = Convert.ToInt32(reader["priority"]);
                 string username = reader["username"].ToString();
                 string type = reader["type"].ToString();
-                string created_date = Convert.ToDateTime(reader["created_date"]).ToShortDateString()+" "+ Convert.ToDateTime(reader["created_date"]).ToShortTimeString();
+                string created_date = Convert.ToDateTime(reader["created_date"]).ToShortDateString() + " " + Convert.ToDateTime(reader["created_date"]).ToShortTimeString();
                 string description = reader["description"].ToString();
                 string extras = reader["extras"].ToString();
                 string current_status = reader["current_status"].ToString();
@@ -800,11 +801,11 @@ namespace WebService.Database
             while (reader.Read())
             {
                 string application_id = reader["application_id"].ToString();
-                string created_date = Convert.ToDateTime(reader["created_date"]).ToShortDateString()+" " + Convert.ToDateTime(reader["created_date"]).ToShortTimeString();
+                string created_date = Convert.ToDateTime(reader["created_date"]).ToShortDateString() + " " + Convert.ToDateTime(reader["created_date"]).ToShortTimeString();
                 string last_update = Convert.ToDateTime(reader["last_updated"]).ToShortDateString() + " " + Convert.ToDateTime(reader["last_updated"]).ToShortTimeString();
                 string status = reader["status"].ToString();
                 string current_status = reader["current_status"].ToString();
-                recentDocuments.Add(new RecentDocuments(application_id, created_date, status,last_update, current_status));
+                recentDocuments.Add(new RecentDocuments(application_id, created_date, status, last_update, current_status));
             }
             conn.Close();
             return recentDocuments;
@@ -829,7 +830,7 @@ namespace WebService.Database
                 string application_id = reader["application_id"].ToString();
                 string created_date = Convert.ToDateTime(reader["created_date"]).ToShortDateString() + " " + Convert.ToDateTime(reader["created_date"]).ToShortTimeString();
                 string last_update = Convert.ToDateTime(reader["last_updated"]).ToShortDateString() + " " + Convert.ToDateTime(reader["last_updated"]).ToShortTimeString();
-              
+
                 savedApplications.Add(new SavedApplications(application_id, created_date, last_update));
             }
             conn.Close();
@@ -922,6 +923,114 @@ namespace WebService.Database
             }
             conn.Close();
             return frequencies;
+        }
+
+        public ApplicationCounters GetApplicationCounters(string username)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader reader = null;
+            cmd.CommandText = "sp_getApplicationCounters @username";
+
+            ApplicationCounters applicationCounters = new ApplicationCounters();
+            cmd.Parameters.AddWithValue("@username", username);
+            cmd.Connection = conn;
+
+            reader = cmd.ExecuteReader();
+            if (reader.HasRows)
+            {
+                reader.Read();
+                applicationCounters.licensed_applications = Convert.ToInt32(reader["licensed_apps"]);
+                applicationCounters.pending_applications = Convert.ToInt32(reader["pending_apps"]);
+                applicationCounters.incomplete_applications = Convert.ToInt32(reader["incomplete_apps"]);
+            }
+            conn.Close();
+            return applicationCounters;
+        }
+
+        public List<RecentActivity> GetRecentActivities(string username)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader reader = null;
+            cmd.CommandText = "sp_getRecentActivities @username";
+            List<RecentActivity> recentActivities = new List<RecentActivity>();
+
+            cmd.Parameters.AddWithValue("@username", username);
+            cmd.Connection = conn;
+            reader = cmd.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    recentActivities.Add(new RecentActivity(reader["application_id"].ToString(), reader["manufacturer"].ToString(), reader["model"].ToString(), Convert.ToDateTime(reader["created_date"]).ToShortDateString(), Convert.ToDateTime(reader["licensed_date"]).ToShortDateString(), reader["author"].ToString(), reader["category"].ToString(), reader["status"].ToString()));
+                }
+            }
+            conn.Close();
+            return recentActivities;
+        }
+
+        public List<LicensedApplication> GetLicensedApplications(string username)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader reader = null;
+            cmd.CommandText = "sp_getLicensedApplications @username";
+            List<LicensedApplication> licensedApplications = new List<LicensedApplication>();
+
+            cmd.Parameters.AddWithValue("@username", username);
+            cmd.Connection = conn;
+            reader = cmd.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    licensedApplications.Add(new LicensedApplication(reader["application_id"].ToString(), reader["manufacturer"].ToString(), reader["model"].ToString(), reader["created_date"].ToString(), reader["licensed_date"].ToString(), reader["author"].ToString(), reader["category"].ToString()));
+                }
+            }
+            conn.Close();
+            return licensedApplications;
+        }
+
+        public List<PendingApproval> GetPendingApprovals(string username)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader reader = null;
+            cmd.CommandText = "sp_getPendingApprovals @username";
+            List<PendingApproval> pendingApprovals = new List<PendingApproval>();
+
+            cmd.Parameters.AddWithValue("@username", username);
+            cmd.Connection = conn;
+            reader = cmd.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    pendingApprovals.Add(new PendingApproval(reader["application_id"].ToString(), reader["manufacturer"].ToString(), reader["model"].ToString(), reader["created_date"].ToString(), reader["licensed_date"].ToString(), reader["author"].ToString(), reader["category"].ToString()));
+                }
+            }
+            conn.Close();
+            return pendingApprovals;
+        }
+
+        public Dashboard GetDashboardData(string username)
+        {
+            Dashboard dashboard = new Dashboard();
+            ApplicationCounters applicationCounters = GetApplicationCounters(username);
+
+            dashboard.licensed_app_count = applicationCounters.licensed_applications;
+            dashboard.pending_app_count = applicationCounters.pending_applications;
+            dashboard.incomplete_app_count = applicationCounters.incomplete_applications;
+
+            dashboard.recentActivities = GetRecentActivities(username);
+            dashboard.licensedApplications = GetLicensedApplications(username);
+            dashboard.pendingApprovals = GetPendingApprovals(username);
+
+            return null;
         }
     }
 }

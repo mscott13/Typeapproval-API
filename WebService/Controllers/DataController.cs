@@ -63,6 +63,8 @@ namespace WebService.Controllers
             if (data.application_id != null && data.application_id != "")
             {
                 SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+                data.category = Commons.Constants.TYPE_APPROVAL;
+                data.status = Commons.Constants.INCOMPLETE_TYPE;
                 db.SaveApplication(data);
 
                 Commons.UserActivity.Record(new UserActivity(data.username, Commons.Constants.UPDATE, data.application_id, data.status));
@@ -74,6 +76,8 @@ namespace WebService.Controllers
                 SLW_DatabaseInfo db = new SLW_DatabaseInfo();
 
                 data.application_id = application_id;
+                data.category = Commons.Constants.TYPE_APPROVAL;
+                data.status = Commons.Constants.INCOMPLETE_TYPE;
                 db.SaveApplication(data);
 
                 Commons.UserActivity.Record(new UserActivity(data.username, Commons.Constants.NEW_APPLICATION_TYPE, data.application_id, data.status));
