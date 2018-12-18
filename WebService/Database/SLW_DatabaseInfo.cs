@@ -885,6 +885,7 @@ namespace WebService.Database
                 form.equipment_comm_type = reader["equipment_comm_type"].ToString();
                 form.fee_code = reader["fee_code"].ToString();
                 form.status = reader["current_status"].ToString();
+                form.category = reader["category"].ToString();
             }
             conn.Close();
 
@@ -936,6 +937,7 @@ namespace WebService.Database
             cmd.Parameters.AddWithValue("@username", username);
             cmd.Connection = conn;
 
+            conn.Open();
             reader = cmd.ExecuteReader();
             if (reader.HasRows)
             {
@@ -958,6 +960,8 @@ namespace WebService.Database
 
             cmd.Parameters.AddWithValue("@username", username);
             cmd.Connection = conn;
+
+            conn.Open();
             reader = cmd.ExecuteReader();
 
             if (reader.HasRows)
@@ -981,6 +985,8 @@ namespace WebService.Database
 
             cmd.Parameters.AddWithValue("@username", username);
             cmd.Connection = conn;
+
+            conn.Open();
             reader = cmd.ExecuteReader();
 
             if (reader.HasRows)
@@ -1004,6 +1010,8 @@ namespace WebService.Database
 
             cmd.Parameters.AddWithValue("@username", username);
             cmd.Connection = conn;
+
+            conn.Open();
             reader = cmd.ExecuteReader();
 
             if (reader.HasRows)
@@ -1030,7 +1038,7 @@ namespace WebService.Database
             dashboard.licensedApplications = GetLicensedApplications(username);
             dashboard.pendingApprovals = GetPendingApprovals(username);
 
-            return null;
+            return dashboard;
         }
     }
 }

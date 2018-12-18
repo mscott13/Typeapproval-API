@@ -67,9 +67,9 @@ namespace WebService.Controllers
                     application_id = form.application_id;
                 }
 
-                db.SaveApplication(form);
                 form.category = Commons.Constants.TYPE_APPROVAL;
-                form.status = Commons.Constants.INCOMPLETE_TYPE;
+                form.status = Commons.Constants.SUBMITTED_TYPE;
+                db.SaveApplication(form);
 
                 Commons.UserActivity.Record(new UserActivity(form.username, Commons.Constants.SUBMISSION_TYPE, form.application_id, form.status));
 

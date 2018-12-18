@@ -1,0 +1,4 @@
+﻿Parse error on line 1:
+e
+^
+Expecting 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '[', got 'undefined'

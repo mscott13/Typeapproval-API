@@ -159,5 +159,23 @@ namespace WebService.Controllers
                 return Request.CreateResponse(HttpStatusCode.Forbidden, "invalid key");
             }
         }
+
+        [HttpPost]
+        public HttpResponseMessage GetDashboardFeed([FromBody] string access_key)
+        {
+            SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+            Dashboard dashboard = new Dashboard();
+            KeyDetail detail = db.GetKeyDetail(access_key);
+
+            if (detail.data_present)
+            {
+                dashboard = db.GetDashboardData(detail.username);
+                return Request.CreateResponse(HttpStatusCode.OK, dashboard);
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Forbidden, "invalid key");
+            }
+        }
     }
 }
