@@ -640,8 +640,7 @@ namespace WebService.Database
                               "@manufacturer_contact_person," +
                               "@equipment_type, @equipment_description," +
                               "@product_identification, @ref#, @make, @software, @type_of_equipment," +
-                              "@other, @antenna_type, @antenna_gain, @channel,@separation, @aspect," +
-                              "@compatibility, @security, @equipment_comm_type, @fee_code, @status, @category";
+                              "@other, @antenna_type, @antenna_gain, @channel,@separation, @additional_info, @status, @category";
 
             cmd.Parameters.AddWithValue("@applicationId", form.application_id);
             cmd.Parameters.AddWithValue("@username", form.username);
@@ -669,11 +668,7 @@ namespace WebService.Database
             cmd.Parameters.AddWithValue("@antenna_gain", form.antenna_gain);
             cmd.Parameters.AddWithValue("@channel", form.channel);
             cmd.Parameters.AddWithValue("@separation", form.separation);
-            cmd.Parameters.AddWithValue("@aspect", form.aspect);
-            cmd.Parameters.AddWithValue("@compatibility", form.compatibility);
-            cmd.Parameters.AddWithValue("@security", form.security);
-            cmd.Parameters.AddWithValue("@equipment_comm_type", form.equipment_comm_type);
-            cmd.Parameters.AddWithValue("@fee_code", form.fee_code);
+            cmd.Parameters.AddWithValue("@additional_info", form.additional_info);
             cmd.Parameters.AddWithValue("@status", form.status);
             cmd.Parameters.AddWithValue("category", form.category);
 
@@ -879,16 +874,12 @@ namespace WebService.Database
                 form.antenna_gain = reader["antenna_gain"].ToString();
                 form.channel = reader["channel"].ToString();
                 form.separation = reader["separation"].ToString();
-                form.aspect = reader["aspect"].ToString();
-                form.compatibility = reader["compatibility"].ToString();
-                form.security = reader["security"].ToString();
-                form.equipment_comm_type = reader["equipment_comm_type"].ToString();
-                form.fee_code = reader["fee_code"].ToString();
                 form.status = reader["current_status"].ToString();
                 form.category = reader["category"].ToString();
+                form.additional_info = reader["additional_info"].ToString();
             }
-            conn.Close();
 
+            conn.Close();
             form.frequencies = GetFrequencies(application_id);
             return form;
         }
@@ -1039,6 +1030,26 @@ namespace WebService.Database
             dashboard.pendingApprovals = GetPendingApprovals(username);
 
             return dashboard;
+        }
+
+        public void AddFileReference(string filename, DateTime created_date, string path, string application_id, string name_of_test, string country, string username)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandText = "sp_addFile @filename, @created_date, @path, @application_id, @username";
+
+            cmd.Parameters.AddWithValue("@filename", filename);
+            cmd.Parameters.AddWithValue("@created_date", created_date);
+            cmd.Parameters.AddWithValue("@path", path);
+            cmd.Parameters.AddWithValue("@application_id", application_id);
+            cmd.Parameters.AddWithValue("@name_of_test", name_of_test);
+            cmd.Parameters.AddWithValue("@application_id", country);
+            cmd.Parameters.AddWithValue("@username", username);
+            cmd.Connection = conn;
+
+            conn.Open();
+            cmd.ExecuteNonQuery();
+            conn.Close();
         }
     }
 }

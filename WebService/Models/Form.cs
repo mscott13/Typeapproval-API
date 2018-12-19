@@ -36,15 +36,10 @@ namespace WebService.Models
             antenna_gain = "";
             channel = "";
             separation = "";
-            aspect = "";
-            compatibility = "";
-            security = "";
-            equipment_comm_type = "";
-            fee_code = "";
             category = "";
+            additional_info = "";
 
             List<Frequency> frequencies = new List<Frequency>();
-
         }
 
         public string access_key { get; set; }
@@ -74,11 +69,7 @@ namespace WebService.Models
         public string antenna_gain { get; set; }
         public string channel { get; set; }
         public string separation { get; set; }
-        public string aspect { get; set; }
-        public string compatibility { get; set; }
-        public string security { get; set; }
-        public string equipment_comm_type { get; set; }
-        public string fee_code { get; set; }
+        public string additional_info { get; set; }
         public List<Frequency> frequencies { get; set; }
         public string status { get; set; }
         public string category { get; set; }
