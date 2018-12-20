@@ -38,6 +38,8 @@ namespace WebService.Models
             separation = "";
             category = "";
             additional_info = "";
+            name_of_test = "";
+            country = "";
 
             List<Frequency> frequencies = new List<Frequency>();
         }
@@ -73,5 +75,7 @@ namespace WebService.Models
         public List<Frequency> frequencies { get; set; }
         public string status { get; set; }
         public string category { get; set; }
+        public string name_of_test { get; set; }
+        public string country { get; set; }
     }
 }

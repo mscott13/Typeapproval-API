@@ -640,7 +640,7 @@ namespace WebService.Database
                               "@manufacturer_contact_person," +
                               "@equipment_type, @equipment_description," +
                               "@product_identification, @ref#, @make, @software, @type_of_equipment," +
-                              "@other, @antenna_type, @antenna_gain, @channel,@separation, @additional_info, @status, @category";
+                              "@other, @antenna_type, @antenna_gain, @channel,@separation, @additional_info, @name_of_test, @country, @status, @category";
 
             cmd.Parameters.AddWithValue("@applicationId", form.application_id);
             cmd.Parameters.AddWithValue("@username", form.username);
@@ -669,6 +669,8 @@ namespace WebService.Database
             cmd.Parameters.AddWithValue("@channel", form.channel);
             cmd.Parameters.AddWithValue("@separation", form.separation);
             cmd.Parameters.AddWithValue("@additional_info", form.additional_info);
+            cmd.Parameters.AddWithValue("@name_of_test", form.name_of_test);
+            cmd.Parameters.AddWithValue("@country", form.country);
             cmd.Parameters.AddWithValue("@status", form.status);
             cmd.Parameters.AddWithValue("category", form.category);
 
@@ -877,6 +879,8 @@ namespace WebService.Database
                 form.status = reader["current_status"].ToString();
                 form.category = reader["category"].ToString();
                 form.additional_info = reader["additional_info"].ToString();
+                form.name_of_test = reader["name_of_test"].ToString();
+                form.country = reader["country"].ToString();
             }
 
             conn.Close();
@@ -1036,14 +1040,12 @@ namespace WebService.Database
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
-            cmd.CommandText = "sp_addFile @filename, @created_date, @path, @application_id, @name_of_test, @country, @username";
+            cmd.CommandText = "sp_addFile @filename, @created_date, @path, @application_id, @username";
 
             cmd.Parameters.AddWithValue("@filename", filename);
             cmd.Parameters.AddWithValue("@created_date", created_date);
             cmd.Parameters.AddWithValue("@path", path);
             cmd.Parameters.AddWithValue("@application_id", application_id);
-            cmd.Parameters.AddWithValue("@name_of_test", name_of_test);
-            cmd.Parameters.AddWithValue("@country", country);
             cmd.Parameters.AddWithValue("@username", username);
             cmd.Connection = conn;
 
