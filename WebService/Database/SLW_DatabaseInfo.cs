@@ -910,7 +910,7 @@ namespace WebService.Database
                     string emmision_desig = reader["emmision_desig"].ToString();
                     string freq_type = reader["freq_type"].ToString();
 
-                    frequencies.Add(new Frequency(application_id, sequence, lower_freq, upper_freq, power, tolerance, emmision_desig, freq_type));
+                    frequencies.Add(new Frequency("", application_id, sequence, lower_freq, upper_freq, power, tolerance, emmision_desig, freq_type));
                 }
             }
             conn.Close();
@@ -1036,20 +1036,47 @@ namespace WebService.Database
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
-            cmd.CommandText = "sp_addFile @filename, @created_date, @path, @application_id, @username";
+            cmd.CommandText = "sp_addFile @filename, @created_date, @path, @application_id, @name_of_test, @country, @username";
 
             cmd.Parameters.AddWithValue("@filename", filename);
             cmd.Parameters.AddWithValue("@created_date", created_date);
             cmd.Parameters.AddWithValue("@path", path);
             cmd.Parameters.AddWithValue("@application_id", application_id);
             cmd.Parameters.AddWithValue("@name_of_test", name_of_test);
-            cmd.Parameters.AddWithValue("@application_id", country);
+            cmd.Parameters.AddWithValue("@country", country);
             cmd.Parameters.AddWithValue("@username", username);
             cmd.Connection = conn;
 
             conn.Open();
             cmd.ExecuteNonQuery();
             conn.Close();
+        }
+
+        public Certificate GetCertificate(string application_id)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader reader = null;
+            Certificate certificate = new Certificate();
+
+            cmd.CommandText = "sp_getCertificateMain @application_id";
+            cmd.Parameters.AddWithValue("@application_id", application_id);
+            cmd.Connection = conn;
+
+            conn.Open();
+            reader = cmd.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                reader.Read();
+                certificate.manufacturer_name = reader["manufacturer_name"].ToString();
+                certificate.manufacturer_address = reader["manufacturer_address"].ToString();
+                certificate.product_identification = reader["product_identifiation"].ToString();
+                certificate.equipment_description = reader["equipment_description"].ToString();
+            }
+
+            certificate.frequencies = GetFrequencies(application_id);
+            return certificate;
         }
     }
 }

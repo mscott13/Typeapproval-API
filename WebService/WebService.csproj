@@ -204,6 +204,7 @@
     <Compile Include="Models\ApplicationCounters.cs" />
     <Compile Include="Models\ApplicationSearchResultMain.cs" />
     <Compile Include="Models\AssignedCompany.cs" />
+    <Compile Include="Models\Certificate.cs" />
     <Compile Include="Models\ClientCompany.cs" />
     <Compile Include="Models\Dashboard.cs" />
     <Compile Include="Models\Delete.cs" />
