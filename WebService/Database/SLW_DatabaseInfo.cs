@@ -1080,5 +1080,82 @@ namespace WebService.Database
             certificate.frequencies = GetFrequencies(application_id);
             return certificate;
         }
+
+        public string GenerateAppID()
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader reader = null;
+            string result = "";
+
+            cmd.CommandText = "sp_getNewAppId";
+            cmd.Connection = conn;
+            conn.Open();
+
+            reader = cmd.ExecuteReader();
+            reader.Read();
+            result = reader["id"].ToString();
+            conn.Close();
+            return result;
+        }
+
+        public List<ManufacturerModel> GetCurrentManufacturerModels(string username)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader reader = null;
+            List<ManufacturerModel> manufacturerModels = new List<ManufacturerModel>();
+            cmd.CommandText = "sp_getCurrentManufacturerModels @username";
+
+            cmd.Parameters.AddWithValue("@username", username);
+            cmd.Connection = conn;
+
+            conn.Open();
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    manufacturerModels.Add(new ManufacturerModel(reader["manufacturer"].ToString(), reader["model"].ToString());
+                }
+            }
+            conn.Close();
+            return manufacturerModels;
+        }
+
+        public ManufacturerModel GetASMSManufacturerModel(string manufacturer, string model)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader reader = null;
+            ManufacturerModel manufacturerModel = null;
+            cmd.CommandText = "sp_getASMSApplication @manufacturer, @model";
+
+            cmd.Parameters.AddWithValue("@manufacturer", manufacturer);
+            cmd.Parameters.AddWithValue("@model", model);
+
+            conn.Open();
+            reader = cmd.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                reader.Read();
+                manufacturerModel = new ManufacturerModel(reader["manufacturer"].ToString(), reader["model"].ToString());
+            }
+
+            return manufacturerModel;
+        }
+
+        public void CheckForApplicationUpdates(string username)
+        {
+            List<ManufacturerModel> currentManufacturerModels = GetCurrentManufacturerModels(username);
+            for (int i = 0; i < currentManufacturerModels.Count; i++)
+            {
+                ManufacturerModel asmsManufacturerModel = GetASMSManufacturerModel(currentManufacturerModels[i].manufacturer, currentManufacturerModels[i].model);
+                if (asmsManufacturerModel != null)
+                {
+
+                }
+            }
+        }
     }
 }

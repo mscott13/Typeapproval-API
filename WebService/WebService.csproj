@@ -215,6 +215,7 @@
     <Compile Include="Models\Login.cs" />
     <Compile Include="Models\LoginResult.cs" />
     <Compile Include="Models\Manufacturer.cs" />
+    <Compile Include="Models\ManufacturerModel.cs" />
     <Compile Include="Models\NewUser.cs" />
     <Compile Include="Models\Notification.cs" />
     <Compile Include="Models\Message.cs" />

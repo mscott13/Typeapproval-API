@@ -56,7 +56,7 @@ namespace WebService.Controllers
 
                 if (form.application_id == null || form.application_id == "")
                 {
-                    application_id = Generator.guid();
+                    application_id = Generator.application_id();
                     form.application_id = application_id;
                 }
                 else

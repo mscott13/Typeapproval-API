@@ -72,7 +72,7 @@ namespace WebService.Controllers
             }
             else
             {
-                string application_id = Generator.guid();
+                string application_id = Generator.application_id();
                 SLW_DatabaseInfo db = new SLW_DatabaseInfo();
 
                 data.application_id = application_id;
