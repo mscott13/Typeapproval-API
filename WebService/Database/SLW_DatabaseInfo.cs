@@ -5,8 +5,8 @@ using System.Data.SqlClient;
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
-using WebService.Models;
 using WebService.Commons;
+using WebService.Models;
 
 namespace WebService.Database
 {
@@ -813,10 +813,11 @@ namespace WebService.Database
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
             SqlDataReader reader = null;
-            cmd.CommandText = " sp_getSavedApplications @username";
+            cmd.CommandText = " sp_getSavedApplications @username, @category";
 
             List<SavedApplications> savedApplications = new List<SavedApplications>();
             cmd.Parameters.AddWithValue("@username", _username_);
+            cmd.Parameters.AddWithValue("@category", Constants.TYPE_APPROVAL); //temporary implementation
             cmd.Connection = conn;
 
             conn.Open();
@@ -1099,7 +1100,7 @@ namespace WebService.Database
             return result;
         }
 
-        public List<ManufacturerModel> GetCurrentManufacturerModels(string username)
+        private List<ManufacturerModel> GetCurrentManufacturerModels(string username)
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
@@ -1111,18 +1112,19 @@ namespace WebService.Database
             cmd.Connection = conn;
 
             conn.Open();
+            reader = cmd.ExecuteReader();
             if (reader.HasRows)
             {
                 while (reader.Read())
                 {
-                    manufacturerModels.Add(new ManufacturerModel(reader["manufacturer"].ToString(), reader["model"].ToString());
+                    manufacturerModels.Add(new ManufacturerModel(reader["application_id"].ToString(), reader["manufacturer_name"].ToString(), reader["product_identifiation"].ToString(), reader["status"].ToString()));
                 }
             }
             conn.Close();
             return manufacturerModels;
         }
 
-        public ManufacturerModel GetASMSManufacturerModel(string manufacturer, string model)
+        private ManufacturerModel GetASMSManufacturerModel(string manufacturer, string model)
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
@@ -1132,17 +1134,32 @@ namespace WebService.Database
 
             cmd.Parameters.AddWithValue("@manufacturer", manufacturer);
             cmd.Parameters.AddWithValue("@model", model);
-
+            cmd.Connection = conn;
             conn.Open();
             reader = cmd.ExecuteReader();
 
             if (reader.HasRows)
             {
                 reader.Read();
-                manufacturerModel = new ManufacturerModel(reader["manufacturer"].ToString(), reader["model"].ToString());
+                manufacturerModel = new ManufacturerModel("", reader["manufacturer"].ToString(), reader["model"].ToString(), reader["Status"].ToString());
             }
 
             return manufacturerModel;
+        }
+
+        private void UpdateApplicationStatus(string application_id, string status)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandText = "sp_updateApplicationStatus @application_id, @status";
+
+            cmd.Parameters.AddWithValue("@application_id", application_id);
+            cmd.Parameters.AddWithValue("@status", status);
+            cmd.Connection = conn;
+
+            conn.Open();
+            cmd.ExecuteNonQuery();
+            conn.Close();
         }
 
         public void CheckForApplicationUpdates(string username)
@@ -1154,6 +1171,21 @@ namespace WebService.Database
                 if (asmsManufacturerModel != null)
                 {
 
+                    switch (asmsManufacturerModel.status)
+                    {
+                        case "Licensed":
+                            UpdateApplicationStatus(currentManufacturerModels[i].application_id, Constants.LICENSED_TYPE);
+                            break;
+                        case "Pending":
+                            UpdateApplicationStatus(currentManufacturerModels[i].application_id, Constants.PENDING_TYPE);
+                            break;
+                        case "Rejected":
+                            UpdateApplicationStatus(currentManufacturerModels[i].application_id, Constants.REJECTED);
+                            break;
+                        case "Invoiced":
+                            UpdateApplicationStatus(currentManufacturerModels[i].application_id, Constants.INVOICED_TYPE);
+                            break;
+                    }
                 }
             }
         }

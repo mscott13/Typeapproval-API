@@ -74,6 +74,7 @@ namespace WebService.Controllers
 
                     if (passed)
                     {
+                        db.CheckForApplicationUpdates(login.username);
                         string access_key = mgr.GenerateNewAccessKey(login.username);
                         db.SetNewAccessKey(login.username, access_key);
                         Commons.UserActivity.Record(new UserActivity(login.username, Commons.Constants.ACCOUNT_TYPE,"login sucessful", ""));
