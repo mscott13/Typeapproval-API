@@ -882,6 +882,8 @@ namespace WebService.Database
                 form.additional_info = reader["additional_info"].ToString();
                 form.name_of_test = reader["name_of_test"].ToString();
                 form.country = reader["country"].ToString();
+                form.name_of_test = reader["name_of_test"].ToString();
+                form.country = reader["country"].ToString();
             }
 
             conn.Close();
