@@ -170,6 +170,7 @@ namespace WebService.Controllers
             if (detail.data_present)
             {
                 dashboard = db.GetDashboardData(detail.username);
+                db.CheckForApplicationUpdates(detail.username);
                 return Request.CreateResponse(HttpStatusCode.OK, dashboard);
             }
             else
