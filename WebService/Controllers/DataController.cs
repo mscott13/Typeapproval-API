@@ -196,5 +196,142 @@ namespace WebService.Controllers
                 return Request.CreateResponse(HttpStatusCode.Forbidden, "invalid key");
             }
         }
+
+        [HttpPost]
+        public HttpResponseMessage GetEngineers([FromBody] string access_key)
+        {
+            SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+            KeyDetail detail = db.GetKeyDetail(access_key);
+
+            if (detail.data_present)
+            {
+                List<EngineerUser> engineers = db.GetEngineerUsers();
+                return Request.CreateResponse(HttpStatusCode.OK, engineers);
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Forbidden, "invalid key");
+            }
+        }
+
+        [HttpPost]
+        public HttpResponseMessage GetOngoingTasks([FromBody] string access_key)
+        {
+            SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+            KeyDetail detail = db.GetKeyDetail(access_key);
+
+            if (detail.data_present)
+            {
+                List<OngoingTask> ongoingTasks = db.GetOngoingTasks();
+                return Request.CreateResponse(HttpStatusCode.OK, ongoingTasks);
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Forbidden, "invalid key");
+            }
+        }
+
+        [HttpPost]
+        public HttpResponseMessage GetUnassignedTask([FromBody] string access_key)
+        {
+            SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+            KeyDetail detail = db.GetKeyDetail(access_key);
+
+            if (detail.data_present)
+            {
+                List<UnassignedTask> unassignedTasks = db.GetUnassignedTasks();
+                return Request.CreateResponse(HttpStatusCode.OK, unassignedTasks);
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Forbidden, "invalid key");
+            }
+        }
+
+        [HttpPost]
+        public HttpResponseMessage NewUnassignedTask([FromBody] dynamic data)
+        {
+            SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+            KeyDetail detail = db.GetKeyDetail((string)data.access_key);
+
+            if (detail.data_present)
+            {
+                db.NewUnassignedTask((string)data.application_id, (string)data.submitted_by);
+                return Request.CreateResponse(HttpStatusCode.OK, "task created");
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, "invalid key");
+            }
+        }
+
+        [HttpPost]
+        public HttpResponseMessage NewOngoingTask([FromBody] dynamic data)
+        {
+            SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+            KeyDetail detail = db.GetKeyDetail((string)data.accesss_key);
+
+            if (detail.data_present)
+            {
+                db.NewOngoingTask((string)data.application_id, (string)data.assigned_to, (string)data.status);
+                return Request.CreateResponse(HttpStatusCode.OK, "task assigned");
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Forbidden, "invalid key");
+            }
+        }
+
+
+        [HttpPost]
+        public HttpResponseMessage DeleteUnassignedTask([FromBody] dynamic data)
+        {
+            SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+            KeyDetail detail = db.GetKeyDetail((string)data.access_key);
+
+            if (detail.data_present)
+            {
+                db.DeleteUnassignedTask((string)data.application_id);
+                return Request.CreateResponse(HttpStatusCode.OK, "deleted");
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, "invalid key");
+            }
+        }
+
+        [HttpPost]
+        public HttpResponseMessage DeleteOngoingTask([FromBody] dynamic data)
+        {
+            SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+            KeyDetail detail = db.GetKeyDetail((string)data.access_key);
+
+            if (detail.data_present)
+            {
+                db.DeleteOngoingTask((string)data.application_id);
+                return Request.CreateResponse(HttpStatusCode.OK, "deleted");
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, "invalid key");
+            }
+        }
+
+        [HttpPost]
+        public HttpResponseMessage ReassignTask([FromBody] dynamic data)
+        {
+            SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+            KeyDetail detail = db.GetKeyDetail((string)data.access_key);
+
+            if (detail.data_present)
+            {
+                db.ReassignTask((string)data.application_id, (string)data.assign_to, (string)data.status);
+                return Request.CreateResponse(HttpStatusCode.OK, "task assigned");
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, "invalid key");
+            }
+        }
     }
 }

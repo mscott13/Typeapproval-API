@@ -208,6 +208,7 @@
     <Compile Include="Models\ClientCompany.cs" />
     <Compile Include="Models\Dashboard.cs" />
     <Compile Include="Models\Delete.cs" />
+    <Compile Include="Models\EngineerUser.cs" />
     <Compile Include="Models\Form.cs" />
     <Compile Include="Models\Frequency.cs" />
     <Compile Include="Models\KeyDetail.cs" />
@@ -219,12 +220,14 @@
     <Compile Include="Models\NewUser.cs" />
     <Compile Include="Models\Notification.cs" />
     <Compile Include="Models\Message.cs" />
+    <Compile Include="Models\OngoingTask.cs" />
     <Compile Include="Models\PendingApproval.cs" />
     <Compile Include="Models\RecentActivity.cs" />
     <Compile Include="Models\RecentDocuments.cs" />
     <Compile Include="Models\SavedApplications.cs" />
     <Compile Include="Models\SearchCategory.cs" />
     <Compile Include="Models\TypeApprovalDetails.cs" />
+    <Compile Include="Models\UnassignedTask.cs" />
     <Compile Include="Models\UserActivity.cs" />
     <Compile Include="Models\UserCredentials.cs" />
     <Compile Include="Models\UserTypes.cs" />
