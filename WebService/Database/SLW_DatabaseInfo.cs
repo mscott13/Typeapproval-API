@@ -1262,11 +1262,10 @@ namespace WebService.Database
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
-            cmd.CommandText = "sp_newOngoingTask @application_id, @assigned_to, @status";
+            cmd.CommandText = "sp_newOngoingTask @application_id, @assigned_to";
 
             cmd.Parameters.AddWithValue("@application_id", application_id);
             cmd.Parameters.AddWithValue("@assigned_to", assigned_to);
-            cmd.Parameters.AddWithValue("@status", status);
             cmd.Connection = conn;
 
             conn.Open();
@@ -1290,7 +1289,7 @@ namespace WebService.Database
             {
                 while (reader.Read())
                 {
-                    unassignedTasks.Add(new UnassignedTask(reader["application_id"].ToString(), Convert.ToDateTime(reader["created_date"]).ToShortDateString(), reader["submitted_by"].ToString()));
+                    unassignedTasks.Add(new UnassignedTask(reader["application_id"].ToString(),String.Format("{0:g}", Convert.ToDateTime(reader["created_date"])), reader["submitted_by"].ToString()));
                 }
             }
             conn.Close();
@@ -1303,7 +1302,7 @@ namespace WebService.Database
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
             SqlDataReader reader = null;
-            cmd.CommandText = "sp_getUnassignedTasks";
+            cmd.CommandText = "sp_getOngoingTasks";
 
             cmd.Connection = conn;
             conn.Open();
@@ -1313,27 +1312,94 @@ namespace WebService.Database
             {
                 while (reader.Read())
                 {
-                    ongoingTasks.Add(new OngoingTask(reader["application_id"].ToString(), Convert.ToDateTime(reader["created_date"]).ToShortDateString(), reader["assigned_to"].ToString(), Convert.ToDateTime(reader["date_assigned"]).ToShortDateString(), reader["status"].ToString()));
+                    ongoingTasks.Add(new OngoingTask(reader["application_id"].ToString(), Convert.ToDateTime(reader["created_date"]).ToLongDateString(), reader["assigned_to"].ToString(), Convert.ToDateTime(reader["date_assigned"]).ToLongDateString(), reader["status"].ToString()));
                 }
             }
             conn.Close();
             return ongoingTasks;
         }
-        
-        public void ReassignTask(string application_id, string assign_to, string status)
+
+        public OngoingTask GetSingleOngoingTask(string applicationId)
+        {
+            OngoingTask ongoing = new OngoingTask();
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader reader = null;
+            cmd.CommandText = "sp_getOngoingTasks";
+
+            cmd.Connection = conn;
+            conn.Open();
+
+            reader = cmd.ExecuteReader();
+            if (reader.HasRows)
+            {
+                reader.Read();
+                ongoing = new OngoingTask(reader["application_id"].ToString(), Convert.ToDateTime(reader["created_date"]).ToLongDateString(), reader["assigned_to"].ToString(), Convert.ToDateTime(reader["date_assigned"]).ToLongDateString(), reader["status"].ToString());
+            }
+           
+            conn.Close();
+            return ongoing;
+        }
+
+        public UnassignedTask GetSingleUnassignedTask(string applicationId)
+        {
+            UnassignedTask unassigned = new UnassignedTask();
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader reader = null;
+            cmd.CommandText = "sp_getSingleUnassignedTask";
+
+            cmd.Connection = conn;
+            conn.Open();
+
+            reader = cmd.ExecuteReader();
+            if (reader.HasRows)
+            {
+                reader.Read();
+                unassigned = new UnassignedTask(reader["application_id"].ToString(), Convert.ToDateTime(reader["created_date"]).ToLongDateString(), reader["submitted_by"].ToString());
+            }
+
+            conn.Close();
+            return unassigned;
+        }
+
+        public void ReassignTask(string application_id, string assign_to)
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
-            cmd.CommandText = "sp_updateAssignedUser @application_id, @assigned_to, @status";
+            cmd.CommandText = "sp_updateAssignedUser @application_id, @assigned_to";
 
             cmd.Parameters.AddWithValue("@application_id", application_id);
             cmd.Parameters.AddWithValue("@assigned_to", assign_to);
-            cmd.Parameters.AddWithValue("@status", status);
             cmd.Connection = conn;
 
             conn.Open();
             cmd.ExecuteNonQuery();
             conn.Close();
+        }
+
+        public bool CheckTaskExist(string applicationId)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader reader = null;
+            cmd.CommandText = "sp_checkTaskExist @applicationId";
+            cmd.Parameters.AddWithValue("@applicationId", applicationId);
+
+            cmd.Connection = conn;
+            conn.Open();
+
+            reader = cmd.ExecuteReader();
+            reader.Read();
+
+            if (reader["exist"].ToString() == "0")
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
     }
 }

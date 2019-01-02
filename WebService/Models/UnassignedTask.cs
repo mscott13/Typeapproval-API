@@ -7,6 +7,7 @@ namespace WebService.Models
 {
     public class UnassignedTask
     {
+        public UnassignedTask() { }
         public UnassignedTask(string application_id, string created_date, string submitted_by)
         {
             this.application_id = application_id;

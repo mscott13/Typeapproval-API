@@ -67,7 +67,7 @@ namespace WebService.Controllers
                 form.category = Commons.Constants.TYPE_APPROVAL;
                 form.status = Commons.Constants.SUBMITTED_TYPE;
                 db.SaveApplication(form);
-
+                db.NewUnassignedTask(form.application_id, form.username);
 
                 Commons.UserActivity.Record(new UserActivity(form.username, Commons.Constants.SUBMISSION_TYPE, form.application_id, form.status));
 

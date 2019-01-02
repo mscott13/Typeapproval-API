@@ -7,6 +7,7 @@ namespace WebService.Models
 {
     public class OngoingTask
     {
+        public OngoingTask() { }
         public OngoingTask(string application_id, string created_date, string assigned_to, string date_assigned, string status)
         {
             this.application_id = application_id;

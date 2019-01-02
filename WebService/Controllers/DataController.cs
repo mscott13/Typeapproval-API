@@ -256,8 +256,10 @@ namespace WebService.Controllers
 
             if (detail.data_present)
             {
+                db.DeleteOngoingTask((string)data.application_id);
                 db.NewUnassignedTask((string)data.application_id, (string)data.submitted_by);
-                return Request.CreateResponse(HttpStatusCode.OK, "task created");
+                UnassignedTask unassigned = db.GetSingleUnassignedTask((string)data.application_id);
+                return Request.CreateResponse(HttpStatusCode.OK, unassigned);
             }
             else
             {
@@ -269,12 +271,14 @@ namespace WebService.Controllers
         public HttpResponseMessage NewOngoingTask([FromBody] dynamic data)
         {
             SLW_DatabaseInfo db = new SLW_DatabaseInfo();
-            KeyDetail detail = db.GetKeyDetail((string)data.accesss_key);
+            KeyDetail detail = db.GetKeyDetail((string)data.access_key);
 
             if (detail.data_present)
             {
+                db.DeleteUnassignedTask((string)data.application_id);
                 db.NewOngoingTask((string)data.application_id, (string)data.assigned_to, (string)data.status);
-                return Request.CreateResponse(HttpStatusCode.OK, "task assigned");
+                OngoingTask ongoing = db.GetSingleOngoingTask((string)data.application_id);
+                return Request.CreateResponse(HttpStatusCode.OK, ongoing);
             }
             else
             {
@@ -325,7 +329,7 @@ namespace WebService.Controllers
 
             if (detail.data_present)
             {
-                db.ReassignTask((string)data.application_id, (string)data.assign_to, (string)data.status);
+                db.ReassignTask((string)data.application_id, (string)data.assign_to);
                 return Request.CreateResponse(HttpStatusCode.OK, "task assigned");
             }
             else
