@@ -268,6 +268,25 @@ namespace WebService.Controllers
         }
 
         [HttpPost]
+        public HttpResponseMessage MoveToUnassigned([FromBody] dynamic data)
+        {
+            SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+            KeyDetail detail = db.GetKeyDetail((string)data.access_key);
+
+            if (detail.data_present)
+            {
+                OngoingTask ongoing = db.GetSingleOngoingTask((string)data.application_id);
+                db.DeleteOngoingTask((string)data.application_id);
+                db.NewUnassignedTask(ongoing.application_id, ongoing.submitted_by_username);
+                return Request.CreateResponse(HttpStatusCode.OK, new UnassignedTask(ongoing.application_id, ongoing.created_date, ongoing.submitted_by, ongoing.submitted_by_username));
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, "invalid key");
+            }
+        }
+
+        [HttpPost]
         public HttpResponseMessage NewOngoingTask([FromBody] dynamic data)
         {
             SLW_DatabaseInfo db = new SLW_DatabaseInfo();
@@ -275,8 +294,10 @@ namespace WebService.Controllers
 
             if (detail.data_present)
             {
+                UnassignedTask unassigned = db.GetSingleUnassignedTask((string)data.application_id);
                 db.DeleteUnassignedTask((string)data.application_id);
-                db.NewOngoingTask((string)data.application_id, (string)data.assigned_to, (string)data.status);
+
+                db.NewOngoingTask((string)data.application_id, (string)data.assigned_to, unassigned.username, (string)data.status);
                 OngoingTask ongoing = db.GetSingleOngoingTask((string)data.application_id);
                 return Request.CreateResponse(HttpStatusCode.OK, ongoing);
             }

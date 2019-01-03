@@ -1258,14 +1258,15 @@ namespace WebService.Database
             conn.Close();
         }
 
-        public void NewOngoingTask(string application_id, string assigned_to, string status)
+        public void NewOngoingTask(string application_id, string assigned_to, string submitted_by, string status)
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
-            cmd.CommandText = "sp_newOngoingTask @application_id, @assigned_to";
+            cmd.CommandText = "sp_newOngoingTask @application_id, @assigned_to, @submitted_by_username";
 
             cmd.Parameters.AddWithValue("@application_id", application_id);
             cmd.Parameters.AddWithValue("@assigned_to", assigned_to);
+            cmd.Parameters.AddWithValue("@submitted_by_username", submitted_by);
             cmd.Connection = conn;
 
             conn.Open();
@@ -1289,7 +1290,7 @@ namespace WebService.Database
             {
                 while (reader.Read())
                 {
-                    unassignedTasks.Add(new UnassignedTask(reader["application_id"].ToString(),String.Format("{0:g}", Convert.ToDateTime(reader["created_date"])), reader["submitted_by"].ToString()));
+                    unassignedTasks.Add(new UnassignedTask(reader["application_id"].ToString(),String.Format("{0:g}", Convert.ToDateTime(reader["created_date"])), reader["submitted_by"].ToString(), reader["username"].ToString()));
                 }
             }
             conn.Close();
@@ -1312,7 +1313,7 @@ namespace WebService.Database
             {
                 while (reader.Read())
                 {
-                    ongoingTasks.Add(new OngoingTask(reader["application_id"].ToString(), Convert.ToDateTime(reader["created_date"]).ToLongDateString(), reader["assigned_to"].ToString(), Convert.ToDateTime(reader["date_assigned"]).ToLongDateString(), reader["status"].ToString()));
+                    ongoingTasks.Add(new OngoingTask(reader["application_id"].ToString(), String.Format("{0:g}", Convert.ToDateTime(reader["created_date"])), reader["assigned_to"].ToString(), String.Format("{0:g}", Convert.ToDateTime(reader["date_assigned"])), reader["status"].ToString(), reader["submitted_by"].ToString(), reader["submitted_by_username"].ToString()));
                 }
             }
             conn.Close();
@@ -1325,7 +1326,8 @@ namespace WebService.Database
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
             SqlDataReader reader = null;
-            cmd.CommandText = "sp_getOngoingTasks";
+            cmd.CommandText = "sp_getSingleOngoingTask @application_id";
+            cmd.Parameters.AddWithValue("@application_id", applicationId);
 
             cmd.Connection = conn;
             conn.Open();
@@ -1334,7 +1336,7 @@ namespace WebService.Database
             if (reader.HasRows)
             {
                 reader.Read();
-                ongoing = new OngoingTask(reader["application_id"].ToString(), Convert.ToDateTime(reader["created_date"]).ToLongDateString(), reader["assigned_to"].ToString(), Convert.ToDateTime(reader["date_assigned"]).ToLongDateString(), reader["status"].ToString());
+                ongoing = new OngoingTask(reader["application_id"].ToString(), String.Format("{0:g}", Convert.ToDateTime(reader["created_date"])), reader["assigned_to"].ToString(), String.Format("{0:g}", Convert.ToDateTime(reader["date_assigned"])), reader["status"].ToString(), reader["submitted_by"].ToString(), reader["submitted_by_username"].ToString());
             }
            
             conn.Close();
@@ -1347,7 +1349,8 @@ namespace WebService.Database
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
             SqlDataReader reader = null;
-            cmd.CommandText = "sp_getSingleUnassignedTask";
+            cmd.CommandText = "sp_getSingleUnassignedTask @application_id";
+            cmd.Parameters.AddWithValue("@application_id", applicationId);
 
             cmd.Connection = conn;
             conn.Open();
@@ -1356,7 +1359,7 @@ namespace WebService.Database
             if (reader.HasRows)
             {
                 reader.Read();
-                unassigned = new UnassignedTask(reader["application_id"].ToString(), Convert.ToDateTime(reader["created_date"]).ToLongDateString(), reader["submitted_by"].ToString());
+                unassigned = new UnassignedTask(reader["application_id"].ToString(), String.Format("{0:g}", Convert.ToDateTime(reader["created_date"])), reader["submitted_by"].ToString(), reader["username"].ToString());
             }
 
             conn.Close();
