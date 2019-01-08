@@ -252,6 +252,42 @@ namespace WebService.Database
         }
 
         // User management
+
+        public UserDetails GetUserDetails(string username)
+        {
+            UserDetails userDetails = new UserDetails();
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader reader = null;
+            cmd.CommandText = "sp_getUserDetails @username";
+            cmd.Parameters.AddWithValue("@username", username);
+            cmd.Connection = conn;
+
+            conn.Open();
+            reader = cmd.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                reader.Read();
+                userDetails.username = reader["username"].ToString();
+                userDetails.first_name = reader["first_name"].ToString();
+                userDetails.last_name = reader["last_name"].ToString();
+                userDetails.fullname = reader["fullname"].ToString();
+                userDetails.email = reader["email"].ToString();
+                userDetails.user_type = reader["user_type"].ToString();
+                userDetails.created_date = Convert.ToDateTime(reader["created_date"]);
+                userDetails.last_detected_activity = Convert.ToDateTime(reader["last_detected_activity"]);
+                conn.Close();
+
+                return userDetails;
+            }
+            else
+            {
+                conn.Close();
+                return null;
+            }
+        }
+            
         public UserCredentials GetUserCredentials(string user)
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
@@ -1146,6 +1182,7 @@ namespace WebService.Database
                 manufacturerModel = new ManufacturerModel("", reader["manufacturer"].ToString(), reader["model"].ToString(), reader["Status"].ToString());
             }
 
+            conn.Close();
             return manufacturerModel;
         }
 
@@ -1243,14 +1280,15 @@ namespace WebService.Database
             conn.Close();
         }
         
-        public void NewUnassignedTask(string application_id, string submitted_by)
+        public void NewUnassignedTask(string application_id, string submitted_by, DateTime created_date)
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
-            cmd.CommandText = "sp_newUnassignedTask @application_id, @username";
+            cmd.CommandText = "sp_newUnassignedTask @application_id, @username, @created_date";
 
             cmd.Parameters.AddWithValue("@application_id", application_id);
             cmd.Parameters.AddWithValue("@username", submitted_by);
+            cmd.Parameters.AddWithValue("@created_date", created_date);
             cmd.Connection = conn;
 
             conn.Open();
@@ -1258,15 +1296,16 @@ namespace WebService.Database
             conn.Close();
         }
 
-        public void NewOngoingTask(string application_id, string assigned_to, string submitted_by, string status)
+        public void NewOngoingTask(string application_id, string assigned_to, string submitted_by, string status, DateTime created_date)
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
-            cmd.CommandText = "sp_newOngoingTask @application_id, @assigned_to, @submitted_by_username";
+            cmd.CommandText = "sp_newOngoingTask @application_id, @assigned_to, @submitted_by_username, @created_date";
 
             cmd.Parameters.AddWithValue("@application_id", application_id);
             cmd.Parameters.AddWithValue("@assigned_to", assigned_to);
             cmd.Parameters.AddWithValue("@submitted_by_username", submitted_by);
+            cmd.Parameters.AddWithValue("@created_date", created_date);
             cmd.Connection = conn;
 
             conn.Open();
@@ -1290,7 +1329,7 @@ namespace WebService.Database
             {
                 while (reader.Read())
                 {
-                    unassignedTasks.Add(new UnassignedTask(reader["application_id"].ToString(),String.Format("{0:g}", Convert.ToDateTime(reader["created_date"])), reader["submitted_by"].ToString(), reader["username"].ToString()));
+                    unassignedTasks.Add(new UnassignedTask(reader["application_id"].ToString(),String.Format("{0:g}", Convert.ToDateTime(reader["created_date"])), Convert.ToDateTime(reader["created_date"]), reader["submitted_by"].ToString(), reader["username"].ToString()));
                 }
             }
             conn.Close();
@@ -1313,7 +1352,7 @@ namespace WebService.Database
             {
                 while (reader.Read())
                 {
-                    ongoingTasks.Add(new OngoingTask(reader["application_id"].ToString(), String.Format("{0:g}", Convert.ToDateTime(reader["created_date"])), reader["assigned_to"].ToString(), String.Format("{0:g}", Convert.ToDateTime(reader["date_assigned"])), reader["status"].ToString(), reader["submitted_by"].ToString(), reader["submitted_by_username"].ToString()));
+                    ongoingTasks.Add(new OngoingTask(reader["application_id"].ToString(), String.Format("{0:g}", Convert.ToDateTime(reader["created_date"])), Convert.ToDateTime(reader["created_date"]), reader["assigned_to"].ToString(), String.Format("{0:g}", Convert.ToDateTime(reader["date_assigned"])), reader["status"].ToString(), reader["submitted_by"].ToString(), reader["submitted_by_username"].ToString()));
                 }
             }
             conn.Close();
@@ -1336,7 +1375,7 @@ namespace WebService.Database
             if (reader.HasRows)
             {
                 reader.Read();
-                ongoing = new OngoingTask(reader["application_id"].ToString(), String.Format("{0:g}", Convert.ToDateTime(reader["created_date"])), reader["assigned_to"].ToString(), String.Format("{0:g}", Convert.ToDateTime(reader["date_assigned"])), reader["status"].ToString(), reader["submitted_by"].ToString(), reader["submitted_by_username"].ToString());
+                ongoing = new OngoingTask(reader["application_id"].ToString(), String.Format("{0:g}", Convert.ToDateTime(reader["created_date"])), Convert.ToDateTime(reader["created_date"]), reader["assigned_to"].ToString(), String.Format("{0:g}", Convert.ToDateTime(reader["date_assigned"])), reader["status"].ToString(), reader["submitted_by"].ToString(), reader["submitted_by_username"].ToString());
             }
            
             conn.Close();
@@ -1359,7 +1398,7 @@ namespace WebService.Database
             if (reader.HasRows)
             {
                 reader.Read();
-                unassigned = new UnassignedTask(reader["application_id"].ToString(), String.Format("{0:g}", Convert.ToDateTime(reader["created_date"])), reader["submitted_by"].ToString(), reader["username"].ToString());
+                unassigned = new UnassignedTask(reader["application_id"].ToString(), String.Format("{0:g}", Convert.ToDateTime(reader["created_date"])), Convert.ToDateTime(reader["created_date"]), reader["submitted_by"].ToString(), reader["username"].ToString());
             }
 
             conn.Close();

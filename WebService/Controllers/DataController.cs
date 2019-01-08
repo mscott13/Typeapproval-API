@@ -256,8 +256,9 @@ namespace WebService.Controllers
 
             if (detail.data_present)
             {
+                OngoingTask ongoing = db.GetSingleOngoingTask((string)data.application_id);
                 db.DeleteOngoingTask((string)data.application_id);
-                db.NewUnassignedTask((string)data.application_id, (string)data.submitted_by);
+                db.NewUnassignedTask((string)data.application_id, (string)data.submitted_by, ongoing.created_date_raw);
                 UnassignedTask unassigned = db.GetSingleUnassignedTask((string)data.application_id);
                 return Request.CreateResponse(HttpStatusCode.OK, unassigned);
             }
@@ -277,8 +278,8 @@ namespace WebService.Controllers
             {
                 OngoingTask ongoing = db.GetSingleOngoingTask((string)data.application_id);
                 db.DeleteOngoingTask((string)data.application_id);
-                db.NewUnassignedTask(ongoing.application_id, ongoing.submitted_by_username);
-                return Request.CreateResponse(HttpStatusCode.OK, new UnassignedTask(ongoing.application_id, ongoing.created_date, ongoing.submitted_by, ongoing.submitted_by_username));
+                db.NewUnassignedTask(ongoing.application_id, ongoing.submitted_by_username, ongoing.created_date_raw);
+                return Request.CreateResponse(HttpStatusCode.OK, new UnassignedTask(ongoing.application_id, ongoing.created_date, ongoing.created_date_raw, ongoing.submitted_by, ongoing.submitted_by_username));
             }
             else
             {
@@ -297,8 +298,9 @@ namespace WebService.Controllers
                 UnassignedTask unassigned = db.GetSingleUnassignedTask((string)data.application_id);
                 db.DeleteUnassignedTask((string)data.application_id);
 
-                db.NewOngoingTask((string)data.application_id, (string)data.assigned_to, unassigned.username, (string)data.status);
+                db.NewOngoingTask((string)data.application_id, (string)data.assigned_to, unassigned.username, (string)data.status, unassigned.created_date_raw);
                 OngoingTask ongoing = db.GetSingleOngoingTask((string)data.application_id);
+                ongoing.assigned_to = db.GetUserDetails(ongoing.assigned_to).fullname;
                 return Request.CreateResponse(HttpStatusCode.OK, ongoing);
             }
             else
@@ -351,7 +353,9 @@ namespace WebService.Controllers
             if (detail.data_present)
             {
                 db.ReassignTask((string)data.application_id, (string)data.assign_to);
-                return Request.CreateResponse(HttpStatusCode.OK, "task assigned");
+                OngoingTask ongoing = db.GetSingleOngoingTask((string)data.application_id);
+                ongoing.assigned_to = db.GetUserDetails(ongoing.assigned_to).fullname;
+                return Request.CreateResponse(HttpStatusCode.OK, ongoing);
             }
             else
             {
