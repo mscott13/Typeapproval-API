@@ -202,8 +202,10 @@
     <Compile Include="Hubs\NotificationTicker.cs" />
     <Compile Include="Hubs\SignalRUsers.cs" />
     <Compile Include="Models\ApplicationCounters.cs" />
+    <Compile Include="Models\ApplicationFiles.cs" />
     <Compile Include="Models\ApplicationSearchResultMain.cs" />
     <Compile Include="Models\AssignedCompany.cs" />
+    <Compile Include="Models\AssignedTask.cs" />
     <Compile Include="Models\Certificate.cs" />
     <Compile Include="Models\ClientCompany.cs" />
     <Compile Include="Models\Dashboard.cs" />
@@ -259,7 +261,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Uploads\" />
     <Folder Include="Views\Data\" />
     <Folder Include="Views\Notifiy\" />
   </ItemGroup>

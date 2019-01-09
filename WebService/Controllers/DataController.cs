@@ -362,5 +362,26 @@ namespace WebService.Controllers
                 return Request.CreateResponse(HttpStatusCode.Unauthorized, "invalid key");
             }
         }
+
+        [HttpPost]
+        public HttpResponseMessage GetStaffAssignedTasks([FromBody] dynamic data)
+        {
+            SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+            KeyDetail detail = db.GetKeyDetail((string)data.access_key);
+
+            if (detail.data_present)
+            {
+                List<AssignedTask> assignedTasks = db.GetStaffAssignedTasks((string)data.username);
+                for(int i=0; i<assignedTasks.Count; i++)
+                {
+                    assignedTasks[i].applicationFiles = db.GetApplicationFiles(assignedTasks[i].application_id);
+                }
+                return Request.CreateResponse(HttpStatusCode.OK, assignedTasks);
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, "invalid key");
+            }
+        }
     }
 }

@@ -11,7 +11,7 @@ namespace WebService.Commons
         //@"Data Source=DESKTOP-6DGAJN8\SQLEXPRESS;Initial Catalog=SLW_Database;Integrated Security=True"
         //@"Data Source=DESKTOP-E9VTQUL\SQLEXPRESS;Initial Catalog=SLW_Database;Integrated Security=True"
 
-        public const string databaseConnection = @"Data Source=DESKTOP-E9VTQUL\SQLEXPRESS;Initial Catalog=SLW_Database;Integrated Security=True";
+        public const string databaseConnection = @"Data Source=DESKTOP-6DGAJN8\SQLEXPRESS;Initial Catalog=SLW_Database;Integrated Security=True";
    
         public const string notifyTypeApproval = "TYPE_APPROVAL";
         public const string notifyGeneral = "GENERAL";
@@ -37,6 +37,11 @@ namespace WebService.Commons
         public const string INVOICED_TYPE = "INVOICED";
         public const string LICENSED_TYPE = "LICENSED";
         public const string REJECTED = "REJECTED";
+
+        //application file types
+        public const string ACCREDITATION_FILE = "ACCREDITATION";
+        public const string TEST_REPORT_FILE = "TEST_REPORT";
+        public const string TECHNICAL_SPECIFICATION_FILE = "TECHNICAL_SPECIFICATION";
 
     }
 }

@@ -82,7 +82,23 @@ namespace WebService.Controllers
                     if (!File.Exists(rename))
                     {
                         File.Move(file.LocalFileName, rename);
-                        db.AddFileReference(file.Headers.ContentDisposition.FileName.Replace("\"", ""), DateTime.Now, rename, application_id, institution, country, form.username);
+                        var purpose = file.Headers.ContentDisposition.Name.Replace("\"", "");
+                        switch (purpose)
+                        {
+                            case "tech_spec":
+                                db.AddFileReference(Generator.guid(),  file.Headers.ContentDisposition.FileName.Replace("\"", ""), DateTime.Now, rename, application_id, institution, country, form.username, Commons.Constants.TECHNICAL_SPECIFICATION_FILE);
+                                break;
+                            case "test_report":
+                                db.AddFileReference(Generator.guid(), file.Headers.ContentDisposition.FileName.Replace("\"", ""), DateTime.Now, rename, application_id, institution, country, form.username, Commons.Constants.TEST_REPORT_FILE);
+                                break;
+                            case "accreditation":
+                                db.AddFileReference(Generator.guid(), file.Headers.ContentDisposition.FileName.Replace("\"", ""), DateTime.Now, rename, application_id, institution, country, form.username, Commons.Constants.ACCREDITATION_FILE);
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        File.Delete(file.LocalFileName);
                     }
                 }
 

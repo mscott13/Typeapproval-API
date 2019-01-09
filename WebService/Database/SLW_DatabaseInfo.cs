@@ -1075,23 +1075,26 @@ namespace WebService.Database
             return dashboard;
         }
 
-        public void AddFileReference(string filename, DateTime created_date, string path, string application_id, string name_of_test, string country, string username)
+        public void AddFileReference(string file_id ,string filename, DateTime created_date, string path, string application_id, string name_of_test, string country, string username, string purpose)
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
-            cmd.CommandText = "sp_addFile @filename, @created_date, @path, @application_id, @username";
+            cmd.CommandText = "sp_addFile @file_id, @filename, @created_date, @path, @application_id, @username, @purpose";
 
+            cmd.Parameters.AddWithValue("@file_id", file_id); 
             cmd.Parameters.AddWithValue("@filename", filename);
             cmd.Parameters.AddWithValue("@created_date", created_date);
             cmd.Parameters.AddWithValue("@path", path);
             cmd.Parameters.AddWithValue("@application_id", application_id);
             cmd.Parameters.AddWithValue("@username", username);
+            cmd.Parameters.AddWithValue("@purpose", purpose);
             cmd.Connection = conn;
 
             conn.Open();
             cmd.ExecuteNonQuery();
             conn.Close();
         }
+
 
         public Certificate GetCertificate(string application_id)
         {
@@ -1442,6 +1445,66 @@ namespace WebService.Database
             {
                 return true;
             }
+        }
+
+        public List<AssignedTask> GetStaffAssignedTasks(string username)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            List<AssignedTask> assignedTasks = new List<AssignedTask>();
+            SqlDataReader reader = null;
+            cmd.CommandText = "sp_getAssignedTasks @username";
+            cmd.Parameters.AddWithValue("@username", username);
+            cmd.Connection = conn;
+
+            conn.Open();
+            reader = cmd.ExecuteReader();
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    AssignedTask assigned = new AssignedTask();
+                    assigned.application_id = reader["application_id"].ToString();
+                    assigned.created_date = String.Format("{0:g}", Convert.ToDateTime(reader["created_date"]));
+                    assigned.submitted_by = reader["submitted_by"].ToString();
+                    assigned.assigned_date = String.Format("{0:g}", Convert.ToDateTime(reader["date_assigned"]));
+                    assigned.status = reader["status"].ToString();
+                    assignedTasks.Add(assigned);
+                }
+            }
+            conn.Close();
+            return assignedTasks;
+        }
+
+        public List<ApplicationFiles> GetApplicationFiles(string application_id)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            List<ApplicationFiles> applicationFiles = new List<ApplicationFiles>();
+            SqlDataReader reader = null;
+            cmd.CommandText = "sp_getApplicationFiles @application_id";
+            cmd.Parameters.AddWithValue("@application_id", application_id);
+            cmd.Connection = conn;
+
+            conn.Open();
+            reader = cmd.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    ApplicationFiles applicationFile = new ApplicationFiles();
+                    applicationFile.application_id = reader["application_id"].ToString();
+                    applicationFile.file_id = reader["file_id"].ToString();
+                    applicationFile.filename = reader["filename"].ToString();
+                    applicationFile.created_date = String.Format("{0:g}", Convert.ToDateTime(reader["created_date"]));
+                    applicationFile.purpose = reader["purpose"].ToString();
+                    applicationFile.username = reader["username"].ToString();
+                    applicationFiles.Add(applicationFile);
+                }
+            }
+            conn.Close();
+            return applicationFiles;
         }
     }
 }
