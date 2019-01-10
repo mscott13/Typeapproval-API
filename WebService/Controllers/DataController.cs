@@ -222,6 +222,7 @@ namespace WebService.Controllers
 
             if (detail.data_present)
             {
+                db.CheckForApplicationUpdatesAllUsers();
                 List<OngoingTask> ongoingTasks = db.GetOngoingTasks();
                 return Request.CreateResponse(HttpStatusCode.OK, ongoingTasks);
             }
@@ -239,6 +240,7 @@ namespace WebService.Controllers
 
             if (detail.data_present)
             {
+                db.CheckForApplicationUpdatesAllUsers();
                 List<UnassignedTask> unassignedTasks = db.GetUnassignedTasks();
                 return Request.CreateResponse(HttpStatusCode.OK, unassignedTasks);
             }
@@ -259,6 +261,8 @@ namespace WebService.Controllers
                 OngoingTask ongoing = db.GetSingleOngoingTask((string)data.application_id);
                 db.DeleteOngoingTask((string)data.application_id);
                 db.NewUnassignedTask((string)data.application_id, (string)data.submitted_by, ongoing.created_date_raw);
+
+                db.UpdateApplicationStatus((string)data.application_id, Commons.Constants.SUBMITTED_TYPE);
                 UnassignedTask unassigned = db.GetSingleUnassignedTask((string)data.application_id);
                 return Request.CreateResponse(HttpStatusCode.OK, unassigned);
             }
@@ -279,6 +283,7 @@ namespace WebService.Controllers
                 OngoingTask ongoing = db.GetSingleOngoingTask((string)data.application_id);
                 db.DeleteOngoingTask((string)data.application_id);
                 db.NewUnassignedTask(ongoing.application_id, ongoing.submitted_by_username, ongoing.created_date_raw);
+                db.UpdateApplicationStatus((string)data.application_id, Commons.Constants.SUBMITTED_TYPE);
                 return Request.CreateResponse(HttpStatusCode.OK, new UnassignedTask(ongoing.application_id, ongoing.created_date, ongoing.created_date_raw, ongoing.submitted_by, ongoing.submitted_by_username));
             }
             else
@@ -299,6 +304,7 @@ namespace WebService.Controllers
                 db.DeleteUnassignedTask((string)data.application_id);
 
                 db.NewOngoingTask((string)data.application_id, (string)data.assigned_to, unassigned.username, (string)data.status, unassigned.created_date_raw);
+                db.UpdateApplicationStatus((string)data.application_id, Commons.Constants.PENDING_TYPE);
                 OngoingTask ongoing = db.GetSingleOngoingTask((string)data.application_id);
                 ongoing.assigned_to = db.GetUserDetails(ongoing.assigned_to).fullname;
                 return Request.CreateResponse(HttpStatusCode.OK, ongoing);
@@ -371,6 +377,7 @@ namespace WebService.Controllers
 
             if (detail.data_present)
             {
+                db.CheckForApplicationUpdatesAllUsers();
                 List<AssignedTask> assignedTasks = db.GetStaffAssignedTasks((string)data.username);
                 for(int i=0; i<assignedTasks.Count; i++)
                 {
@@ -382,6 +389,12 @@ namespace WebService.Controllers
             {
                 return Request.CreateResponse(HttpStatusCode.Unauthorized, "invalid key");
             }
+        }
+        [HttpPost]
+        public HttpResponseMessage SendEmail([FromBody] string message)
+        {
+            Utilities.Email.Send();
+            return Request.CreateResponse(HttpStatusCode.OK, "");
         }
     }
 }

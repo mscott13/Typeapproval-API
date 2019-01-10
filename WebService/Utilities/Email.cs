@@ -3,23 +3,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Net.Mail;
+using System.Net;
 
 namespace WebService.Utilities
 {
     public static class Email
     {
-        public static void Send()
+        public static void Send(string to_email,string subject, string message)
         {
-            MailMessage mail = new MailMessage("you@yourcompany.com", "a.markscott13@gmail.com");
-            SmtpClient client = new SmtpClient();
-            client.Port = 25;
-            client.DeliveryMethod = SmtpDeliveryMethod.Network;
-            client.UseDefaultCredentials = false;
-            client.Host = "smtp.gmail.com";
-            mail.Subject = "this is a test email.";
-            mail.Body = "this is my test email body";
-            client.Send(mail);
+            MailMessage msg = new MailMessage("Spectrum Management Authority, Jamaica", to_email);
+            msg.Body = message;
+            msg.Subject = subject;
+            msg.Priority = MailPriority.High;
 
+            SmtpClient smtpClient = new SmtpClient();
+            smtpClient.UseDefaultCredentials = false;
+            smtpClient.Host = "smtp.gmail.com";
+            smtpClient.Port = 587;
+            smtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
+            smtpClient.Credentials = new NetworkCredential("smaja.noreply@gmail.com", "spectrumharbour");
+            smtpClient.EnableSsl = true;
+            smtpClient.Send(msg);
         }
     }
 }

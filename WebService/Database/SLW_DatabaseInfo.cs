@@ -287,6 +287,39 @@ namespace WebService.Database
                 return null;
             }
         }
+
+        public List<UserDetails> GetAllUsersDetails()
+        {
+            List<UserDetails> userDetails = new List<UserDetails>();
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader reader = null;
+            cmd.CommandText = "sp_getUserDetails @username";
+            cmd.Parameters.AddWithValue("@username", "*all");
+            cmd.Connection = conn;
+
+            conn.Open();
+            reader = cmd.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    UserDetails userDetail = new UserDetails();
+                    userDetail.username = reader["username"].ToString();
+                    userDetail.first_name = reader["first_name"].ToString();
+                    userDetail.last_name = reader["last_name"].ToString();
+                    userDetail.fullname = reader["fullname"].ToString();
+                    userDetail.email = reader["email"].ToString();
+                    userDetail.user_type = reader["user_type"].ToString();
+                    userDetail.created_date = Convert.ToDateTime(reader["created_date"]);
+                    userDetail.last_detected_activity = Convert.ToDateTime(reader["last_detected_activity"]);
+                    userDetails.Add(userDetail);
+                }
+            }
+            conn.Close();
+            return userDetails;
+        }
             
         public UserCredentials GetUserCredentials(string user)
         {
@@ -311,6 +344,35 @@ namespace WebService.Database
             {
                 conn.Close();
                 return new UserCredentials();
+            }
+        }
+
+        public List<string> GetAllUsernames()
+        {
+            
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            List<string> usernames = new List<string>();
+            SqlDataReader reader = null;
+            cmd.CommandText = "sp_getAllUsernames";
+
+            cmd.Connection = conn;
+            conn.Open();
+            reader = cmd.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    usernames.Add(reader["username"].ToString());
+                }
+                conn.Close();
+                return usernames;
+            }
+            else
+            {
+                conn.Close();
+                return usernames;
             }
         }
 
@@ -1189,7 +1251,7 @@ namespace WebService.Database
             return manufacturerModel;
         }
 
-        private void UpdateApplicationStatus(string application_id, string status)
+        public void UpdateApplicationStatus(string application_id, string status)
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
@@ -1212,7 +1274,6 @@ namespace WebService.Database
                 ManufacturerModel asmsManufacturerModel = GetASMSManufacturerModel(currentManufacturerModels[i].manufacturer, currentManufacturerModels[i].model);
                 if (asmsManufacturerModel != null)
                 {
-
                     switch (asmsManufacturerModel.status)
                     {
                         case "Licensed":
@@ -1229,6 +1290,15 @@ namespace WebService.Database
                             break;
                     }
                 }
+            }
+        }
+
+        public void CheckForApplicationUpdatesAllUsers()
+        {
+            List<string> usernames = GetAllUsernames();
+            for(int i=0; i<usernames.Count; i++)
+            {
+                CheckForApplicationUpdates(usernames[i]);
             }
         }
 

@@ -14,6 +14,23 @@ namespace WebService.Controllers
     public class UserController : ApiController
     {
         [HttpPost]
+        public HttpResponseMessage GetUsersList([FromBody] string access_key)
+        {
+            SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+            KeyDetail key_detail = db.GetKeyDetail(access_key);
+
+            if (IsKeyValid(key_detail))
+            {
+                List<UserDetails> userDetails = db.GetAllUsersDetails();
+                return Request.CreateResponse(HttpStatusCode.OK, userDetails);
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, "invalid_key");
+            }
+        }
+
+        [HttpPost]
         public HttpResponseMessage Register([FromBody]Models.NewUser user)
         {
             if (user != null)
@@ -76,7 +93,7 @@ namespace WebService.Controllers
                     {
                         string access_key = mgr.GenerateNewAccessKey(login.username);
                         db.SetNewAccessKey(login.username, access_key);
-                        Commons.UserActivity.Record(new UserActivity(login.username, Commons.Constants.ACCOUNT_TYPE,"login sucessful", ""));
+                        Commons.UserActivity.Record(new UserActivity(login.username, Commons.Constants.ACCOUNT_TYPE, "login sucessful", ""));
                         return Request.CreateResponse(HttpStatusCode.OK, new Models.LoginResult("credentials verified", access_key, credentials.user_type, credentials.name, login.username));
                     }
                     else
@@ -97,6 +114,30 @@ namespace WebService.Controllers
         }
 
         [HttpPost]
+        public HttpResponseMessage ChangePassword([FromBody] dynamic data)
+        {
+            SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+            KeyDetail key_detail = db.GetKeyDetail((string)data.access_key);
+
+            if (IsKeyValid(key_detail))
+            {
+                Utilities.PasswordManager psw_manager = new Utilities.PasswordManager();
+                if (psw_manager.ChangePassword((string)data.username, (string)data.old_psw, (string)data.new_psw))
+                {
+                    return Request.CreateResponse(HttpStatusCode.OK, "password_updated");
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.Unauthorized, "password_incorrect");
+                }
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, "invalid key");
+            }
+        }
+
+        [HttpPost]
         public HttpResponseMessage Delete([FromBody]Delete delete)
         {
             SLW_DatabaseInfo db = new SLW_DatabaseInfo();
@@ -112,11 +153,11 @@ namespace WebService.Controllers
                     if (db.CheckUserExist(delete.user))
                     {
                         db.DeleteUser(delete.user);
-                        return Request.CreateResponse(HttpStatusCode.OK, "user deleted");
+                        return Request.CreateResponse(HttpStatusCode.OK, "user_deleted");
                     }
                     else
                     {
-                        return Request.CreateResponse(HttpStatusCode.Unauthorized, "invalid user");
+                        return Request.CreateResponse(HttpStatusCode.Unauthorized, "invalid_user");
                     }
                 }
                 else
@@ -126,7 +167,7 @@ namespace WebService.Controllers
             }
             else
             {
-                return Request.CreateResponse(HttpStatusCode.Unauthorized, "access key invalid");
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, "access_key_invalid");
             }
         }
 
