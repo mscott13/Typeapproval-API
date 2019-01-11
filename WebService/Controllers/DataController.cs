@@ -390,10 +390,26 @@ namespace WebService.Controllers
                 return Request.CreateResponse(HttpStatusCode.Unauthorized, "invalid key");
             }
         }
+
+        [HttpPost]
+        public HttpResponseMessage GetApplicationFileCategories([FromBody] dynamic data)
+        {
+            SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+            KeyDetail detail = db.GetKeyDetail((string)data.access_key);
+
+            if (detail.data_present)
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, db.GetApplicationFileCategories((string)data.application_id));
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, "invalid key");
+            }
+        }
+
         [HttpPost]
         public HttpResponseMessage SendEmail([FromBody] string message)
         {
-            Utilities.Email.Send();
             return Request.CreateResponse(HttpStatusCode.OK, "");
         }
     }

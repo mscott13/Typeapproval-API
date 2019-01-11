@@ -1576,5 +1576,109 @@ namespace WebService.Database
             conn.Close();
             return applicationFiles;
         }
+        public List<Models.ApplicationFiles> GetTechnicalSpecificationFiles(string application_id)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            List<ApplicationFiles> applicationFiles = new List<ApplicationFiles>();
+            SqlDataReader reader = null;
+            cmd.CommandText = "sp_getFilesByType @purpose, @application_id";
+            cmd.Parameters.AddWithValue("@purpose", Commons.Constants.TECHNICAL_SPECIFICATION_FILE);
+            cmd.Parameters.AddWithValue("@application_id", application_id);
+            cmd.Connection = conn;
+
+            conn.Open();
+            reader = cmd.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    ApplicationFiles applicationFile = new ApplicationFiles();
+                    applicationFile.application_id = reader["application_id"].ToString();
+                    applicationFile.file_id = reader["file_id"].ToString();
+                    applicationFile.filename = reader["filename"].ToString();
+                    applicationFile.created_date = String.Format("{0:g}", Convert.ToDateTime(reader["created_date"]));
+                    applicationFile.purpose = reader["purpose"].ToString();
+                    applicationFile.username = reader["username"].ToString();
+                    applicationFiles.Add(applicationFile);
+                }
+            }
+            conn.Close();
+            return applicationFiles;
+        }
+
+        public List<Models.ApplicationFiles> GetTestReportFiles(string application_id)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            List<ApplicationFiles> applicationFiles = new List<ApplicationFiles>();
+            SqlDataReader reader = null;
+            cmd.CommandText = "sp_getFilesByType @purpose, @application_id";
+            cmd.Parameters.AddWithValue("@purpose", Commons.Constants.TEST_REPORT_FILE);
+            cmd.Parameters.AddWithValue("@application_id", application_id);
+            cmd.Connection = conn;
+
+            conn.Open();
+            reader = cmd.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    ApplicationFiles applicationFile = new ApplicationFiles();
+                    applicationFile.application_id = reader["application_id"].ToString();
+                    applicationFile.file_id = reader["file_id"].ToString();
+                    applicationFile.filename = reader["filename"].ToString();
+                    applicationFile.created_date = String.Format("{0:g}", Convert.ToDateTime(reader["created_date"]));
+                    applicationFile.purpose = reader["purpose"].ToString();
+                    applicationFile.username = reader["username"].ToString();
+                    applicationFiles.Add(applicationFile);
+                }
+            }
+            conn.Close();
+            return applicationFiles;
+        }
+
+        public List<Models.ApplicationFiles> GetAccreditationFiles(string application_id)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            List<ApplicationFiles> applicationFiles = new List<ApplicationFiles>();
+            SqlDataReader reader = null;
+            cmd.CommandText = "sp_getFilesByType @purpose, @application_id";
+            cmd.Parameters.AddWithValue("@purpose", Commons.Constants.ACCREDITATION_FILE);
+            cmd.Parameters.AddWithValue("@application_id", application_id);
+            cmd.Connection = conn;
+
+            conn.Open();
+            reader = cmd.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    ApplicationFiles applicationFile = new ApplicationFiles();
+                    applicationFile.application_id = reader["application_id"].ToString();
+                    applicationFile.file_id = reader["file_id"].ToString();
+                    applicationFile.filename = reader["filename"].ToString();
+                    applicationFile.created_date = String.Format("{0:g}", Convert.ToDateTime(reader["created_date"]));
+                    applicationFile.purpose = reader["purpose"].ToString();
+                    applicationFile.username = reader["username"].ToString();
+                    applicationFiles.Add(applicationFile);
+                }
+            }
+            conn.Close();
+            return applicationFiles;
+        }
+
+        public ApplicationFileCategories GetApplicationFileCategories(string application_id)
+        {
+            ApplicationFileCategories applicationFileCategories = new ApplicationFileCategories();
+            applicationFileCategories.technicalSpecifications = GetTechnicalSpecificationFiles(application_id);
+            applicationFileCategories.testReport = GetTestReportFiles(application_id);
+            applicationFileCategories.accreditation = GetAccreditationFiles(application_id);
+            return applicationFileCategories;
+        }
     }
 }

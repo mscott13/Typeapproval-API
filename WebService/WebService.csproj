@@ -202,6 +202,7 @@
     <Compile Include="Hubs\NotificationTicker.cs" />
     <Compile Include="Hubs\SignalRUsers.cs" />
     <Compile Include="Models\ApplicationCounters.cs" />
+    <Compile Include="Models\ApplicationFileCategories.cs" />
     <Compile Include="Models\ApplicationFiles.cs" />
     <Compile Include="Models\ApplicationSearchResultMain.cs" />
     <Compile Include="Models\AssignedCompany.cs" />
