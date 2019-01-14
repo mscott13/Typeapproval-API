@@ -240,6 +240,7 @@
     <Compile Include="Hubs\startup.cs" />
     <Compile Include="startup.cs" />
     <Compile Include="Utilities\Email.cs" />
+    <Compile Include="Utilities\FileManager.cs" />
     <Compile Include="Utilities\Generator.cs" />
     <Compile Include="Utilities\Log.cs" />
     <Compile Include="Utilities\PasswordManager.cs" />

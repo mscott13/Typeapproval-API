@@ -127,6 +127,7 @@ namespace WebService.Controllers
         {
             string access_key = (string)data.access_key;
             string application_id = (string)data.application_id;
+            string mode = (string)data.mode;
 
             SLW_DatabaseInfo db = new SLW_DatabaseInfo();
             KeyDetail detail = db.GetKeyDetail(access_key);
@@ -134,7 +135,26 @@ namespace WebService.Controllers
             if (detail.data_present)
             {
                 Form form = db.GetApplication(application_id);
-                return Request.CreateResponse(HttpStatusCode.OK, form);
+                if (mode == "preview")
+                {
+                    return Request.CreateResponse(HttpStatusCode.OK, form);
+                }
+                else if (mode == "edit")
+                {
+                    string status = (string)data.status;
+                    if (status == form.status)
+                    {
+                        return Request.CreateResponse(HttpStatusCode.OK, form);
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.Unauthorized, "unauthorized");
+                    }
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.Unauthorized, "unauthroized");
+                }
             }
             else
             {
@@ -143,6 +163,25 @@ namespace WebService.Controllers
         }
 
         [HttpPost]
+        public HttpResponseMessage GetApplicationStatus([FromBody] dynamic data)
+        {
+            string access_key = (string)data.access_key;
+            string application_id = (string)data.application_id;
+
+            SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+            KeyDetail detail = db.GetKeyDetail(access_key);
+
+            if (detail.data_present)
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, db.GetApplicationStatus(application_id));
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, "invalid key");
+            }
+        }
+
+       [HttpPost]
         public HttpResponseMessage GetSavedApplications([FromBody] dynamic data)
         {
             string access_key = (string)data;

@@ -34,5 +34,23 @@ namespace WebService.Controllers
             //db.SaveApplication(form);
             return Request.CreateResponse(HttpStatusCode.OK, "updated"); ;
         }
+
+        [HttpPost]
+        public HttpResponseMessage ClientResubmission([FromBody] dynamic data)
+        {
+            SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+            KeyDetail keyDetail = db.GetKeyDetail((string)data.access_key);
+
+            if (keyDetail.data_present)
+            {
+                db.UpdateApplicationStatus((string)data.application_id, Commons.Constants.PENDING_RESUBMISSION);
+                Utilities.FileManager.DeleteFiles((string)data.application_id);
+                return Request.CreateResponse(HttpStatusCode.OK, "status updated");
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, "invalid key");
+            }
+        }
     }
 }

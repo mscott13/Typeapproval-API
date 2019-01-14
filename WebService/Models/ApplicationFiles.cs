@@ -12,6 +12,7 @@ namespace WebService.Models
         public string created_date { get; set; }
         public string purpose { get; set; }
         public string application_id { get; set; }
+        public string path { get; set; }
         public string username { get; set; }
     }
 }

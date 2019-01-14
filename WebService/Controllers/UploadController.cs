@@ -48,8 +48,6 @@ namespace WebService.Controllers
                 }
 
                 string json = keyValuePairs["json"].ToString();
-                string country = keyValuePairs["country"].ToString();
-                string institution = keyValuePairs["institution"].ToString();
 
                 Form form = JsonConvert.DeserializeObject<Form>(json);
                 SLW_DatabaseInfo db = new SLW_DatabaseInfo();
@@ -86,13 +84,13 @@ namespace WebService.Controllers
                         switch (purpose)
                         {
                             case "tech_spec":
-                                db.AddFileReference(Generator.guid(),  file.Headers.ContentDisposition.FileName.Replace("\"", ""), DateTime.Now, rename, application_id, institution, country, form.username, Commons.Constants.TECHNICAL_SPECIFICATION_FILE);
+                                db.AddFileReference(Generator.guid(),  file.Headers.ContentDisposition.FileName.Replace("\"", ""), DateTime.Now, rename, application_id, form.name_of_test, form.country, form.username, Commons.Constants.TECHNICAL_SPECIFICATION_FILE);
                                 break;
                             case "test_report":
-                                db.AddFileReference(Generator.guid(), file.Headers.ContentDisposition.FileName.Replace("\"", ""), DateTime.Now, rename, application_id, institution, country, form.username, Commons.Constants.TEST_REPORT_FILE);
+                                db.AddFileReference(Generator.guid(), file.Headers.ContentDisposition.FileName.Replace("\"", ""), DateTime.Now, rename, application_id, form.name_of_test, form.country, form.username, Commons.Constants.TEST_REPORT_FILE);
                                 break;
                             case "accreditation":
-                                db.AddFileReference(Generator.guid(), file.Headers.ContentDisposition.FileName.Replace("\"", ""), DateTime.Now, rename, application_id, institution, country, form.username, Commons.Constants.ACCREDITATION_FILE);
+                                db.AddFileReference(Generator.guid(), file.Headers.ContentDisposition.FileName.Replace("\"", ""), DateTime.Now, rename, application_id, form.name_of_test, form.country, form.username, Commons.Constants.ACCREDITATION_FILE);
                                 break;
                         }
                     }

@@ -989,6 +989,27 @@ namespace WebService.Database
             return form;
         }
 
+        public string GetApplicationStatus(string application_id)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader reader = null;
+            cmd.CommandText = "sp_getApplicationStatus @application_id";
+            cmd.Connection = conn;
+            string status = "";
+
+            conn.Open();
+            reader = cmd.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                reader.Read();
+                status = reader["status"].ToString();
+            }
+            conn.Close();
+            return status;
+        }
+
         public List<Frequency> GetFrequencies(string application_id)
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
@@ -1567,6 +1588,7 @@ namespace WebService.Database
                     applicationFile.application_id = reader["application_id"].ToString();
                     applicationFile.file_id = reader["file_id"].ToString();
                     applicationFile.filename = reader["filename"].ToString();
+                    applicationFile.path = reader["path"].ToString();
                     applicationFile.created_date = String.Format("{0:g}", Convert.ToDateTime(reader["created_date"]));
                     applicationFile.purpose = reader["purpose"].ToString();
                     applicationFile.username = reader["username"].ToString();
