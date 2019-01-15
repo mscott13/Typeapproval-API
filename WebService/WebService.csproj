@@ -209,6 +209,7 @@
     <Compile Include="Models\AssignedTask.cs" />
     <Compile Include="Models\Certificate.cs" />
     <Compile Include="Models\ClientCompany.cs" />
+    <Compile Include="Models\ClientUser.cs" />
     <Compile Include="Models\Dashboard.cs" />
     <Compile Include="Models\Delete.cs" />
     <Compile Include="Models\EngineerUser.cs" />

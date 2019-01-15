@@ -67,7 +67,6 @@ namespace WebService.Utilities
 
             if(VerifyCredentials(old_psw, credentials.hash))
             {
-
                 db.UpdatePassword(user, GetHash(new_psw));
                 return true;
             }

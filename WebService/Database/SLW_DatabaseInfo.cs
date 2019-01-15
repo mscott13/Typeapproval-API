@@ -320,7 +320,7 @@ namespace WebService.Database
             conn.Close();
             return userDetails;
         }
-            
+
         public UserCredentials GetUserCredentials(string user)
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
@@ -349,7 +349,7 @@ namespace WebService.Database
 
         public List<string> GetAllUsernames()
         {
-            
+
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
             List<string> usernames = new List<string>();
@@ -989,6 +989,31 @@ namespace WebService.Database
             return form;
         }
 
+        public List<string> GetApplicationIDsForUser(string username)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader reader = null;
+            List<string> applications = new List<string>();
+
+            cmd.CommandText = " sp_getApplicationIdsForUser @username";
+            cmd.Parameters.AddWithValue("@username", username);
+            cmd.Connection = conn;
+
+            conn.Open();
+            reader = cmd.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    applications.Add(reader["application_id"].ToString());
+                }
+            }
+            conn.Close();
+            return applications;
+        }
+
         public string GetApplicationStatus(string application_id)
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
@@ -1158,13 +1183,13 @@ namespace WebService.Database
             return dashboard;
         }
 
-        public void AddFileReference(string file_id ,string filename, DateTime created_date, string path, string application_id, string name_of_test, string country, string username, string purpose)
+        public void AddFileReference(string file_id, string filename, DateTime created_date, string path, string application_id, string name_of_test, string country, string username, string purpose)
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
             cmd.CommandText = "sp_addFile @file_id, @filename, @created_date, @path, @application_id, @username, @purpose";
 
-            cmd.Parameters.AddWithValue("@file_id", file_id); 
+            cmd.Parameters.AddWithValue("@file_id", file_id);
             cmd.Parameters.AddWithValue("@filename", filename);
             cmd.Parameters.AddWithValue("@created_date", created_date);
             cmd.Parameters.AddWithValue("@path", path);
@@ -1317,7 +1342,7 @@ namespace WebService.Database
         public void CheckForApplicationUpdatesAllUsers()
         {
             List<string> usernames = GetAllUsernames();
-            for(int i=0; i<usernames.Count; i++)
+            for (int i = 0; i < usernames.Count; i++)
             {
                 CheckForApplicationUpdates(usernames[i]);
             }
@@ -1344,6 +1369,33 @@ namespace WebService.Database
             }
             conn.Close();
             return engineerUsers;
+        }
+
+        public List<ClientUser> GetClientUsers()
+        {
+            List<ClientUser> clientUsers = new List<ClientUser>();
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader reader = null;
+            cmd.CommandText = "sp_getClientUsers";
+
+            cmd.Connection = conn;
+            conn.Open();
+
+            reader = cmd.ExecuteReader();
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    ClientUser clientUser = new ClientUser();
+                    clientUser.username = reader["username"].ToString();
+                    clientUser.first_name = reader["first_name"].ToString();
+                    clientUser.last_name = reader["last_name"].ToString();
+                    clientUsers.Add(clientUser);
+                }
+            }
+            conn.Close();
+            return clientUsers;
         }
 
         public void DeleteUnassignedTask(string application_id)
@@ -1373,7 +1425,7 @@ namespace WebService.Database
             cmd.ExecuteNonQuery();
             conn.Close();
         }
-        
+
         public void NewUnassignedTask(string application_id, string submitted_by, DateTime created_date)
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
@@ -1423,7 +1475,7 @@ namespace WebService.Database
             {
                 while (reader.Read())
                 {
-                    unassignedTasks.Add(new UnassignedTask(reader["application_id"].ToString(),String.Format("{0:g}", Convert.ToDateTime(reader["created_date"])), Convert.ToDateTime(reader["created_date"]), reader["submitted_by"].ToString(), reader["username"].ToString()));
+                    unassignedTasks.Add(new UnassignedTask(reader["application_id"].ToString(), String.Format("{0:g}", Convert.ToDateTime(reader["created_date"])), Convert.ToDateTime(reader["created_date"]), reader["submitted_by"].ToString(), reader["username"].ToString()));
                 }
             }
             conn.Close();
@@ -1471,7 +1523,7 @@ namespace WebService.Database
                 reader.Read();
                 ongoing = new OngoingTask(reader["application_id"].ToString(), String.Format("{0:g}", Convert.ToDateTime(reader["created_date"])), Convert.ToDateTime(reader["created_date"]), reader["assigned_to"].ToString(), String.Format("{0:g}", Convert.ToDateTime(reader["date_assigned"])), reader["status"].ToString(), reader["submitted_by"].ToString(), reader["submitted_by_username"].ToString());
             }
-           
+
             conn.Close();
             return ongoing;
         }

@@ -447,6 +447,38 @@ namespace WebService.Controllers
         }
 
         [HttpPost]
+        public HttpResponseMessage GetClientUsers([FromBody] dynamic data)
+        {
+            SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+            KeyDetail detail = db.GetKeyDetail((string)data.access_key);
+
+            if (detail.data_present)
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, db.GetClientUsers());
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, "invalid key");
+            }
+        }
+
+        [HttpPost]
+        public HttpResponseMessage GetApplicationIDsForClient([FromBody] dynamic data)
+        {
+            SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+            KeyDetail detail = db.GetKeyDetail((string)data.access_key);
+
+            if (detail.data_present)
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, db.GetApplicationIDsForUser((string)data.username));
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, "invalid key");
+            }
+        }
+
+        [HttpPost]
         public HttpResponseMessage SendEmail([FromBody] string message)
         {
             return Request.CreateResponse(HttpStatusCode.OK, "");
