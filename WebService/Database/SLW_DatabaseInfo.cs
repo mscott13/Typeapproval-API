@@ -1203,6 +1203,17 @@ namespace WebService.Database
             conn.Close();
         }
 
+        public void DeleteFileReference(string file_id)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandText = "sp_removeFileReference @file_id";
+            cmd.Parameters.AddWithValue("@file_id", @file_id);
+
+            conn.Open();
+            cmd.ExecuteNonQuery();
+            conn.Close();
+        }
 
         public Certificate GetCertificate(string application_id)
         {

@@ -364,6 +364,8 @@ namespace WebService.Controllers
             if (detail.data_present)
             {
                 db.DeleteUnassignedTask((string)data.application_id);
+                db.UpdateApplicationStatus((string)data.application_id, Commons.Constants.REJECTED);
+                FileManager.DeleteFiles((string)data.application_id);
                 return Request.CreateResponse(HttpStatusCode.OK, "deleted");
             }
             else
@@ -381,6 +383,8 @@ namespace WebService.Controllers
             if (detail.data_present)
             {
                 db.DeleteOngoingTask((string)data.application_id);
+                db.UpdateApplicationStatus((string)data.application_id, Commons.Constants.REJECTED);
+                FileManager.DeleteFiles((string)data.application_id);
                 return Request.CreateResponse(HttpStatusCode.OK, "deleted");
             }
             else

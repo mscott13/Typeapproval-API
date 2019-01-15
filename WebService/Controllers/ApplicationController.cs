@@ -45,12 +45,14 @@ namespace WebService.Controllers
             {
                 db.UpdateApplicationStatus((string)data.application_id, Commons.Constants.PENDING_RESUBMISSION);
                 Utilities.FileManager.DeleteFiles((string)data.application_id);
+                db.DeleteOngoingTask((string)data.application_id);
+                db.DeleteUnassignedTask((string)data.application_id);
                 return Request.CreateResponse(HttpStatusCode.OK, "status updated");
             }
             else
             {
                 return Request.CreateResponse(HttpStatusCode.Unauthorized, "invalid key");
-            }
+            }   
         }
     }
 }

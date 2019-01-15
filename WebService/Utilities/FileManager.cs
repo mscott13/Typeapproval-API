@@ -20,6 +20,7 @@ namespace WebService.Utilities
                     if (File.Exists(files[i].path))
                     {
                         File.Delete(files[i].path);
+                        db.DeleteFileReference(files[i].file_id);
                     }
                 }
                 catch (Exception e)
