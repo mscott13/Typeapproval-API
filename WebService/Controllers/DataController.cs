@@ -487,5 +487,24 @@ namespace WebService.Controllers
         {
             return Request.CreateResponse(HttpStatusCode.OK, "");
         }
+
+        [HttpPost]
+        public HttpResponseMessage NewEmailSetting([FromBody] dynamic data)
+        {
+            SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+            KeyDetail detail = db.GetKeyDetail((string)data.access_key);
+
+            if (detail.data_present)
+            {
+                //do additional checks here to confirm if this is a sys admin
+                string crypt = Encryption.Encrypt((string)data.password);
+                db.NewEmailSetting((string)data.email, crypt);
+                return Request.CreateResponse(HttpStatusCode.OK, "email_saved");
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, "invalid key");
+            }
+        }
     }
 }

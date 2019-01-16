@@ -425,7 +425,7 @@ namespace WebService.Database
             SqlCommand cmd = new SqlCommand();
             cmd.CommandText = "sp_updatePassword @user, @hash";
             cmd.Parameters.AddWithValue("@user", user);
-            cmd.Parameters.AddWithValue("@user", hash);
+            cmd.Parameters.AddWithValue("@hash", hash);
 
             cmd.Connection = conn;
             conn.Open();
@@ -1183,6 +1183,44 @@ namespace WebService.Database
             return dashboard;
         }
 
+        public void NewEmailSetting(string email, string crypt)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandText = "sp_setNewEmailSettings @email, @crypt";
+
+            cmd.Parameters.AddWithValue("@email", email);
+            cmd.Parameters.AddWithValue("@crypt", crypt);
+            cmd.Connection = conn;
+
+            conn.Open();
+            cmd.ExecuteNonQuery();
+            conn.Close();
+        }
+
+        public EmailSetting GetEmailSetting()
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader reader = null;
+            EmailSetting emailSetting = new EmailSetting();
+            cmd.Connection = conn;
+            cmd.CommandText = "sp_getCurrentEmailSettings";
+
+            conn.Open();
+            reader = cmd.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                reader.Read();
+                emailSetting.email = reader["email"].ToString();
+                emailSetting.last_accessed = Convert.ToDateTime(reader["last_accessed"]);
+                emailSetting.password = reader["crypt"].ToString();
+            }
+            conn.Close();
+            return emailSetting;
+        }
+
         public void AddFileReference(string file_id, string filename, DateTime created_date, string path, string application_id, string name_of_test, string country, string username, string purpose)
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
@@ -1209,7 +1247,7 @@ namespace WebService.Database
             SqlCommand cmd = new SqlCommand();
             cmd.CommandText = "sp_removeFileReference @file_id";
             cmd.Parameters.AddWithValue("@file_id", @file_id);
-
+            cmd.Connection = conn;
             conn.Open();
             cmd.ExecuteNonQuery();
             conn.Close();

@@ -71,20 +71,40 @@ namespace WebService.Controllers
 
                 foreach (MultipartFileData file in provider.FileData)
                 {
-                    rename = root + @"\" + form.username + @"\" + application_id + @"\" + file.Headers.ContentDisposition.FileName.Replace("\"", "");
-                    if (!Directory.Exists(root + @"\" + form.username + @"\" + application_id))
+                    var purpose = file.Headers.ContentDisposition.Name.Replace("\"", "");
+                    switch (purpose)
                     {
-                        Directory.CreateDirectory(root + @"\" + form.username + @"\" + application_id);
+                        case "tech_spec":
+                            rename = root + @"\" + form.username + @"\" + application_id + @"\" + "technical_specifications" + @"\" + file.Headers.ContentDisposition.FileName.Replace("\"", "");
+                            if (!Directory.Exists(root + @"\" + form.username + @"\" + application_id + @"\" + "technical_specifications"))
+                            {
+                                Directory.CreateDirectory(root + @"\" + form.username + @"\" + application_id + @"\" + "technical_specifications");
+                            }
+                            break;
+                        case "test_report":
+                            rename = root + @"\" + form.username + @"\" + application_id + @"\" + "test_report" + @"\" + file.Headers.ContentDisposition.FileName.Replace("\"", "");
+                            if (!Directory.Exists(root + @"\" + form.username + @"\" + application_id + @"\" + "test_report"))
+                            {
+                                Directory.CreateDirectory(root + @"\" + form.username + @"\" + application_id + @"\" + "test_report");
+                            }
+                            break;
+                        case "accreditation":
+                            rename = root + @"\" + form.username + @"\" + application_id + @"\" + "accreditation" + @"\" + file.Headers.ContentDisposition.FileName.Replace("\"", "");
+                            if (!Directory.Exists(root + @"\" + form.username + @"\" + application_id + @"\" + "accreditation"))
+                            {
+                                Directory.CreateDirectory(root + @"\" + form.username + @"\" + application_id + @"\" + "accreditation");
+                            }
+                            break;
                     }
 
                     if (!File.Exists(rename))
                     {
                         File.Move(file.LocalFileName, rename);
-                        var purpose = file.Headers.ContentDisposition.Name.Replace("\"", "");
+
                         switch (purpose)
                         {
                             case "tech_spec":
-                                db.AddFileReference(Generator.guid(),  file.Headers.ContentDisposition.FileName.Replace("\"", ""), DateTime.Now, rename, application_id, form.name_of_test, form.country, form.username, Commons.Constants.TECHNICAL_SPECIFICATION_FILE);
+                                db.AddFileReference(Generator.guid(), file.Headers.ContentDisposition.FileName.Replace("\"", ""), DateTime.Now, rename, application_id, form.name_of_test, form.country, form.username, Commons.Constants.TECHNICAL_SPECIFICATION_FILE);
                                 break;
                             case "test_report":
                                 db.AddFileReference(Generator.guid(), file.Headers.ContentDisposition.FileName.Replace("\"", ""), DateTime.Now, rename, application_id, form.name_of_test, form.country, form.username, Commons.Constants.TEST_REPORT_FILE);

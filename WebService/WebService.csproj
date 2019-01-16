@@ -212,6 +212,7 @@
     <Compile Include="Models\ClientUser.cs" />
     <Compile Include="Models\Dashboard.cs" />
     <Compile Include="Models\Delete.cs" />
+    <Compile Include="Models\EmailSetting.cs" />
     <Compile Include="Models\EngineerUser.cs" />
     <Compile Include="Models\Form.cs" />
     <Compile Include="Models\Frequency.cs" />
@@ -241,6 +242,7 @@
     <Compile Include="Hubs\startup.cs" />
     <Compile Include="startup.cs" />
     <Compile Include="Utilities\Email.cs" />
+    <Compile Include="Utilities\Encryption.cs" />
     <Compile Include="Utilities\FileManager.cs" />
     <Compile Include="Utilities\Generator.cs" />
     <Compile Include="Utilities\Log.cs" />
