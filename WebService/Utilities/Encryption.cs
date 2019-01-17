@@ -10,7 +10,7 @@ namespace WebService.Utilities
 {
     public static class Encryption
     {
-        private static string base64key = "RjY2MDI0OUY1MjFFODE5OUM3RTZBMEQ0Q0YwQUE0REQxMjcxN0FEOTI5RkZDNzVBMTU4MzIwQzg4NkFGNzkzNA==";
+        private static string base64key = "NWY0ZGNjM2I1YWE3NjVkNjFkODMyN2RlYjg4MmNmOTk=";
         public static string Encrypt(string input)
         {
             using (var random = new RNGCryptoServiceProvider())

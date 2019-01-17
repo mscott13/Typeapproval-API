@@ -868,7 +868,7 @@ namespace WebService.Database
                 int priority = Convert.ToInt32(reader["priority"]);
                 string username = reader["username"].ToString();
                 string type = reader["type"].ToString();
-                string created_date = Convert.ToDateTime(reader["created_date"]).ToShortDateString() + " " + Convert.ToDateTime(reader["created_date"]).ToShortTimeString();
+                string created_date = Utilities.DateFormatter.GetPrettyDate(Convert.ToDateTime(reader["created_date"]));
                 string description = reader["description"].ToString();
                 string extras = reader["extras"].ToString();
                 string current_status = reader["current_status"].ToString();

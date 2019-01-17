@@ -67,7 +67,7 @@ namespace WebService.Controllers
                 data.status = Commons.Constants.INCOMPLETE_TYPE;
                 db.SaveApplication(data);
 
-                Commons.UserActivity.Record(new UserActivity(data.username, Commons.Constants.UPDATE, data.application_id, data.status));
+                db.SaveActivity(new UserActivity(data.username, Commons.Constants.ACTIVITY_UPDATE, data.application_id, "", 1));
                 return Request.CreateResponse(HttpStatusCode.OK, "updated");
             }
             else
@@ -80,7 +80,7 @@ namespace WebService.Controllers
                 data.status = Commons.Constants.INCOMPLETE_TYPE;
                 db.SaveApplication(data);
 
-                Commons.UserActivity.Record(new UserActivity(data.username, Commons.Constants.NEW_APPLICATION_TYPE, data.application_id, data.status));
+                db.SaveActivity(new UserActivity(data.username, Commons.Constants.ACTIVITY_NEW_APPLICATION_TYPE, data.application_id, "", 1));
                 return Request.CreateResponse(HttpStatusCode.OK, application_id);
             }
         }
@@ -95,7 +95,7 @@ namespace WebService.Controllers
 
             if (detail.data_present)
             {
-                userActivities = db.GetUserActivities(detail.username);
+                userActivities = db.GetUserActivities("*preview");
                 return Request.CreateResponse(HttpStatusCode.OK, userActivities);
             }
             else
@@ -303,6 +303,7 @@ namespace WebService.Controllers
 
                 db.UpdateApplicationStatus((string)data.application_id, Commons.Constants.SUBMITTED_TYPE);
                 UnassignedTask unassigned = db.GetSingleUnassignedTask((string)data.application_id);
+                db.SaveActivity(new UserActivity(detail.username, Commons.Constants.ACTIVITY_NEW_UNASSIGNED, (string)data.application_id, "", 1));
                 return Request.CreateResponse(HttpStatusCode.OK, unassigned);
             }
             else
@@ -323,6 +324,7 @@ namespace WebService.Controllers
                 db.DeleteOngoingTask((string)data.application_id);
                 db.NewUnassignedTask(ongoing.application_id, ongoing.submitted_by_username, ongoing.created_date_raw);
                 db.UpdateApplicationStatus((string)data.application_id, Commons.Constants.SUBMITTED_TYPE);
+                db.SaveActivity(new UserActivity(detail.username, Commons.Constants.ACTIVITY_MOVE_UNASSAIGNED, (string)data.application_id, "", 1));
                 return Request.CreateResponse(HttpStatusCode.OK, new UnassignedTask(ongoing.application_id, ongoing.created_date, ongoing.created_date_raw, ongoing.submitted_by, ongoing.submitted_by_username));
             }
             else
@@ -346,6 +348,7 @@ namespace WebService.Controllers
                 db.UpdateApplicationStatus((string)data.application_id, Commons.Constants.PENDING_TYPE);
                 OngoingTask ongoing = db.GetSingleOngoingTask((string)data.application_id);
                 ongoing.assigned_to = db.GetUserDetails(ongoing.assigned_to).fullname;
+                db.SaveActivity(new UserActivity(detail.username, Commons.Constants.ACTIVITY_NEW_ONGOING, (string)data.application_id, (string)data.assigned_to, 1));
                 return Request.CreateResponse(HttpStatusCode.OK, ongoing);
             }
             else
@@ -366,6 +369,7 @@ namespace WebService.Controllers
                 db.DeleteUnassignedTask((string)data.application_id);
                 db.UpdateApplicationStatus((string)data.application_id, Commons.Constants.REJECTED);
                 FileManager.DeleteFiles((string)data.application_id);
+                db.SaveActivity(new UserActivity(detail.username, Commons.Constants.ACTIVITY_REJECT_UNASSIGNED, (string)data.application_id, "", 1));
                 return Request.CreateResponse(HttpStatusCode.OK, "deleted");
             }
             else
@@ -385,6 +389,7 @@ namespace WebService.Controllers
                 db.DeleteOngoingTask((string)data.application_id);
                 db.UpdateApplicationStatus((string)data.application_id, Commons.Constants.REJECTED);
                 FileManager.DeleteFiles((string)data.application_id);
+                db.SaveActivity(new UserActivity(detail.username, Commons.Constants.ACTIVITY_REJECT_UNASSIGNED, (string)data.application_id, "", 1));
                 return Request.CreateResponse(HttpStatusCode.OK, "deleted");
             }
             else
@@ -404,6 +409,7 @@ namespace WebService.Controllers
                 db.ReassignTask((string)data.application_id, (string)data.assign_to);
                 OngoingTask ongoing = db.GetSingleOngoingTask((string)data.application_id);
                 ongoing.assigned_to = db.GetUserDetails(ongoing.assigned_to).fullname;
+                db.SaveActivity(new UserActivity(detail.username, Commons.Constants.ACTIVITY_REASSIGN_TASK, (string)data.application_id, (string)data.assign_to, 1));
                 return Request.CreateResponse(HttpStatusCode.OK, ongoing);
             }
             else
@@ -499,6 +505,13 @@ namespace WebService.Controllers
                 //do additional checks here to confirm if this is a sys admin
                 string crypt = Encryption.Encrypt((string)data.password);
                 db.NewEmailSetting((string)data.email, crypt);
+                db.SaveActivity(new UserActivity(detail.username, Commons.Constants.ACTIVITY_SET_EMAIL, (string)data.email, "", 1));
+
+                if ((bool)data.test_send)
+                {
+                    Email.SendGrid((string)data.email, "TEST_SEND", "This is a test to verify that your email is working correctly.");
+                }
+
                 return Request.CreateResponse(HttpStatusCode.OK, "email_saved");
             }
             else

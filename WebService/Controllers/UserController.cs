@@ -57,6 +57,7 @@ namespace WebService.Controllers
                     {
                         string hash = mgr.GetHash(user.password);
                         db.NewUser(user.username, user.first_name, user.last_name, DateTime.Now, user.user_type, DateTime.Now, (DateTime)System.Data.SqlTypes.SqlDateTime.MinValue, hash, false, user.email, user.company, user.clientId);
+                        db.SaveActivity(new UserActivity(user.username, Commons.Constants.ACTIVITY_CREATE_ACCOUNT, "", "", 0));
                         return Request.CreateResponse(HttpStatusCode.OK, "user created");
                     }
                     else
@@ -93,12 +94,12 @@ namespace WebService.Controllers
                     {
                         string access_key = mgr.GenerateNewAccessKey(login.username);
                         db.SetNewAccessKey(login.username, access_key);
-                        Commons.UserActivity.Record(new UserActivity(login.username, Commons.Constants.ACCOUNT_TYPE, "login sucessful", ""));
+                        db.SaveActivity(new UserActivity(login.username, Commons.Constants.ACTIVITY_LOGIN, "login successful", "", 0));
                         return Request.CreateResponse(HttpStatusCode.OK, new Models.LoginResult("credentials verified", access_key, credentials.user_type, credentials.name, login.username));
                     }
                     else
                     {
-                        Commons.UserActivity.Record(new UserActivity(login.username, Commons.Constants.ACCOUNT_TYPE, "incorrect credentials. login failed", ""));
+                        Commons.UserActivity.Record(new UserActivity(login.username, Commons.Constants.ACTIVITY_ACCOUNT_TYPE, "incorrect credentials. login failed", ""));
                         return Request.CreateResponse(HttpStatusCode.Unauthorized, new Models.LoginResult("incorrect credentials", "", -1, "", login.username));
                     }
                 }
@@ -124,6 +125,7 @@ namespace WebService.Controllers
                 Utilities.PasswordManager psw_manager = new Utilities.PasswordManager();
                 if (psw_manager.ChangePassword((string)data.username, (string)data.old_psw, (string)data.new_psw))
                 {
+                    db.SaveActivity(new UserActivity((string)data.username, Commons.Constants.ACTIVITY_CHANGE_PASSWORD, "", "", 0));
                     return Request.CreateResponse(HttpStatusCode.OK, "password_updated");
                 }
                 else
@@ -153,6 +155,7 @@ namespace WebService.Controllers
                     if (db.CheckUserExist(delete.user))
                     {
                         db.DeleteUser(delete.user);
+                        db.SaveActivity(new UserActivity(delete.user, Commons.Constants.ACTIVITY_DELETE_ACCOUNT, delete.user, "", 0));
                         return Request.CreateResponse(HttpStatusCode.OK, "user_deleted");
                     }
                     else

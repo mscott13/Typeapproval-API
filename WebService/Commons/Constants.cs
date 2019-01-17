@@ -17,12 +17,26 @@ namespace WebService.Commons
         public const string notifyGeneral = "GENERAL";
 
         //user activity types
-        public const string ACCOUNT_TYPE = "Account";
-        public const string APPROVAL_TYPE = "Approval";
-        public const string CANCELLATION_TYPE = "Cancellation";
-        public const string NEW_APPLICATION_TYPE = "New Application";
-        public const string SUBMISSION_TYPE = "Submission";
-        public const string UPDATE = "Update";
+        public const string ACTIVITY_ACCOUNT_TYPE = "Account";
+        public const string ACTIVITY_APPROVAL_TYPE = "Approval";
+        public const string ACTIVITY_CANCELLATION_TYPE = "Cancellation";
+        public const string ACTIVITY_NEW_APPLICATION_TYPE = "New Application";
+        public const string ACTIVITY_SUBMISSION_TYPE = "Submission";
+        public const string ACTIVITY_UPDATE = "Update";
+        public const string ACTIVITY_NEW_UNASSIGNED = "New Unassigned";
+        public const string ACTIVITY_NEW_ONGOING = "New Ongoing";
+        public const string ACTIVITY_MOVE_UNASSAIGNED = "Move Unassigned";
+        public const string ACTIVITY_MOVE_ONGOING = "Move Ongoing";
+        public const string ACTIVITY_REJECT_UNASSIGNED = "Reject Unassigned";
+        public const string ACTIVITY_SET_EMAIL = "Set Email";
+        public const string ACTIVITY_CHANGE_PASSWORD = "Change Password";
+        public const string ACTIVITY_RESET_PASSWORD = "Reset Password";
+        public const string ACTIVITY_LOGIN = "Login";
+        public const string ACTIVITY_CREATE_ACCOUNT = "Create Account";
+        public const string ACTIVITY_DELETE_ACCOUNT = "Delete Account";
+        public const string ACTIVITY_REASSIGN_TASK = "Task Reassignment";
+        public const string ACTIVITY_ASSIGN_TASK = "Task Assignment";
+        public const string ACTIVITY_ERROR = "Error";
 
         //application categories
         public const string TYPE_APPROVAL = "TYPE_APPROVAL";

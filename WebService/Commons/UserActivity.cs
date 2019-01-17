@@ -13,22 +13,22 @@ namespace WebService.Commons
         {
             switch (userActivity.type)
             {
-                case Constants.ACCOUNT_TYPE:
+                case Constants.ACTIVITY_ACCOUNT_TYPE:
                     userActivity.priority = 0;
                     break;
-                case Constants.APPROVAL_TYPE:
+                case Constants.ACTIVITY_APPROVAL_TYPE:
                     userActivity.priority = 1;
                     break;
-                case Constants.CANCELLATION_TYPE:
+                case Constants.ACTIVITY_CANCELLATION_TYPE:
                     userActivity.priority = 1;
                     break;
-                case Constants.NEW_APPLICATION_TYPE:
+                case Constants.ACTIVITY_NEW_APPLICATION_TYPE:
                     userActivity.priority = 1;
                     break;
-                case Constants.SUBMISSION_TYPE:
+                case Constants.ACTIVITY_SUBMISSION_TYPE:
                     userActivity.priority = 1;
                     break;
-                case Constants.UPDATE:
+                case Constants.ACTIVITY_UPDATE:
                     userActivity.priority = 1;
                     break;
             }

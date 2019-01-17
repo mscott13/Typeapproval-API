@@ -67,7 +67,7 @@ namespace WebService.Controllers
                 db.SaveApplication(form);
                 db.NewUnassignedTask(form.application_id, form.username, DateTime.Now);
 
-                Commons.UserActivity.Record(new UserActivity(form.username, Commons.Constants.SUBMISSION_TYPE, form.application_id, form.status));
+                Commons.UserActivity.Record(new UserActivity(form.username, Commons.Constants.ACTIVITY_SUBMISSION_TYPE, form.application_id, form.status));
 
                 foreach (MultipartFileData file in provider.FileData)
                 {
