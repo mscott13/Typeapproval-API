@@ -4,8 +4,6 @@ using System.Linq;
 using System.Web;
 using System.Net.Mail;
 using System.Net;
-using SendGrid;
-using SendGrid.Helpers.Mail;
 using System.Threading.Tasks;
 
 namespace WebService.Utilities
@@ -43,25 +41,18 @@ namespace WebService.Utilities
             }
         }
 
-        public static void SendGrid(string to_email, string subject, string message)
-        {
-            Execute(to_email, subject, message).Wait();
-        }
-
-        static  async Task Execute(string to_email, string subject, string message)
+        public static void SendEmailAdmins(string title, string message)
         {
             Database.SLW_DatabaseInfo db = new Database.SLW_DatabaseInfo();
-            Models.EmailSetting setting = db.GetEmailSetting();
-            string password = Encryption.Decrypt(setting.password);
+            List<Models.UserDetails> userDetails = db.GetAllUsersDetails();
 
-            var apiKey = "SG.vToJODFNTWqPxeHjJxnTwA.NvDKsQ8q6a8dFD3WFXAhchgBPQGpGJ890IHc4MAY5";
-            var client = new SendGridClient(apiKey);
-            var from = new EmailAddress(setting.email, "Example User");
-            var to = new EmailAddress("a.markscott13@gmail.com", "Example User");
-            var plainTextContent = "and easy to do anywhere, even with C#";
-            var htmlContent = "<strong>and easy to do anywhere, even with C#</strong>";
-            var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
-            var response = await client.SendEmailAsync(msg);
+            for (int i = 0; i < userDetails.Count; i++)
+            {
+                if (userDetails[i].user_type == "Administrator")
+                {
+                    Send(userDetails[i].email, title, message);
+                }
+            }
         }
     }
 }

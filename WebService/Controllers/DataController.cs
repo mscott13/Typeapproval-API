@@ -347,8 +347,10 @@ namespace WebService.Controllers
                 db.NewOngoingTask((string)data.application_id, (string)data.assigned_to, unassigned.username, (string)data.status, unassigned.created_date_raw);
                 db.UpdateApplicationStatus((string)data.application_id, Commons.Constants.PENDING_TYPE);
                 OngoingTask ongoing = db.GetSingleOngoingTask((string)data.application_id);
-                ongoing.assigned_to = db.GetUserDetails(ongoing.assigned_to).fullname;
+                UserDetails userDetails = db.GetUserDetails(ongoing.assigned_to);
+                ongoing.assigned_to = userDetails.fullname;
                 db.SaveActivity(new UserActivity(detail.username, Commons.Constants.ACTIVITY_NEW_ONGOING, (string)data.application_id, (string)data.assigned_to, 1));
+                Email.Send(userDetails.email, "New Type Approval Application", "A new application has been assigned to you for processing.");
                 return Request.CreateResponse(HttpStatusCode.OK, ongoing);
             }
             else
@@ -406,10 +408,17 @@ namespace WebService.Controllers
 
             if (detail.data_present)
             {
+                OngoingTask prev_ongoing = db.GetSingleOngoingTask((string)data.application_id);
                 db.ReassignTask((string)data.application_id, (string)data.assign_to);
                 OngoingTask ongoing = db.GetSingleOngoingTask((string)data.application_id);
-                ongoing.assigned_to = db.GetUserDetails(ongoing.assigned_to).fullname;
+                UserDetails prevUserDetails = db.GetUserDetails(prev_ongoing.assigned_to);
+                UserDetails userDetails = db.GetUserDetails(ongoing.assigned_to);
+                ongoing.assigned_to = userDetails.fullname;
                 db.SaveActivity(new UserActivity(detail.username, Commons.Constants.ACTIVITY_REASSIGN_TASK, (string)data.application_id, (string)data.assign_to, 1));
+
+                Email.Send(userDetails.email, "New Type Approval Application", "A new application has been assigned to you for processing.");
+                Email.Send(prevUserDetails.email, "Assigned Type Approval Application", "An application that had been assigned to you has been reassigned.");
+
                 return Request.CreateResponse(HttpStatusCode.OK, ongoing);
             }
             else
@@ -509,7 +518,7 @@ namespace WebService.Controllers
 
                 if ((bool)data.test_send)
                 {
-                    Email.SendGrid((string)data.email, "TEST_SEND", "This is a test to verify that your email is working correctly.");
+                    Email.Send((string)data.email, "TEST_SEND", "This is a test to verify that your email is working correctly.");
                 }
 
                 return Request.CreateResponse(HttpStatusCode.OK, "email_saved");

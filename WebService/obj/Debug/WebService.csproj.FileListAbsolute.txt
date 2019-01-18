@@ -270,6 +270,3 @@ C:\Users\Mark Scott\Desktop\Git-Repositories\Typeapproval-API\WebService\obj\Deb
 C:\Users\Mark Scott\Desktop\Git-Repositories\Typeapproval-API\WebService\obj\Debug\WebService.dll
 C:\Users\Mark Scott\Desktop\Git-Repositories\Typeapproval-API\WebService\obj\Debug\WebService.pdb
 C:\Users\Mark Scott\Desktop\Git repositories\Typeapproval-API\WebService\obj\Debug\WebService.csprojAssemblyReference.cache
-C:\Users\Mark Scott\Desktop\Git repositories\Typeapproval-API\WebService\bin\SendGrid.dll
-C:\Users\Mark Scott\Desktop\Git repositories\Typeapproval-API\WebService\bin\SendGrid.pdb
-C:\Users\Mark Scott\Desktop\Git repositories\Typeapproval-API\WebService\bin\SendGrid.xml

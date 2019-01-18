@@ -4,8 +4,6 @@ using System.Web.Http;
 using WebService.Database;
 using WebService.Models;
 using WebService.Commons;
-using SendGrid;
-using SendGrid.Helpers.Mail;
 using System;
 using System.Threading.Tasks;
 namespace WebService.Controllers
@@ -37,25 +35,7 @@ namespace WebService.Controllers
         [HttpPost]
         public HttpResponseMessage SendEmail()
         {
-            Execute().Wait();
             return Request.CreateResponse(HttpStatusCode.OK, "");
-        }
-
-        static async Task Execute()
-        {
-            Database.SLW_DatabaseInfo db = new Database.SLW_DatabaseInfo();
-            Models.EmailSetting setting = db.GetEmailSetting();
-            string password = Utilities.Encryption.Decrypt(setting.password);
-
-            var apiKey = "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";
-            var client = new SendGridClient(apiKey);
-            var from = new EmailAddress("a.markscott13@gmail.com", "Example User");
-            var subject = "Sending with SendGrid is Fun";
-            var to = new EmailAddress("a.markscott13@yahoo.com", "Example User");
-            var plainTextContent = "and easy to do anywhere, even with C#";
-            var htmlContent = "<strong>and easy to do anywhere, even with C#</strong>";
-            var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
-            var response = await client.SendEmailAsync(msg);
         }
     }
 }
