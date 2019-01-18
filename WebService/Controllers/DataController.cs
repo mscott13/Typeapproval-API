@@ -513,20 +513,16 @@ namespace WebService.Controllers
             {
                 //do additional checks here to confirm if this is a sys admin
                 string crypt = Encryption.Encrypt((string)data.password);
-                db.NewEmailSetting((string)data.email, crypt);
+                db.NewEmailSetting((string)data.email, crypt, (string)data.host, (int)data.port, (bool)data.use_ssl);
                 db.SaveActivity(new UserActivity(detail.username, Commons.Constants.ACTIVITY_SET_EMAIL, (string)data.email, "", 1));
 
-                if ((bool)data.test_send)
-                {
-                    Email.Send((string)data.email, "TEST_SEND", "This is a test to verify that your email is working correctly.");
-                }
-
+                Email.Send((string)data.email, "TEST_SEND", "This is a test to verify that your email is working correctly.");
                 return Request.CreateResponse(HttpStatusCode.OK, "email_saved");
             }
             else
             {
                 return Request.CreateResponse(HttpStatusCode.Unauthorized, "invalid key");
-            }
+            }   
         }
     }
 }

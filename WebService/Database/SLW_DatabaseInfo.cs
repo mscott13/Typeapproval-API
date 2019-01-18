@@ -1183,14 +1183,17 @@ namespace WebService.Database
             return dashboard;
         }
 
-        public void NewEmailSetting(string email, string crypt)
+        public void NewEmailSetting(string email, string crypt, string host, int port, bool use_ssl)
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
-            cmd.CommandText = "sp_setNewEmailSettings @email, @crypt";
+            cmd.CommandText = "sp_setNewEmailSettings @email,  @crypt, @host, @port, @use_ssl";
 
             cmd.Parameters.AddWithValue("@email", email);
             cmd.Parameters.AddWithValue("@crypt", crypt);
+            cmd.Parameters.AddWithValue("@host", host);
+            cmd.Parameters.AddWithValue("@port", port);
+            cmd.Parameters.AddWithValue("@use_ssl", use_ssl);
             cmd.Connection = conn;
 
             conn.Open();
@@ -1216,6 +1219,9 @@ namespace WebService.Database
                 emailSetting.email = reader["email"].ToString();
                 emailSetting.last_accessed = Convert.ToDateTime(reader["last_accessed"]);
                 emailSetting.password = reader["crypt"].ToString();
+                emailSetting.host = reader["host"].ToString();
+                emailSetting.port = Convert.ToInt32(reader["port"]);
+                emailSetting.use_ssl = Convert.ToBoolean(reader["use_ssl"]);
             }
             conn.Close();
             return emailSetting;

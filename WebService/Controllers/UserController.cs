@@ -77,6 +77,61 @@ namespace WebService.Controllers
         }
 
         [HttpPost]
+        public HttpResponseMessage RegisterV2([FromBody]Models.NewUser user)
+        {
+            if (user != null)
+            {
+                SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+                KeyDetail detail = db.GetKeyDetail(user.access_key);
+
+                if (detail.data_present)
+                {
+                    //can be used to call client functions
+                    var connection = GlobalHost.ConnectionManager.GetHubContext<CrossDomainHub>();
+
+                    Utilities.PasswordManager mgr = new Utilities.PasswordManager();
+                    bool valid_user_type = false;
+
+                    List<UserType> user_types = db.GetUserTypes();
+                    for (int i = 0; i < user_types.Count; i++)
+                    {
+                        if (user_types[i].user_type == user.user_type)
+                        {
+                            valid_user_type = true;
+                        }
+                    }
+
+                    if (valid_user_type)
+                    {
+                        if (!db.CheckUserExist(user.username))
+                        {
+                            string hash = mgr.GetHash(user.password);
+                            db.NewUser(user.username, user.first_name, user.last_name, DateTime.Now, user.user_type, DateTime.Now, (DateTime)System.Data.SqlTypes.SqlDateTime.MinValue, hash, false, user.email, user.company, user.clientId);
+                            db.SaveActivity(new UserActivity(user.username, Commons.Constants.ACTIVITY_CREATE_ACCOUNT, "", "", 0));
+                            return Request.CreateResponse(HttpStatusCode.OK, db.GetUserDetails(user.username));
+                        }
+                        else
+                        {
+                            return Request.CreateResponse(HttpStatusCode.Unauthorized, "user exists");
+                        }
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.Unauthorized, "invalid user type");
+                    }
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.Unauthorized, "invalid key");
+                }
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, "bad request");
+            }
+        }
+
+        [HttpPost]
         public HttpResponseMessage Login([FromBody]Models.Login login)
         {
             Utilities.PasswordManager mgr = new Utilities.PasswordManager();

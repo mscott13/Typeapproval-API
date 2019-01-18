@@ -25,5 +25,7 @@ namespace WebService.Models
         public string email      { get; set; }
         public string company    { get; set; }
         public int clientId      { get; set; }
+        public string access_key { get; set; }
+        public bool send_credentials { get; set; }
     }
 }

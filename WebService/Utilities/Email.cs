@@ -25,13 +25,12 @@ namespace WebService.Utilities
 
                 SmtpClient smtpClient = new SmtpClient();
                 smtpClient.UseDefaultCredentials = false;
-                smtpClient.Host = "smtp.gmail.com";
-                smtpClient.Port = 587;
+                smtpClient.Host = setting.host;
+                smtpClient.Port = setting.port;
                 smtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
                 smtpClient.Credentials = new NetworkCredential(setting.email, password);
-                smtpClient.EnableSsl = true;
+                smtpClient.EnableSsl = setting.use_ssl;
                 smtpClient.Send(msg);
-                db.SaveActivity(new Models.UserActivity("", Commons.Constants.ACTIVITY_SET_EMAIL, "", "", 1));
                 return true;
             }
             catch (Exception e)
