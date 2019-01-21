@@ -35,6 +35,7 @@ namespace WebService.Controllers
         [HttpPost]
         public HttpResponseMessage SendEmail()
         {
+            Utilities.Email.Send("admin@smagate.sma.gov.jm", "Testing Subject", "Using sendgrid is quite nice");
             return Request.CreateResponse(HttpStatusCode.OK, "");
         }
     }

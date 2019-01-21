@@ -512,11 +512,10 @@ namespace WebService.Controllers
             if (detail.data_present)
             {
                 //do additional checks here to confirm if this is a sys admin
-                string crypt = Encryption.Encrypt((string)data.password);
-                db.NewEmailSetting((string)data.email, crypt, (string)data.host, (int)data.port, (bool)data.use_ssl);
+                db.NewEmailSetting((string)data.email, (string)data.company_name);
                 db.SaveActivity(new UserActivity(detail.username, Commons.Constants.ACTIVITY_SET_EMAIL, (string)data.email, "", 1));
 
-                Email.Send((string)data.email, "TEST_SEND", "This is a test to verify that your email is working correctly.");
+                Email.Send((string)data.email, "Email Verification", "Email is now configured...");
                 return Request.CreateResponse(HttpStatusCode.OK, "email_saved");
             }
             else

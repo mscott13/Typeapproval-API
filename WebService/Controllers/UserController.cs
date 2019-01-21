@@ -149,17 +149,18 @@ namespace WebService.Controllers
                     {
                         string access_key = mgr.GenerateNewAccessKey(login.username);
                         db.SetNewAccessKey(login.username, access_key);
-                        db.SaveActivity(new UserActivity(login.username, Commons.Constants.ACTIVITY_LOGIN, "login successful", "", 0));
+                        db.SaveActivity(new UserActivity(login.username, Commons.Constants.ACTIVITY_LOGIN, "login successful", "", 1));
                         return Request.CreateResponse(HttpStatusCode.OK, new Models.LoginResult("credentials verified", access_key, credentials.user_type, credentials.name, login.username));
                     }
                     else
                     {
-                        Commons.UserActivity.Record(new UserActivity(login.username, Commons.Constants.ACTIVITY_ACCOUNT_TYPE, "incorrect credentials. login failed", ""));
+                        db.SaveActivity(new UserActivity(login.username, Commons.Constants.ACTIVITY_LOGIN, "incorrect credentials. login failed", "", 1));
                         return Request.CreateResponse(HttpStatusCode.Unauthorized, new Models.LoginResult("incorrect credentials", "", -1, "", login.username));
                     }
                 }
                 else
                 {
+                    db.SaveActivity(new UserActivity(login.username, Commons.Constants.ACTIVITY_LOGIN, "invalid user", "", 1));
                     return Request.CreateResponse(HttpStatusCode.Unauthorized, new LoginResult("invalid user", "", -1, "", login.username));
                 }
             }

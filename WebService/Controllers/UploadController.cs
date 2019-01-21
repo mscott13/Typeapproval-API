@@ -66,57 +66,70 @@ namespace WebService.Controllers
                 form.status = Commons.Constants.SUBMITTED_TYPE;
                 db.SaveApplication(form);
                 db.NewUnassignedTask(form.application_id, form.username, DateTime.Now);
-                Email.SendEmailAdmins("NEW APPLICATION", "A new application has been submitted");
+                Email.SendEmailAdmins("New Application", "A new application has been submitted: <b>"+form.application_id+"<b>");
 
                 Commons.UserActivity.Record(new UserActivity(form.username, Commons.Constants.ACTIVITY_SUBMISSION_TYPE, form.application_id, form.status));
                 foreach (MultipartFileData file in provider.FileData)
                 {
-                    var purpose = file.Headers.ContentDisposition.Name.Replace("\"", "");
-                    switch (purpose)
+                    var type = file.Headers.ContentType.MediaType;
+                    if (type == "application/pdf")
                     {
-                        case "tech_spec":
-                            rename = root + @"\" + form.username + @"\" + application_id + @"\" + "technical_specifications" + @"\" + file.Headers.ContentDisposition.FileName.Replace("\"", "");
-                            if (!Directory.Exists(root + @"\" + form.username + @"\" + application_id + @"\" + "technical_specifications"))
-                            {
-                                Directory.CreateDirectory(root + @"\" + form.username + @"\" + application_id + @"\" + "technical_specifications");
-                            }
-                            break;
-                        case "test_report":
-                            rename = root + @"\" + form.username + @"\" + application_id + @"\" + "test_report" + @"\" + file.Headers.ContentDisposition.FileName.Replace("\"", "");
-                            if (!Directory.Exists(root + @"\" + form.username + @"\" + application_id + @"\" + "test_report"))
-                            {
-                                Directory.CreateDirectory(root + @"\" + form.username + @"\" + application_id + @"\" + "test_report");
-                            }
-                            break;
-                        case "accreditation":
-                            rename = root + @"\" + form.username + @"\" + application_id + @"\" + "accreditation" + @"\" + file.Headers.ContentDisposition.FileName.Replace("\"", "");
-                            if (!Directory.Exists(root + @"\" + form.username + @"\" + application_id + @"\" + "accreditation"))
-                            {
-                                Directory.CreateDirectory(root + @"\" + form.username + @"\" + application_id + @"\" + "accreditation");
-                            }
-                            break;
-                    }
-
-                    if (!File.Exists(rename))
-                    {
-                        File.Move(file.LocalFileName, rename);
-
+                        var purpose = file.Headers.ContentDisposition.Name.Replace("\"", "");
                         switch (purpose)
                         {
                             case "tech_spec":
-                                db.AddFileReference(Generator.guid(), file.Headers.ContentDisposition.FileName.Replace("\"", ""), DateTime.Now, rename, application_id, form.name_of_test, form.country, form.username, Commons.Constants.TECHNICAL_SPECIFICATION_FILE);
+                                rename = root + @"\" + form.username + @"\" + application_id + @"\" + "technical_specifications" + @"\" + file.Headers.ContentDisposition.FileName.Replace("\"", "");
+                                if (!Directory.Exists(root + @"\" + form.username + @"\" + application_id + @"\" + "technical_specifications"))
+                                {
+                                    Directory.CreateDirectory(root + @"\" + form.username + @"\" + application_id + @"\" + "technical_specifications");
+                                }
                                 break;
                             case "test_report":
-                                db.AddFileReference(Generator.guid(), file.Headers.ContentDisposition.FileName.Replace("\"", ""), DateTime.Now, rename, application_id, form.name_of_test, form.country, form.username, Commons.Constants.TEST_REPORT_FILE);
+                                rename = root + @"\" + form.username + @"\" + application_id + @"\" + "test_report" + @"\" + file.Headers.ContentDisposition.FileName.Replace("\"", "");
+                                if (!Directory.Exists(root + @"\" + form.username + @"\" + application_id + @"\" + "test_report"))
+                                {
+                                    Directory.CreateDirectory(root + @"\" + form.username + @"\" + application_id + @"\" + "test_report");
+                                }
                                 break;
                             case "accreditation":
-                                db.AddFileReference(Generator.guid(), file.Headers.ContentDisposition.FileName.Replace("\"", ""), DateTime.Now, rename, application_id, form.name_of_test, form.country, form.username, Commons.Constants.ACCREDITATION_FILE);
+                                rename = root + @"\" + form.username + @"\" + application_id + @"\" + "accreditation" + @"\" + file.Headers.ContentDisposition.FileName.Replace("\"", "");
+                                if (!Directory.Exists(root + @"\" + form.username + @"\" + application_id + @"\" + "accreditation"))
+                                {
+                                    Directory.CreateDirectory(root + @"\" + form.username + @"\" + application_id + @"\" + "accreditation");
+                                }
                                 break;
+                        }
+
+                        if (!File.Exists(rename))
+                        {
+                            File.Move(file.LocalFileName, rename);
+
+                            switch (purpose)
+                            {
+                                case "tech_spec":
+                                    db.AddFileReference(Generator.guid(), file.Headers.ContentDisposition.FileName.Replace("\"", ""), DateTime.Now, rename, application_id, form.name_of_test, form.country, form.username, Commons.Constants.TECHNICAL_SPECIFICATION_FILE);
+                                    break;
+                                case "test_report":
+                                    db.AddFileReference(Generator.guid(), file.Headers.ContentDisposition.FileName.Replace("\"", ""), DateTime.Now, rename, application_id, form.name_of_test, form.country, form.username, Commons.Constants.TEST_REPORT_FILE);
+                                    break;
+                                case "accreditation":
+                                    db.AddFileReference(Generator.guid(), file.Headers.ContentDisposition.FileName.Replace("\"", ""), DateTime.Now, rename, application_id, form.name_of_test, form.country, form.username, Commons.Constants.ACCREDITATION_FILE);
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            File.Delete(file.LocalFileName);
                         }
                     }
                     else
                     {
-                        File.Delete(file.LocalFileName);
+                        foreach (MultipartFileData files in provider.FileData)
+                        {
+                            File.Delete(files.LocalFileName);
+                        }
+                        
+                        return Request.CreateResponse(HttpStatusCode.UnsupportedMediaType, "invalid_file");
                     }
                 }
 

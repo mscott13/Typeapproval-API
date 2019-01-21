@@ -276,7 +276,9 @@ namespace WebService.Database
                 userDetails.email = reader["email"].ToString();
                 userDetails.user_type = reader["user_type"].ToString();
                 userDetails.created_date = Convert.ToDateTime(reader["created_date"]);
+                userDetails.created_date_str = userDetails.created_date.ToString();
                 userDetails.last_detected_activity = Convert.ToDateTime(reader["last_detected_activity"]);
+                userDetails.last_detected_activity_str = userDetails.last_detected_activity.ToString();
                 conn.Close();
 
                 return userDetails;
@@ -1183,17 +1185,14 @@ namespace WebService.Database
             return dashboard;
         }
 
-        public void NewEmailSetting(string email, string crypt, string host, int port, bool use_ssl)
+        public void NewEmailSetting(string email, string company)
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
-            cmd.CommandText = "sp_setNewEmailSettings @email,  @crypt, @host, @port, @use_ssl";
+            cmd.CommandText = "sp_setNewEmailSettings @email, @company";
 
             cmd.Parameters.AddWithValue("@email", email);
-            cmd.Parameters.AddWithValue("@crypt", crypt);
-            cmd.Parameters.AddWithValue("@host", host);
-            cmd.Parameters.AddWithValue("@port", port);
-            cmd.Parameters.AddWithValue("@use_ssl", use_ssl);
+            cmd.Parameters.AddWithValue("@company", company);
             cmd.Connection = conn;
 
             conn.Open();
@@ -1218,10 +1217,7 @@ namespace WebService.Database
                 reader.Read();
                 emailSetting.email = reader["email"].ToString();
                 emailSetting.last_accessed = Convert.ToDateTime(reader["last_accessed"]);
-                emailSetting.password = reader["crypt"].ToString();
-                emailSetting.host = reader["host"].ToString();
-                emailSetting.port = Convert.ToInt32(reader["port"]);
-                emailSetting.use_ssl = Convert.ToBoolean(reader["use_ssl"]);
+                emailSetting.company_name = reader["company_name"].ToString();
             }
             conn.Close();
             return emailSetting;
