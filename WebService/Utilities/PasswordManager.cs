@@ -54,10 +54,10 @@ namespace WebService.Utilities
             }
         }
 
-        public void ResetPassword(string user)
+        public void ResetPassword(string user, string password)
         {
             Database.SLW_DatabaseInfo db = new Database.SLW_DatabaseInfo();
-            db.ResetPassword(user);
+            db.ResetPassword(user, GetHash(password));
         }
 
         public bool ChangePassword(string user, string old_psw, string new_psw)

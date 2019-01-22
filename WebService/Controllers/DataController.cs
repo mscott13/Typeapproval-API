@@ -32,6 +32,7 @@ namespace WebService.Controllers
         {
             SLW_DatabaseInfo db = new SLW_DatabaseInfo();
             AssignedCompany company = db.GetAssignedCompany(db.GetKeyDetail((string)data.access_key).username);
+            ClientCompany clientCompany = new ClientCompany();
 
             if (company == null)
             {
@@ -39,7 +40,16 @@ namespace WebService.Controllers
             }
             else
             {
-                return Request.CreateResponse(HttpStatusCode.OK, db.GetClientDetail(company.clientId));
+                if (company.source == Commons.Constants.LOCAL_SOURCE)
+                {
+                    clientCompany = db.GetLocalClientCompany(company.clientId);
+                }
+                else
+                {
+                    clientCompany = db.GetClientDetail(company.clientId);
+                }
+
+                return Request.CreateResponse(HttpStatusCode.OK, clientCompany);
             }
         }
 
@@ -522,6 +532,36 @@ namespace WebService.Controllers
             {
                 return Request.CreateResponse(HttpStatusCode.Unauthorized, "invalid key");
             }   
+        }
+
+        [HttpPost]
+        public HttpResponseMessage NewCompany([FromBody] ClientCompany data)
+        {
+            SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+            try
+            {
+                int client_id = db.NewLocalClient(data);
+                return Request.CreateResponse(HttpStatusCode.OK, client_id);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "something went wrong");
+            }
+        }
+
+        [HttpPost]
+        public HttpResponseMessage NewManufacturer([FromBody] Manufacturer data)
+        {
+            SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+            try
+            {
+                Manufacturer manufacturer = db.NewLocalManufacturer(data);
+                return Request.CreateResponse(HttpStatusCode.OK, manufacturer);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "something went wrong");
+            }
         }
     }
 }

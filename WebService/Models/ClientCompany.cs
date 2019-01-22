@@ -19,6 +19,8 @@ namespace WebService.Models
             this.nationality = (nationality == "") ? "unavailable" : nationality;
         }
 
+        public ClientCompany() { }
+
         public string clientId { get; set; }
         public string name { get; set; }
         public string telephone { get; set; }

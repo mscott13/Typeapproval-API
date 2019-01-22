@@ -9,5 +9,6 @@ namespace WebService.Models
     {
         public string company { get; set; }
         public int clientId { get; set; }
+        public string source { get; set; }
     }
 }

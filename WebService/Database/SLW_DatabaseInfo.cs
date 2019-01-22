@@ -408,12 +408,13 @@ namespace WebService.Database
             conn.Close();
         }
 
-        public void ResetPassword(string user)
+        public void ResetPassword(string user, string hash)
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
-            cmd.CommandText = "sp_resetPassword @user";
+            cmd.CommandText = "sp_resetPassword @user, @hash";
             cmd.Parameters.AddWithValue("@user", user);
+            cmd.Parameters.AddWithValue("@hash", hash);
 
             cmd.Connection = conn;
             conn.Open();
@@ -468,13 +469,14 @@ namespace WebService.Database
             }
         }
 
-        public void NewUser(string username, string first_name, string last_name, DateTime created_date, int user_type, DateTime last_password_change_date,
-                                  DateTime last_login_date, string hash, bool password_reset_required, string email, string company, int clientId)
+        public int NewUser(string username, string first_name, string last_name, DateTime created_date, int user_type, DateTime last_password_change_date,
+                                  DateTime last_login_date, string hash, bool password_reset_required, string email, string company, int clientId, string source)
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlDataReader reader = null;
             SqlCommand cmd = new SqlCommand();
             cmd.CommandText = "sp_createUser @username, @first_name, @last_name, @created_date, @user_type, @last_password_change_date, " +
-                              "@last_login_date, @hash, @password_reset_required, @email, @company, @clientId";
+                              "@last_login_date, @hash, @password_reset_required, @email, @company, @clientId, @source";
 
             cmd.Parameters.AddWithValue("@username", username);
             cmd.Parameters.AddWithValue("@first_name", first_name);
@@ -488,11 +490,41 @@ namespace WebService.Database
             cmd.Parameters.AddWithValue("@email", email);
             cmd.Parameters.AddWithValue("@company", company);
             cmd.Parameters.AddWithValue("@clientId", clientId);
+            cmd.Parameters.AddWithValue("@source", source);
 
             cmd.Connection = conn;
             conn.Open();
-            cmd.ExecuteNonQuery();
+            reader = cmd.ExecuteReader();
+
+            reader.Read();
+            int id = Convert.ToInt32(reader["client_id"]);
             conn.Close();
+            return id;
+        }
+
+        public bool CheckLocalClientExist(int client_id)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader reader = null;
+            cmd.CommandText = "sp_checkLocalClientExist @client_id";
+            cmd.Parameters.AddWithValue("@client_id", client_id);
+            cmd.Connection = conn;
+
+            conn.Open();
+            reader = cmd.ExecuteReader();
+            reader.Read();
+
+            if (Convert.ToInt32(reader["count"]) > 0)
+            {
+                conn.Close();
+                return true;
+            }
+            else
+            {
+                conn.Close();
+                return false;
+            }
         }
 
         public int GetUserType(string access_key)
@@ -720,6 +752,7 @@ namespace WebService.Database
                 reader.Read();
                 company.clientId = Convert.ToInt32(reader["clientId"]);
                 company.company = reader["company"].ToString();
+                company.source = reader["source"].ToString();
                 conn.Close();
                 return company;
             }
@@ -1804,6 +1837,161 @@ namespace WebService.Database
             applicationFileCategories.testReport = GetTestReportFiles(application_id);
             applicationFileCategories.accreditation = GetAccreditationFiles(application_id);
             return applicationFileCategories;
+        }
+
+        public Manufacturer NewLocalManufacturer(Manufacturer manufacturer)
+        {
+       
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader reader = null;
+            Manufacturer _manufacturer = new Manufacturer();
+
+            cmd.CommandText = "sp_newManufacturer @dealer, @address, @telephone, @fax, @contact_person";
+            cmd.Parameters.AddWithValue("@dealer", manufacturer.name);
+            cmd.Parameters.AddWithValue("@address", manufacturer.address);
+            cmd.Parameters.AddWithValue("@telephone", manufacturer.telephone);
+            cmd.Parameters.AddWithValue("@fax", manufacturer.fax);
+            cmd.Parameters.AddWithValue("@contact_person", manufacturer.contact_person);
+            cmd.Connection = conn;
+
+            conn.Open();
+            reader = cmd.ExecuteReader();
+            reader.Read();
+
+            manufacturer.name = reader["dealer"].ToString();
+            manufacturer.address = reader["address"].ToString();
+            manufacturer.telephone = reader["telephone"].ToString();
+            manufacturer.fax = reader["fax"].ToString();
+            manufacturer.contact_person = reader["fax"].ToString();
+            conn.Close();
+            return manufacturer;
+        }
+
+        public List<Manufacturer> GetLocalManufacturers()
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            List<Manufacturer> manufacturers = new List<Manufacturer>();
+            SqlDataReader reader = null;
+            cmd.CommandText = " sp_getLocalManufacturers @manufacturer_id";
+            cmd.Parameters.AddWithValue("@manufacturer_id", "");
+            cmd.Connection = conn;
+
+            conn.Open();
+            reader = cmd.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                while (reader.Read()) {
+                    manufacturers.Add(new Manufacturer(reader["dealer"].ToString(), reader["address"].ToString(), reader["telephone"].ToString(), reader["fax"].ToString(), reader["contact_person"].ToString()));
+                }
+            }
+
+            conn.Close();
+            return manufacturers;
+        }
+
+        public List<Manufacturer> GetLocalManufacturers(int manufacturer_id)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            List<Manufacturer> manufacturers = new List<Manufacturer>();
+            SqlDataReader reader = null;
+            cmd.CommandText = " sp_getLocalManufacturers @manufacturer_id";
+            cmd.Parameters.AddWithValue("@manufacturer_id", manufacturer_id);
+            cmd.Connection = conn;
+
+            conn.Open();
+            reader = cmd.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    manufacturers.Add(new Manufacturer(reader["dealer"].ToString(), reader["address"].ToString(), reader["telephone"].ToString(), reader["fax"].ToString(), reader["contact_person"].ToString()));
+                }
+            }
+
+            conn.Close();
+            return manufacturers;
+        }
+
+        public ClientCompany GetLocalClientCompany(int client_id)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            ClientCompany clientCompany = new ClientCompany();
+            SqlDataReader reader = null;
+            cmd.CommandText = "sp_getLocalClientCompany @client_id";
+            cmd.Parameters.AddWithValue("@client_id", client_id);
+            cmd.Connection = conn;
+
+            conn.Open();
+            reader = cmd.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                reader.Read();
+
+                clientCompany = new ClientCompany(reader["client_id"].ToString(), reader["name"].ToString(), reader["telephone"].ToString(),
+                                                      reader["address"].ToString(), reader["fax"].ToString(), reader["cityTown"].ToString(), reader["contactPerson"].ToString(), reader["nationality"].ToString());
+
+            }
+            conn.Close();
+            return clientCompany;
+        }
+
+        public List<ClientCompany> GetLocalClientCompanies()
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            List<ClientCompany> clientCompanies = new List<ClientCompany>();
+            SqlDataReader reader = null;
+            cmd.CommandText = "sp_getLocalClientCompany @client_id";
+            cmd.Parameters.AddWithValue("@client_id", "");
+            cmd.Connection = conn;
+
+            conn.Open();
+            reader = cmd.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    clientCompanies.Add(new ClientCompany(reader["client_id"].ToString(), reader["name"].ToString(), reader["telephone"].ToString(),
+                                                          reader["address"].ToString(), reader["fax"].ToString(), reader["cityTown"].ToString(), reader["contactPerson"].ToString(), reader["nationality"].ToString()));
+                }
+            }
+            conn.Close();
+            return clientCompanies;
+        }
+
+
+        public int NewLocalClient(ClientCompany client)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader reader = null;
+
+            cmd.CommandText = "sp_newClientCompany @name, @telephone, @address, @fax, @cityTown, @contactPerson, @nationality";
+            cmd.Parameters.AddWithValue("@name", client.name);
+            cmd.Parameters.AddWithValue("@telephone", client.telephone);
+            cmd.Parameters.AddWithValue("@address", client.address);
+            cmd.Parameters.AddWithValue("@fax", client.fax);
+            cmd.Parameters.AddWithValue("@cityTown", client.cityTown);
+            cmd.Parameters.AddWithValue("@contactPerson", client.contactPerson);
+            cmd.Parameters.AddWithValue("@nationality", client.nationality);
+            cmd.Connection = conn;
+            
+
+            conn.Open();
+            reader = cmd.ExecuteReader();
+            reader.Read();
+
+            int client_id = Convert.ToInt32(reader["client_id"]);
+            conn.Close();
+            return client_id;
         }
     }
 }

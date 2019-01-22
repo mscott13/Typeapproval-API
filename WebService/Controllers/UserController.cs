@@ -55,12 +55,22 @@ namespace WebService.Controllers
                 {
                     if (!db.CheckUserExist(user.username))
                     {
+                        string source = "";
+                        if (db.CheckLocalClientExist(user.clientId))
+                        {
+                            source = Commons.Constants.LOCAL_SOURCE;
+                        }
+                        else
+                        {
+                            source = Commons.Constants.ASMS_SOURCE;
+                        }
+
                         string hash = mgr.GetHash(user.password);
-                        db.NewUser(user.username, user.first_name, user.last_name, DateTime.Now, user.user_type, DateTime.Now, (DateTime)System.Data.SqlTypes.SqlDateTime.MinValue, hash, false, user.email, user.company, user.clientId);
+                        int id = db.NewUser(user.username, user.first_name, user.last_name, DateTime.Now, user.user_type, DateTime.Now, (DateTime)System.Data.SqlTypes.SqlDateTime.MinValue, hash, false, user.email, user.company, user.clientId, source);
                         db.SaveActivity(new UserActivity(user.username, Commons.Constants.ACTIVITY_CREATE_ACCOUNT, "", "", 0));
 
-                        Utilities.Email.SendEmailAdmins("New Account", "A new account has been created. Username: <b>" + user.username + "</b>");
-                        return Request.CreateResponse(HttpStatusCode.OK, "user created");
+                        Utilities.Email.Send(user.email, "New Account", "Your account was created sucessfully. Username: <b>" + user.username + "</b>");
+                        return Request.CreateResponse(HttpStatusCode.OK, id);
                     }
                     else
                     {
@@ -108,7 +118,17 @@ namespace WebService.Controllers
                         if (!db.CheckUserExist(user.username))
                         {
                             string hash = mgr.GetHash(user.password);
-                            db.NewUser(user.username, user.first_name, user.last_name, DateTime.Now, user.user_type, DateTime.Now, (DateTime)System.Data.SqlTypes.SqlDateTime.MinValue, hash, false, user.email, user.company, user.clientId);
+                            string source = "";
+                            if (db.CheckLocalClientExist(user.clientId))
+                            {
+                                source = Commons.Constants.LOCAL_SOURCE;
+                            }
+                            else
+                            {
+                                source = Commons.Constants.ASMS_SOURCE;
+                            }
+
+                            db.NewUser(user.username, user.first_name, user.last_name, DateTime.Now, user.user_type, DateTime.Now, (DateTime)System.Data.SqlTypes.SqlDateTime.MinValue, hash, false, user.email, user.company, user.clientId, source);
                             db.SaveActivity(new UserActivity(user.username, Commons.Constants.ACTIVITY_CREATE_ACCOUNT, "", "", 0));
                             Utilities.Email.SendEmailAdmins("New Account", "A new account has been created. Username: <b>" + user.username + "</b>");
                             return Request.CreateResponse(HttpStatusCode.OK, db.GetUserDetails(user.username));
@@ -191,6 +211,27 @@ namespace WebService.Controllers
                 {
                     return Request.CreateResponse(HttpStatusCode.Unauthorized, "password_incorrect");
                 }
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, "invalid key");
+            }
+        }
+
+        [HttpPost]
+        public HttpResponseMessage ResetPassword([FromBody] dynamic data)
+        {
+            SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+            KeyDetail key_detail = db.GetKeyDetail((string)data.access_key);
+
+            if (IsKeyValid(key_detail))
+            {
+                Utilities.PasswordManager manager = new Utilities.PasswordManager();
+                manager.ResetPassword((string)data.username, (string)data.new_password);
+                UserDetails userDetails = db.GetUserDetails((string)data.username);
+
+                Utilities.Email.SendEmailAdmins("Password reset", "Your password has been reset. New password: <div style style='background: WhiteSmoke; padding:3px; display:inline-block'>" + (string)data.new_password + "<div>");
+                return Request.CreateResponse(HttpStatusCode.OK, "password reset");
             }
             else
             {
