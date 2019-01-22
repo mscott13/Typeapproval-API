@@ -58,6 +58,8 @@ namespace WebService.Controllers
                         string hash = mgr.GetHash(user.password);
                         db.NewUser(user.username, user.first_name, user.last_name, DateTime.Now, user.user_type, DateTime.Now, (DateTime)System.Data.SqlTypes.SqlDateTime.MinValue, hash, false, user.email, user.company, user.clientId);
                         db.SaveActivity(new UserActivity(user.username, Commons.Constants.ACTIVITY_CREATE_ACCOUNT, "", "", 0));
+
+                        Utilities.Email.SendEmailAdmins("New Account", "A new account has been created. Username: <b>" + user.username + "</b>");
                         return Request.CreateResponse(HttpStatusCode.OK, "user created");
                     }
                     else
@@ -108,6 +110,7 @@ namespace WebService.Controllers
                             string hash = mgr.GetHash(user.password);
                             db.NewUser(user.username, user.first_name, user.last_name, DateTime.Now, user.user_type, DateTime.Now, (DateTime)System.Data.SqlTypes.SqlDateTime.MinValue, hash, false, user.email, user.company, user.clientId);
                             db.SaveActivity(new UserActivity(user.username, Commons.Constants.ACTIVITY_CREATE_ACCOUNT, "", "", 0));
+                            Utilities.Email.SendEmailAdmins("New Account", "A new account has been created. Username: <b>" + user.username + "</b>");
                             return Request.CreateResponse(HttpStatusCode.OK, db.GetUserDetails(user.username));
                         }
                         else
