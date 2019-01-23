@@ -41,7 +41,7 @@ namespace WebService.Database
                     details.Description = reader["Description"].ToString();
                     details.Address2 = reader["Address2"].ToString();
                     details.Remarks = reader["Remarks"].ToString();
-                    details.issueDate = reader.GetDateTime(6);
+                    details.issueDate = Convert.ToDateTime(reader["issueDate"]);
                     details.approval_id = reader["keyTypeApprovalID"].ToString();
                     details.keyTypeApprovalID = Convert.ToInt32(reader["keyTypeApprovalID"]);
                     details.TableInfo = GetTypeApprovalTableInfo(Convert.ToInt32(reader["keyTypeApprovalID"]));

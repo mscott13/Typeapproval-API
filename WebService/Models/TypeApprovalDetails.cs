@@ -21,4 +21,4 @@ namespace WebService.Models
         public int keyTypeApprovalID { get; set; }
         public DataTable TableInfo { get; set; }
     }
-}
+}       

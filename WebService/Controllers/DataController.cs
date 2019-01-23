@@ -247,6 +247,14 @@ namespace WebService.Controllers
         }
 
         [HttpPost]
+        public HttpResponseMessage GetSmaCertificate([FromBody] dynamic data)
+        {
+            SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+            Certificate certificate = db.GetSMACertificate((string)data.approval_id);
+            return Request.CreateResponse(HttpStatusCode.OK, certificate);
+        }
+
+        [HttpPost]
         public HttpResponseMessage GetEngineers([FromBody] string access_key)
         {
             SLW_DatabaseInfo db = new SLW_DatabaseInfo();

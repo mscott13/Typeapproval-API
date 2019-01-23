@@ -11,7 +11,7 @@ namespace WebService.Controllers
     public class SearchController : ApiController
     {
         [HttpGet]
-        public HttpResponseMessage TypeApprovalDetails([FromUri]string Dealer="", [FromUri]string Model="")
+        public HttpResponseMessage TypeApprovalDetails([FromUri]string Dealer="", [FromUri]string Model="", [FromUri]string make="", [FromUri]string remarks="")
         {
             SLW_DatabaseInfo db = new SLW_DatabaseInfo();
             if (Dealer == null)
@@ -24,7 +24,17 @@ namespace WebService.Controllers
                 Model = "";
             }
 
-            List<TypeApprovalDetails> data = db.GetTypeApprovalInfo(Dealer, Model);
+            if (make == null)
+            {
+                make = "";
+            }
+
+            if (remarks == "")
+            {
+                remarks = "";
+            }
+
+            List<TypeApprovalDetails> data = db.GetTypeApprovalInfo(Dealer, Model, make, remarks);
             return Request.CreateResponse(HttpStatusCode.OK, data);
         }
 
