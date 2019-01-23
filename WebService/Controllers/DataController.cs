@@ -237,7 +237,7 @@ namespace WebService.Controllers
 
             if (detail.data_present)
             {
-                Certificate certificate = db.GetCertificate((string)data.application_id);
+                Certificate certificate = db.GetPersonalSMACertificate((string)data.application_id);
                 return Request.CreateResponse(HttpStatusCode.OK, certificate);
             }
             else
@@ -354,7 +354,8 @@ namespace WebService.Controllers
                 UnassignedTask unassigned = db.GetSingleUnassignedTask((string)data.application_id);
                 db.DeleteUnassignedTask((string)data.application_id);
 
-                db.NewOngoingTask((string)data.application_id, (string)data.assigned_to, unassigned.username, (string)data.status, unassigned.created_date_raw);
+                UserDetails userDetailsAdmin = db.GetUserDetails(detail.username);
+                db.NewOngoingTask((string)data.application_id, (string)data.assigned_to, unassigned.username, (string)data.status, unassigned.created_date_raw, userDetailsAdmin.fullname, userDetailsAdmin.username);
                 db.UpdateApplicationStatus((string)data.application_id, Commons.Constants.PENDING_TYPE);
                 OngoingTask ongoing = db.GetSingleOngoingTask((string)data.application_id);
                 UserDetails userDetails = db.GetUserDetails(ongoing.assigned_to);

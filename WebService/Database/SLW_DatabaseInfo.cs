@@ -15,14 +15,16 @@ namespace WebService.Database
         string SLW_dbConn = Constants.databaseConnection;
 
         // Type approval search
-        public List<TypeApprovalDetails> GetTypeApprovalInfo(string Dealer, string Model)
+        public List<TypeApprovalDetails> GetTypeApprovalInfo(string Dealer, string Model, string make, string remarks)
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
             SqlDataReader reader = null;
-            cmd.CommandText = "sp_getTypeApprovalDetails @Dealer, @Model";
+            cmd.CommandText = "sp_getTypeApprovalDetails @Dealer, @Model, @make, @remarks";
             cmd.Parameters.AddWithValue("@Dealer", Dealer);
             cmd.Parameters.AddWithValue("@Model", Model);
+            cmd.Parameters.AddWithValue("@make", make);
+            cmd.Parameters.AddWithValue("@remarks", Model);
             cmd.Connection = conn;
             List<TypeApprovalDetails> data = new List<TypeApprovalDetails>();
             conn.Open();
@@ -40,6 +42,7 @@ namespace WebService.Database
                     details.Address2 = reader["Address2"].ToString();
                     details.Remarks = reader["Remarks"].ToString();
                     details.issueDate = reader.GetDateTime(6);
+                    details.approval_id = reader["keyTypeApprovalID"].ToString();
                     details.keyTypeApprovalID = Convert.ToInt32(reader["keyTypeApprovalID"]);
                     details.TableInfo = GetTypeApprovalTableInfo(Convert.ToInt32(reader["keyTypeApprovalID"]));
                     data.Add(details);
@@ -163,6 +166,57 @@ namespace WebService.Database
             return FixDuplicates(models);
         }
 
+        public List<string> GetRemarks(string query)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader reader = null;
+            List<string> models = new List<string>();
+            cmd.CommandText = "sp_getRemarks @query";
+            cmd.Parameters.AddWithValue("@query", query);
+
+            cmd.Connection = conn;
+            conn.Open();
+            reader = cmd.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    models.Add(reader["Remarks"].ToString());
+                }
+            }
+            reader.Close();
+            conn.Close();
+            return FixDuplicates(models);
+        }
+
+
+        public List<string> GetMake(string query)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader reader = null;
+            List<string> models = new List<string>();
+            cmd.CommandText = "sp_getMake @query";
+            cmd.Parameters.AddWithValue("@query", query);
+
+            cmd.Connection = conn;
+            conn.Open();
+            reader = cmd.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    models.Add(reader["Manufacturer"].ToString());
+                }
+            }
+            reader.Close();
+            conn.Close();
+            return FixDuplicates(models);
+        }
+
         public List<string> FixDuplicates(List<string> data)
         {
             List<string> group = new List<string>();
@@ -237,6 +291,10 @@ namespace WebService.Database
         {
             List<string> manufaturers = GetManufacturersByName(q);
             List<string> models = GetModels(q);
+            List<string> remarks = GetRemarks(q);
+            List<string> make = GetMake(q);
+
+
             List<SearchCategory> items = new List<SearchCategory>();
             for (int i = 0; i < manufaturers.Count; i++)
             {
@@ -248,6 +306,15 @@ namespace WebService.Database
                 items.Add(new SearchCategory(models[i], "http://localhost:3348/search?dealer=&model=" + models[i], "", "Models"));
             }
 
+            for (int i = 0; i < remarks.Count; i++)
+            {
+                items.Add(new SearchCategory(remarks[i], "http://localhost:3348/search?dealer=&remarks=" + remarks[i], "", "Remarks"));
+            }
+
+            for (int i = 0; i < make.Count; i++)
+            {
+                items.Add(new SearchCategory(make[i], "http://localhost:3348/search?dealer=&make=" + make[i], "", "Make"));
+            }
             return new ApplicationSearchResultMain(items);
         }
 
@@ -1020,7 +1087,7 @@ namespace WebService.Database
             }
 
             conn.Close();
-            form.frequencies = GetFrequencies(application_id);
+            form.frequencies = GetPersonalFrequencies(application_id);
             return form;
         }
 
@@ -1070,7 +1137,7 @@ namespace WebService.Database
             return status;
         }
 
-        public List<Frequency> GetFrequencies(string application_id)
+        public List<Frequency> GetPersonalFrequencies(string application_id)
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
@@ -1102,6 +1169,43 @@ namespace WebService.Database
             conn.Close();
             return frequencies;
         }
+
+        public List<Frequency> GetSMACertFrequencies(string approval_id)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader reader = null;
+            cmd.CommandText = "sp_getSMACertificateDetails @approval_id";
+
+            List<Frequency> frequencies = new List<Frequency>();
+            cmd.Parameters.AddWithValue("@approval_id", approval_id);
+            cmd.Connection = conn;
+
+            conn.Open();
+            reader = cmd.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                int i = 0;
+                while (reader.Read())
+                {
+                    i += 1;
+                    int sequence = i;
+                    string lower_freq = reader["LowerFrequency"].ToString();
+                    string upper_freq = reader["UpperFrequency"].ToString();
+                    string power = reader["PowerOutput"].ToString();
+                    string tolerance = reader["FrequencyTolerance"].ToString();
+                    string emmision_desig = reader["EmissionClass"].ToString();
+                    string freq_type = "";
+
+
+                    frequencies.Add(new Frequency("", approval_id, sequence, lower_freq, upper_freq, power, tolerance, emmision_desig, freq_type));
+                }
+            }
+            conn.Close();
+            return frequencies;
+        }
+
 
         public ApplicationCounters GetApplicationCounters(string username)
         {
@@ -1288,7 +1392,7 @@ namespace WebService.Database
             conn.Close();
         }
 
-        public Certificate GetCertificate(string application_id)
+        public Certificate GetPersonalSMACertificate(string application_id)
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
@@ -1311,7 +1415,36 @@ namespace WebService.Database
                 certificate.equipment_description = reader["equipment_description"].ToString();
             }
 
-            certificate.frequencies = GetFrequencies(application_id);
+            certificate.frequencies = GetPersonalFrequencies(application_id);
+            return certificate;
+        }
+
+        public Certificate GetSMACertificate(string approval_id)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader reader = null;
+            Certificate certificate = new Certificate();
+
+            cmd.CommandText = "sp_getSMACertificateMain @approval_id";
+            cmd.Parameters.AddWithValue("@approval_id", approval_id);
+            cmd.Connection = conn;
+
+            conn.Open();
+            reader = cmd.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                reader.Read();
+                certificate.manufacturer_name = reader["Dealer"].ToString();
+                certificate.manufacturer_address = reader["Address2"].ToString();
+                certificate.product_identification = reader["Model"].ToString();
+                certificate.equipment_description = reader["Description"].ToString();
+                certificate.remarks = reader["Remarks"].ToString();
+            }
+
+            conn.Close();
+            certificate.frequencies = GetSMACertFrequencies(approval_id);
             return certificate;
         }
 
@@ -1526,16 +1659,18 @@ namespace WebService.Database
             conn.Close();
         }
 
-        public void NewOngoingTask(string application_id, string assigned_to, string submitted_by, string status, DateTime created_date)
+        public void NewOngoingTask(string application_id, string assigned_to, string submitted_by, string status, DateTime created_date, string adminName, string adminUsername)
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
-            cmd.CommandText = "sp_newOngoingTask @application_id, @assigned_to, @submitted_by_username, @created_date";
+            cmd.CommandText = "sp_newOngoingTask @application_id, @assigned_to, @submitted_by_username, @created_date, @assigned_by, @assigned_by_username";
 
             cmd.Parameters.AddWithValue("@application_id", application_id);
             cmd.Parameters.AddWithValue("@assigned_to", assigned_to);
             cmd.Parameters.AddWithValue("@submitted_by_username", submitted_by);
             cmd.Parameters.AddWithValue("@created_date", created_date);
+            cmd.Parameters.AddWithValue("@assigned_by", adminName);
+            cmd.Parameters.AddWithValue("@assigned_by_username", adminUsername);
             cmd.Connection = conn;
 
             conn.Open();
@@ -1696,6 +1831,7 @@ namespace WebService.Database
                     assigned.submitted_by = reader["submitted_by"].ToString();
                     assigned.assigned_date = String.Format("{0:g}", Convert.ToDateTime(reader["date_assigned"]));
                     assigned.status = reader["status"].ToString();
+                    assigned.administrator = reader["assigned_by"].ToString();
                     assignedTasks.Add(assigned);
                 }
             }

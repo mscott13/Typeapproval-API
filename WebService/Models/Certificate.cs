@@ -13,6 +13,7 @@ namespace WebService.Models
             manufacturer_name = "";
             product_identification = "";
             equipment_description = "";
+            remarks = "";
         }
 
         public List<Frequency> frequencies { get; set; }
@@ -20,5 +21,6 @@ namespace WebService.Models
         public string manufacturer_address { get; set; }
         public string product_identification { get; set; }
         public string equipment_description { get; set; }
+        public string remarks { get; set; }
     }
 }

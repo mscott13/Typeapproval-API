@@ -10,6 +10,7 @@ namespace WebService.Models
 {
     public class TypeApprovalDetails
     {
+        public string approval_id { get; set; }
         public string clientCompany { get; set; }
         public string Dealer { get; set; }
         public string Model { get; set; }
