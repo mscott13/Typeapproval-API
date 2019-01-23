@@ -130,7 +130,6 @@ namespace WebService.Controllers
 
                             db.NewUser(user.username, user.first_name, user.last_name, DateTime.Now, user.user_type, DateTime.Now, (DateTime)System.Data.SqlTypes.SqlDateTime.MinValue, hash, false, user.email, user.company, user.clientId, source);
                             db.SaveActivity(new UserActivity(user.username, Commons.Constants.ACTIVITY_CREATE_ACCOUNT, "", "", 0));
-                            Utilities.Email.SendEmailAdmins("New Account", "A new account has been created. Username: <b>" + user.username + "</b>");
                             return Request.CreateResponse(HttpStatusCode.OK, db.GetUserDetails(user.username));
                         }
                         else
@@ -173,6 +172,7 @@ namespace WebService.Controllers
                         string access_key = mgr.GenerateNewAccessKey(login.username);
                         db.SetNewAccessKey(login.username, access_key);
                         db.SaveActivity(new UserActivity(login.username, Commons.Constants.ACTIVITY_LOGIN, "login successful", "", 1));
+                        db.CheckForApplicationUpdates(login.username);
                         return Request.CreateResponse(HttpStatusCode.OK, new Models.LoginResult("credentials verified", access_key, credentials.user_type, credentials.name, login.username));
                     }
                     else
@@ -230,7 +230,7 @@ namespace WebService.Controllers
                 manager.ResetPassword((string)data.username, (string)data.new_password);
                 UserDetails userDetails = db.GetUserDetails((string)data.username);
 
-                Utilities.Email.SendEmailAdmins("Password reset", "Your password has been reset. New password: <div style style='background: WhiteSmoke; padding:3px; display:inline-block'>" + (string)data.new_password + "<div>");
+                Utilities.Email.Send(userDetails.email,"Password reset", "Your password has been reset. New password: <div style style='background: WhiteSmoke; padding:3px; display:inline-block'>" + (string)data.new_password + "<div>");
                 return Request.CreateResponse(HttpStatusCode.OK, "password reset");
             }
             else

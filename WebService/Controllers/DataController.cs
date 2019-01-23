@@ -140,6 +140,7 @@ namespace WebService.Controllers
             string mode = (string)data.mode;
 
             SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+            db.CheckForApplicationUpdatesAllUsers();
             KeyDetail detail = db.GetKeyDetail(access_key);
 
             if (detail.data_present)
@@ -218,8 +219,8 @@ namespace WebService.Controllers
 
             if (detail.data_present)
             {
-                dashboard = db.GetDashboardData(detail.username);
                 db.CheckForApplicationUpdates(detail.username);
+                dashboard = db.GetDashboardData(detail.username);
                 return Request.CreateResponse(HttpStatusCode.OK, dashboard);
             }
             else
@@ -258,6 +259,7 @@ namespace WebService.Controllers
         public HttpResponseMessage GetEngineers([FromBody] string access_key)
         {
             SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+            db.CheckForApplicationUpdatesAllUsers();
             KeyDetail detail = db.GetKeyDetail(access_key);
 
             if (detail.data_present)

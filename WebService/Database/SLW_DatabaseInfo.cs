@@ -24,7 +24,7 @@ namespace WebService.Database
             cmd.Parameters.AddWithValue("@Dealer", Dealer);
             cmd.Parameters.AddWithValue("@Model", Model);
             cmd.Parameters.AddWithValue("@make", make);
-            cmd.Parameters.AddWithValue("@remarks", Model);
+            cmd.Parameters.AddWithValue("@remarks", remarks);
             cmd.Connection = conn;
             List<TypeApprovalDetails> data = new List<TypeApprovalDetails>();
             conn.Open();
@@ -289,6 +289,7 @@ namespace WebService.Database
 
         public ApplicationSearchResultMain GetMultiSearchApplicationResults(string q)
         {
+            
             List<string> manufaturers = GetManufacturersByName(q);
             List<string> models = GetModels(q);
             List<string> remarks = GetRemarks(q);
@@ -298,22 +299,22 @@ namespace WebService.Database
             List<SearchCategory> items = new List<SearchCategory>();
             for (int i = 0; i < manufaturers.Count; i++)
             {
-                items.Add(new SearchCategory(manufaturers[i], "http://localhost:3348/search?dealer=" + manufaturers[i] + "&model=", "", "Manufacturers"));
+                items.Add(new SearchCategory(manufaturers[i], "http://localhost:3348/search?dealer=" + Uri.EscapeUriString(manufaturers[i]) + "&model=", "", "Manufacturers"));
             }
 
             for (int i = 0; i < models.Count; i++)
             {
-                items.Add(new SearchCategory(models[i], "http://localhost:3348/search?dealer=&model=" + models[i], "", "Models"));
+                items.Add(new SearchCategory(models[i], "http://localhost:3348/search?dealer=&model=" + Uri.EscapeUriString(models[i]), "", "Models"));
             }
 
             for (int i = 0; i < remarks.Count; i++)
             {
-                items.Add(new SearchCategory(remarks[i], "http://localhost:3348/search?dealer=&remarks=" + remarks[i], "", "Remarks"));
+                items.Add(new SearchCategory(remarks[i], "http://localhost:3348/search?dealer=&remarks=" + Uri.EscapeUriString(remarks[i]), "", "Remarks"));
             }
 
             for (int i = 0; i < make.Count; i++)
             {
-                items.Add(new SearchCategory(make[i], "http://localhost:3348/search?dealer=&make=" + make[i], "", "Make"));
+                items.Add(new SearchCategory(make[i], "http://localhost:3348/search?dealer=&make=" + Uri.EscapeUriString(make[i]), "", "Make"));
             }
             return new ApplicationSearchResultMain(items);
         }
@@ -1394,6 +1395,7 @@ namespace WebService.Database
 
         public Certificate GetPersonalSMACertificate(string application_id)
         {
+            Form form = GetApplication(application_id);
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
             SqlDataReader reader = null;
@@ -1413,6 +1415,7 @@ namespace WebService.Database
                 certificate.manufacturer_address = reader["manufacturer_address"].ToString();
                 certificate.product_identification = reader["product_identifiation"].ToString();
                 certificate.equipment_description = reader["equipment_description"].ToString();
+                certificate.remarks = form.additional_info;
             }
 
             certificate.frequencies = GetPersonalFrequencies(application_id);

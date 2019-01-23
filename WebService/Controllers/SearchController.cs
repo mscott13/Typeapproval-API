@@ -29,7 +29,7 @@ namespace WebService.Controllers
                 make = "";
             }
 
-            if (remarks == "")
+            if (remarks == null)
             {
                 remarks = "";
             }

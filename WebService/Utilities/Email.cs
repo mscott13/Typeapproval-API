@@ -37,7 +37,7 @@ namespace WebService.Utilities
 
         static async Task Execute(string from_email, string company_name, string to_email, string subject, string message)
         {
-            var apiKey = Environment.GetEnvironmentVariable("SendGrid", EnvironmentVariableTarget.Machine);
+            var apiKey = "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";
             var client = new SendGridClient(apiKey);
             var from = new EmailAddress(from_email, company_name);
             var to = new EmailAddress(to_email, "user");
