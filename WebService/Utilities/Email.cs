@@ -4,9 +4,8 @@ using System.Linq;
 using System.Web;
 using System.Net.Mail;
 using System.Net;
+using PostmarkDotNet;
 using System.Threading.Tasks;
-using SendGrid;
-using SendGrid.Helpers.Mail;
 
 
 namespace WebService.Utilities
@@ -18,7 +17,7 @@ namespace WebService.Utilities
         {
             Database.SLW_DatabaseInfo db = new Database.SLW_DatabaseInfo();
             Models.EmailSetting setting = db.GetEmailSetting();
-            Execute(setting.email, setting.company_name, to_email, subject, message).Wait();
+            PostmarkSend(to_email, setting.email, subject, message, setting.company_name).ConfigureAwait(false);               
         }
 
         public static void SendEmailAdmins(string title, string message)
@@ -35,14 +34,29 @@ namespace WebService.Utilities
             }
         }
 
-        static async Task Execute(string from_email, string company_name, string to_email, string subject, string message)
+        public static async Task PostmarkSend(string to_email, string from_email, string subject, string body, string tag)
         {
-            var apiKey = "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";
-            var client = new SendGridClient(apiKey);
-            var from = new EmailAddress(from_email, company_name);
-            var to = new EmailAddress(to_email, "user");
-            var msg = MailHelper.CreateSingleEmail(from, to, subject, message, message);
-            var response = await client.SendEmailAsync(msg).ConfigureAwait(false);
+            var message = new PostmarkMessage()
+            {
+                To = to_email,
+                From = from_email,
+                TrackOpens = true,
+                Subject = subject,
+                TextBody = body,
+                HtmlBody = "",
+                Tag = tag
+            };
+
+            string key = FileManager.GetEmailKey();
+            var client = new PostmarkClient(key);
+            var sendResult = await client.SendMessageAsync(message);
+
+            if (sendResult.Status == PostmarkStatus.Success)
+            {
+            }
+            else
+            {
+            }
         }
     }
 }

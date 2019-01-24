@@ -156,6 +156,7 @@ namespace WebService.Controllers
         [HttpPost]
         public HttpResponseMessage Login([FromBody]Models.Login login)
         {
+            Utilities.FileManager.GetEmailKey();
             Utilities.PasswordManager mgr = new Utilities.PasswordManager();
             SLW_DatabaseInfo db = new SLW_DatabaseInfo();
 
@@ -230,7 +231,7 @@ namespace WebService.Controllers
                 manager.ResetPassword((string)data.username, (string)data.new_password);
                 UserDetails userDetails = db.GetUserDetails((string)data.username);
 
-                Utilities.Email.Send(userDetails.email,"Password reset", "Your password has been reset. New password: <div style style='background: WhiteSmoke; padding:3px; display:inline-block'>" + (string)data.new_password + "<div>");
+                Utilities.Email.Send(userDetails.email,"Password reset", "Your password has been reset. New password: " + (string)data.new_password + "");
                 return Request.CreateResponse(HttpStatusCode.OK, "password reset");
             }
             else

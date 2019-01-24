@@ -29,5 +29,39 @@ namespace WebService.Utilities
                 }
             }
         }
+
+        public static string GetAccountKey()
+        {
+            string dir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            try
+            {
+                StreamReader reader = new StreamReader(dir + "\\account_key.txt");
+                string txt = reader.ReadLine();
+                return txt;
+            }
+            catch (Exception e)
+            {
+                Database.SLW_DatabaseInfo db = new Database.SLW_DatabaseInfo();
+                db.SaveActivity(new Models.UserActivity("", Commons.Constants.ACTIVITY_ERROR, e.Message, ""));
+                return "";
+            }
+        }
+
+        public static string GetEmailKey()
+        {
+            string dir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            try
+            {
+                StreamReader reader = new StreamReader(dir + "\\server_key.txt");
+                string txt = reader.ReadLine();
+                return txt;
+            }
+            catch (Exception e)
+            {
+                Database.SLW_DatabaseInfo db = new Database.SLW_DatabaseInfo();
+                db.SaveActivity(new Models.UserActivity("", Commons.Constants.ACTIVITY_ERROR, e.Message, ""));
+                return "";
+            }
+        }
     }
 }
