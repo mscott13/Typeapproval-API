@@ -1969,18 +1969,83 @@ namespace WebService.Database
             return applicationFiles;
         }
 
+        public List<Models.ApplicationFiles> GetLetterAuthorizationFiles(string application_id)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            List<ApplicationFiles> applicationFiles = new List<ApplicationFiles>();
+            SqlDataReader reader = null;
+            cmd.CommandText = "sp_getFilesByType @purpose, @application_id";
+            cmd.Parameters.AddWithValue("@purpose", Commons.Constants.LETTER_AUTHORIZATION_FILE);
+            cmd.Parameters.AddWithValue("@application_id", application_id);
+            cmd.Connection = conn;
+
+            conn.Open();
+            reader = cmd.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    ApplicationFiles applicationFile = new ApplicationFiles();
+                    applicationFile.application_id = reader["application_id"].ToString();
+                    applicationFile.file_id = reader["file_id"].ToString();
+                    applicationFile.filename = reader["filename"].ToString();
+                    applicationFile.created_date = String.Format("{0:g}", Convert.ToDateTime(reader["created_date"]));
+                    applicationFile.purpose = reader["purpose"].ToString();
+                    applicationFile.username = reader["username"].ToString();
+                    applicationFiles.Add(applicationFile);
+                }
+            }
+            conn.Close();
+            return applicationFiles;
+        }
+
+        public List<Models.ApplicationFiles> GetUserManualFiles(string application_id)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            List<ApplicationFiles> applicationFiles = new List<ApplicationFiles>();
+            SqlDataReader reader = null;
+            cmd.CommandText = "sp_getFilesByType @purpose, @application_id";
+            cmd.Parameters.AddWithValue("@purpose", Commons.Constants.USER_MANUAL_FILE);
+            cmd.Parameters.AddWithValue("@application_id", application_id);
+            cmd.Connection = conn;
+
+            conn.Open();
+            reader = cmd.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    ApplicationFiles applicationFile = new ApplicationFiles();
+                    applicationFile.application_id = reader["application_id"].ToString();
+                    applicationFile.file_id = reader["file_id"].ToString();
+                    applicationFile.filename = reader["filename"].ToString();
+                    applicationFile.created_date = String.Format("{0:g}", Convert.ToDateTime(reader["created_date"]));
+                    applicationFile.purpose = reader["purpose"].ToString();
+                    applicationFile.username = reader["username"].ToString();
+                    applicationFiles.Add(applicationFile);
+                }
+            }
+            conn.Close();
+            return applicationFiles;
+        }
+
         public ApplicationFileCategories GetApplicationFileCategories(string application_id)
         {
             ApplicationFileCategories applicationFileCategories = new ApplicationFileCategories();
             applicationFileCategories.technicalSpecifications = GetTechnicalSpecificationFiles(application_id);
             applicationFileCategories.testReport = GetTestReportFiles(application_id);
             applicationFileCategories.accreditation = GetAccreditationFiles(application_id);
+            applicationFileCategories.letterAuthorization = GetLetterAuthorizationFiles(application_id);
+            applicationFileCategories.userManual = GetUserManualFiles(application_id);
             return applicationFileCategories;
         }
 
         public Manufacturer NewLocalManufacturer(Manufacturer manufacturer)
         {
-       
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
             SqlDataReader reader = null;

@@ -11,7 +11,7 @@ namespace WebService.Commons
         //@"Data Source=DESKTOP-6DGAJN8\SQLEXPRESS;Initial Catalog=SLW_Database;Integrated Security=True"
         //@"Data Source=DESKTOP-E9VTQUL\SQLEXPRESS;Initial Catalog=SLW_Database;Integrated Security=True"
 
-        public const string databaseConnection = @"Data Source=SMA-DBSRV\ASMSDEV;Initial Catalog=SLW_Database;Integrated Security=True";
+        public const string databaseConnection = @"Data Source=DESKTOP-E9VTQUL\SQLEXPRESS;Initial Catalog=SLW_Database;Integrated Security=True";
         public const string notifyTypeApproval = "TYPE_APPROVAL";
         public const string notifyGeneral = "GENERAL";
 
@@ -56,10 +56,15 @@ namespace WebService.Commons
         public const string ACCREDITATION_FILE = "ACCREDITATION";
         public const string TEST_REPORT_FILE = "TEST_REPORT";
         public const string TECHNICAL_SPECIFICATION_FILE = "TECHNICAL_SPECIFICATION";
+        public const string LETTER_AUTHORIZATION_FILE = "LETTER_OF_AUTHORIZATION";
+        public const string USER_MANUAL_FILE = "USER_MANUAL";
 
         //company_source
         public const string LOCAL_SOURCE = "Local";
         public const string ASMS_SOURCE = "Asms";
+
+        //other
+        public const bool SEND_EMAIL = false;
 
     }
 }

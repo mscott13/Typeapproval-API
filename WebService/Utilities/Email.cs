@@ -15,9 +15,12 @@ namespace WebService.Utilities
 
         public static void Send(string to_email, string subject, string message)
         {
-            Database.SLW_DatabaseInfo db = new Database.SLW_DatabaseInfo();
-            Models.EmailSetting setting = db.GetEmailSetting();
-            PostmarkSend(to_email, setting.email, subject, message, setting.company_name).ConfigureAwait(false);               
+            if (Commons.Constants.SEND_EMAIL)
+            {
+                Database.SLW_DatabaseInfo db = new Database.SLW_DatabaseInfo();
+                Models.EmailSetting setting = db.GetEmailSetting();
+                PostmarkSend(to_email, setting.email, subject, message, setting.company_name).ConfigureAwait(false);
+            }        
         }
 
         public static void SendEmailAdmins(string title, string message)

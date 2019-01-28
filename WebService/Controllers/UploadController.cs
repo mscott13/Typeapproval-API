@@ -98,6 +98,20 @@ namespace WebService.Controllers
                                     Directory.CreateDirectory(root + @"\" + form.username + @"\" + application_id + @"\" + "accreditation");
                                 }
                                 break;
+                            case "letter_auth":
+                                rename = root + @"\" + form.username + @"\" + application_id + @"\" + "letter of authorization" + @"\" + file.Headers.ContentDisposition.FileName.Replace("\"", "");
+                                if (!Directory.Exists(root + @"\" + form.username + @"\" + application_id + @"\" + "letter of authorization"))
+                                {
+                                    Directory.CreateDirectory(root + @"\" + form.username + @"\" + application_id + @"\" + "letter of authorization");
+                                }
+                                break;
+                            case "user_man":
+                                rename = root + @"\" + form.username + @"\" + application_id + @"\" + "user manual" + @"\" + file.Headers.ContentDisposition.FileName.Replace("\"", "");
+                                if (!Directory.Exists(root + @"\" + form.username + @"\" + application_id + @"\" + "user manual"))
+                                {
+                                    Directory.CreateDirectory(root + @"\" + form.username + @"\" + application_id + @"\" + "user manual");
+                                }
+                                break;
                         }
 
                         if (!File.Exists(rename))
@@ -114,6 +128,12 @@ namespace WebService.Controllers
                                     break;
                                 case "accreditation":
                                     db.AddFileReference(Generator.guid(), file.Headers.ContentDisposition.FileName.Replace("\"", ""), DateTime.Now, rename, application_id, form.name_of_test, form.country, form.username, Commons.Constants.ACCREDITATION_FILE);
+                                    break;
+                                case "letter_auth":
+                                    db.AddFileReference(Generator.guid(), file.Headers.ContentDisposition.FileName.Replace("\"", ""), DateTime.Now, rename, application_id, form.name_of_test, form.country, form.username, Commons.Constants.LETTER_AUTHORIZATION_FILE);
+                                    break;
+                                case "user_man":
+                                    db.AddFileReference(Generator.guid(), file.Headers.ContentDisposition.FileName.Replace("\"", ""), DateTime.Now, rename, application_id, form.name_of_test, form.country, form.username, Commons.Constants.USER_MANUAL_FILE);
                                     break;
                             }
                         }
