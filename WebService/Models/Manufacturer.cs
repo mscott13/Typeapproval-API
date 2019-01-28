@@ -5,9 +5,9 @@ using System.Web;
 
 namespace WebService.Models
 {
-    public class Manufacturer
+    public class Grantee
     {
-        public Manufacturer(string name, string address, string telephone, string fax, string contact_person)
+        public Grantee(string name, string address, string telephone, string fax, string contact_person)
         {
             this.name = name;
             this.address = address;
@@ -17,7 +17,7 @@ namespace WebService.Models
 
         }
 
-        public Manufacturer() { }
+        public Grantee() { }
 
         public string name { get; set; }
         public string address { get; set; }

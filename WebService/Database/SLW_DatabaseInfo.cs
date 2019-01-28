@@ -115,12 +115,12 @@ namespace WebService.Database
             return FixDuplicates(manufacturers); ;
         }
 
-        public List<Manufacturer> GetManufacturers(string query)
+        public List<Grantee> GetManufacturers(string query)
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
             SqlDataReader reader = null;
-            List<Manufacturer> manufacturers = new List<Manufacturer>();
+            List<Grantee> manufacturers = new List<Grantee>();
             cmd.CommandText = "sp_getManufacturers @query";
             cmd.Parameters.AddWithValue("@query", query);
 
@@ -132,7 +132,7 @@ namespace WebService.Database
             {
                 while (reader.Read())
                 {
-                    manufacturers.Add(new Manufacturer(reader["Dealer"].ToString(), reader["Address2"].ToString(), reader["TelNum"].ToString(), reader["FaxNum"].ToString(), ""));
+                    manufacturers.Add(new Grantee(reader["Dealer"].ToString(), reader["Address2"].ToString(), reader["TelNum"].ToString(), reader["FaxNum"].ToString(), ""));
                 }
             }
             reader.Close();
@@ -252,10 +252,10 @@ namespace WebService.Database
             return group;
         }
 
-        public List<Manufacturer> FixDuplicates(List<Manufacturer> data)
+        public List<Grantee> FixDuplicates(List<Grantee> data)
         {
-            List<Manufacturer> group = new List<Manufacturer>();
-            List<Manufacturer> duplicates = new List<Manufacturer>();
+            List<Grantee> group = new List<Grantee>();
+            List<Grantee> duplicates = new List<Grantee>();
             bool addToGroup = true;
 
             for (int i = 0; i < data.Count; i++)
@@ -837,11 +837,11 @@ namespace WebService.Database
             SqlCommand cmd = new SqlCommand();
             cmd.CommandText = "sp_saveFormDetails @applicationId, @username, @applicant_name, @applicant_tel, @applicant_address," +
                               "@applicant_fax, @applicant_city_town, @applicant_contact_person, @applicant_nationality, " +
-                              "@manufacturer_name, @manufacturer_tel, @manufacturer_address, @manufacturer_fax," +
-                              "@manufacturer_contact_person," +
+                              "@grantee_name, @grantee_tel, @grantee_address, @grantee_fax," +
+                              "@grantee_contact_person," +
                               "@equipment_type, @equipment_description," +
                               "@product_identification, @ref#, @make, @software, @type_of_equipment," +
-                              "@other, @antenna_type, @antenna_gain, @channel,@separation, @additional_info, @name_of_test, @country, @status, @category";
+                              "@other, @antenna_type, @antenna_gain, @channel,@separation, @additional_info, @name_of_test, @country, @status, @category, @manufacturer_name";
 
             cmd.Parameters.AddWithValue("@applicationId", form.application_id);
             cmd.Parameters.AddWithValue("@username", form.username);
@@ -852,11 +852,12 @@ namespace WebService.Database
             cmd.Parameters.AddWithValue("@applicant_city_town", form.applicant_city_town);
             cmd.Parameters.AddWithValue("@applicant_contact_person", form.applicant_contact_person);
             cmd.Parameters.AddWithValue("@applicant_nationality", form.applicant_nationality);
+            cmd.Parameters.AddWithValue("@grantee_name", form.grantee_name);
+            cmd.Parameters.AddWithValue("@grantee_tel", form.grantee_tel);
+            cmd.Parameters.AddWithValue("@grantee_address", form.grantee_address);
+            cmd.Parameters.AddWithValue("@grantee_fax", form.grantee_fax);
+            cmd.Parameters.AddWithValue("@grantee_contact_person", form.grantee_contact_person);
             cmd.Parameters.AddWithValue("@manufacturer_name", form.manufacturer_name);
-            cmd.Parameters.AddWithValue("@manufacturer_tel", form.manufacturer_tel);
-            cmd.Parameters.AddWithValue("@manufacturer_address", form.manufacturer_address);
-            cmd.Parameters.AddWithValue("@manufacturer_fax", form.manufacturer_fax);
-            cmd.Parameters.AddWithValue("@manufacturer_contact_person", form.manufacturer_contact_person);
             cmd.Parameters.AddWithValue("@equipment_type", form.equipment_type);
             cmd.Parameters.AddWithValue("@equipment_description", form.equipment_description);
             cmd.Parameters.AddWithValue("@product_identification", form.product_identification);
@@ -1062,10 +1063,11 @@ namespace WebService.Database
                 form.applicant_city_town = reader["applicant_city_town"].ToString();
                 form.applicant_nationality = reader["applicant_nationality"].ToString();
                 form.manufacturer_name = reader["manufacturer_name"].ToString();
-                form.manufacturer_tel = reader["manufacturer_tel"].ToString();
-                form.manufacturer_address = reader["manufacturer_address"].ToString();
-                form.manufacturer_fax = reader["manufacturer_fax"].ToString();
-                form.manufacturer_contact_person = reader["manufacturer_contact_person"].ToString();
+                form.grantee_name = reader["grantee_name"].ToString();
+                form.grantee_tel = reader["grantee_tel"].ToString();
+                form.grantee_address = reader["grantee_address"].ToString();
+                form.grantee_fax = reader["grantee_fax"].ToString();
+                form.grantee_contact_person = reader["grantee_contact_person"].ToString();
                 form.equipment_type = reader["equipment_type"].ToString();
                 form.equipment_description = reader["equipment_description"].ToString();
                 form.product_identification = reader["product_identifiation"].ToString();
@@ -2044,42 +2046,42 @@ namespace WebService.Database
             return applicationFileCategories;
         }
 
-        public Manufacturer NewLocalManufacturer(Manufacturer manufacturer)
+        public Grantee NewLocalGrantee(Grantee grantee)
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
             SqlDataReader reader = null;
-            Manufacturer _manufacturer = new Manufacturer();
+            Grantee _grantee = new Grantee();
 
-            cmd.CommandText = "sp_newManufacturer @dealer, @address, @telephone, @fax, @contact_person";
-            cmd.Parameters.AddWithValue("@dealer", manufacturer.name);
-            cmd.Parameters.AddWithValue("@address", manufacturer.address);
-            cmd.Parameters.AddWithValue("@telephone", manufacturer.telephone);
-            cmd.Parameters.AddWithValue("@fax", manufacturer.fax);
-            cmd.Parameters.AddWithValue("@contact_person", manufacturer.contact_person);
+            cmd.CommandText = "sp_newGrantee @dealer, @address, @telephone, @fax, @contact_person";
+            cmd.Parameters.AddWithValue("@dealer", grantee.name);
+            cmd.Parameters.AddWithValue("@address", grantee.address);
+            cmd.Parameters.AddWithValue("@telephone", grantee.telephone);
+            cmd.Parameters.AddWithValue("@fax", grantee.fax);
+            cmd.Parameters.AddWithValue("@contact_person", grantee.contact_person);
             cmd.Connection = conn;
 
             conn.Open();
             reader = cmd.ExecuteReader();
             reader.Read();
 
-            manufacturer.name = reader["dealer"].ToString();
-            manufacturer.address = reader["address"].ToString();
-            manufacturer.telephone = reader["telephone"].ToString();
-            manufacturer.fax = reader["fax"].ToString();
-            manufacturer.contact_person = reader["fax"].ToString();
+            grantee.name = reader["dealer"].ToString();
+            grantee.address = reader["address"].ToString();
+            grantee.telephone = reader["telephone"].ToString();
+            grantee.fax = reader["fax"].ToString();
+            grantee.contact_person = reader["fax"].ToString();
             conn.Close();
-            return manufacturer;
+            return grantee;
         }
 
-        public List<Manufacturer> GetLocalManufacturers()
+        public List<Grantee> GetLocalGrantees()
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
-            List<Manufacturer> manufacturers = new List<Manufacturer>();
+            List<Grantee> manufacturers = new List<Grantee>();
             SqlDataReader reader = null;
-            cmd.CommandText = " sp_getLocalManufacturers @manufacturer_id";
-            cmd.Parameters.AddWithValue("@manufacturer_id", "");
+            cmd.CommandText = "sp_getLocalGrantees @grantee_id";
+            cmd.Parameters.AddWithValue("@grantee_id", "");
             cmd.Connection = conn;
 
             conn.Open();
@@ -2088,32 +2090,7 @@ namespace WebService.Database
             if (reader.HasRows)
             {
                 while (reader.Read()) {
-                    manufacturers.Add(new Manufacturer(reader["dealer"].ToString(), reader["address"].ToString(), reader["telephone"].ToString(), reader["fax"].ToString(), reader["contact_person"].ToString()));
-                }
-            }
-
-            conn.Close();
-            return manufacturers;
-        }
-
-        public List<Manufacturer> GetLocalManufacturers(int manufacturer_id)
-        {
-            SqlConnection conn = new SqlConnection(SLW_dbConn);
-            SqlCommand cmd = new SqlCommand();
-            List<Manufacturer> manufacturers = new List<Manufacturer>();
-            SqlDataReader reader = null;
-            cmd.CommandText = " sp_getLocalManufacturers @manufacturer_id";
-            cmd.Parameters.AddWithValue("@manufacturer_id", manufacturer_id);
-            cmd.Connection = conn;
-
-            conn.Open();
-            reader = cmd.ExecuteReader();
-
-            if (reader.HasRows)
-            {
-                while (reader.Read())
-                {
-                    manufacturers.Add(new Manufacturer(reader["dealer"].ToString(), reader["address"].ToString(), reader["telephone"].ToString(), reader["fax"].ToString(), reader["contact_person"].ToString()));
+                    manufacturers.Add(new Grantee(reader["dealer"].ToString(), reader["address"].ToString(), reader["telephone"].ToString(), reader["fax"].ToString(), reader["contact_person"].ToString()));
                 }
             }
 

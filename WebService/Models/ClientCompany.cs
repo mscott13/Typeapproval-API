@@ -11,12 +11,21 @@ namespace WebService.Models
         {
             this.clientId = clientId;
             this.name = name;
-            this.telephone =  (telephone=="") ? "unavailable" : telephone;
-            this.address = (address == "") ? "unavailable" : address;
-            this.fax = (fax == "") ? "unavailable" : fax;
-            this.cityTown = (cityTown == "") ? "unavailable" : cityTown;
-            this.contactPerson = (contactPerson == "") ? "unavailable" : contactPerson; 
-            this.nationality = (nationality == "") ? "unavailable" : nationality;
+            this.telephone =  (telephone=="") ? "" : telephone;
+            this.address = (address == "") ? "" : address;
+            this.fax = (fax == "") ? "" : fax;
+            this.cityTown = (cityTown == "") ? "" : cityTown;
+            this.contactPerson = (contactPerson == "") ? "" : contactPerson; 
+            this.nationality = (nationality == "") ? "" : nationality;
+
+            this.clientId = this.clientId.Trim();
+            this.name = this.name.Trim();
+            this.telephone = this.telephone.Trim();
+            this.address = this.address.Trim();
+            this.fax = this.fax.Trim();
+            this.cityTown = this.cityTown.Trim();
+            this.contactPerson = this.contactPerson.Trim();
+            this.nationality = this.nationality.Trim();
         }
 
         public ClientCompany() { }

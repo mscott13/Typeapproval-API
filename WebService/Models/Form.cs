@@ -20,10 +20,11 @@ namespace WebService.Models
             applicant_contact_person = "";
             applicant_nationality = "";
             manufacturer_name = "";
-            manufacturer_tel = "";
-            manufacturer_address = "";
-            manufacturer_fax = "";
-            manufacturer_contact_person = "";
+            grantee_tel = "";
+            grantee_address = "";
+            grantee_fax = "";
+            grantee_contact_person = "";
+            manufacturer_name = "";
             equipment_type = "";
             equipment_description = "";
             product_identification = "";
@@ -54,11 +55,11 @@ namespace WebService.Models
         public string applicant_city_town { get; set; }
         public string applicant_contact_person { get; set; }
         public string applicant_nationality { get; set; }
-        public string manufacturer_name { get; set; }
-        public string manufacturer_tel { get; set; }
-        public string manufacturer_address { get; set; }
-        public string manufacturer_fax { get; set; }
-        public string manufacturer_contact_person { get; set; }
+        public string grantee_name { get; set; }
+        public string grantee_tel { get; set; }
+        public string grantee_address { get; set; }
+        public string grantee_fax { get; set; }
+        public string grantee_contact_person { get; set; }
         public string equipment_type { get; set; }
         public string equipment_description { get; set; }
         public string product_identification { get; set; }
@@ -77,5 +78,6 @@ namespace WebService.Models
         public string category { get; set; }
         public string name_of_test { get; set; }
         public string country { get; set; }
+        public string manufacturer_name { get; set; }
     }
 }

@@ -62,7 +62,7 @@ namespace WebService.Controllers
             }
 
             SLW_DatabaseInfo db = new SLW_DatabaseInfo();
-            List<Manufacturer> data = db.GetManufacturers(q);
+            List<Grantee> data = db.GetManufacturers(q);
             return Request.CreateResponse(HttpStatusCode.OK, data);
         }
 
@@ -561,13 +561,13 @@ namespace WebService.Controllers
         }
 
         [HttpPost]
-        public HttpResponseMessage NewManufacturer([FromBody] Manufacturer data)
+        public HttpResponseMessage NewGrantee([FromBody] Grantee data)
         {
             SLW_DatabaseInfo db = new SLW_DatabaseInfo();
             try
             {
-                Manufacturer manufacturer = db.NewLocalManufacturer(data);
-                return Request.CreateResponse(HttpStatusCode.OK, manufacturer);
+                Grantee grantee = db.NewLocalGrantee(data);
+                return Request.CreateResponse(HttpStatusCode.OK, grantee);
             }
             catch (Exception e)
             {
