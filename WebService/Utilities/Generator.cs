@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Security;
 
 namespace WebService.Utilities
 {
@@ -16,6 +17,11 @@ namespace WebService.Utilities
         {
             Database.SLW_DatabaseInfo db = new Database.SLW_DatabaseInfo();
             return db.GenerateAppID();
+        }
+
+        public static string GeneratePassword()
+        {
+           return Membership.GeneratePassword(8, 3);
         }
     }
 }

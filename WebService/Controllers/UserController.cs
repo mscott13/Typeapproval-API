@@ -223,21 +223,31 @@ namespace WebService.Controllers
         public HttpResponseMessage ResetPassword([FromBody] dynamic data)
         {
             SLW_DatabaseInfo db = new SLW_DatabaseInfo();
-            KeyDetail key_detail = db.GetKeyDetail((string)data.access_key);
+            Utilities.PasswordManager manager = new Utilities.PasswordManager();
+            string password = "";
 
-            if (IsKeyValid(key_detail))
+            if ((string)data.new_password == "" || (string)data.new_password == null)
             {
-                Utilities.PasswordManager manager = new Utilities.PasswordManager();
-                manager.ResetPassword((string)data.username, (string)data.new_password);
-                UserDetails userDetails = db.GetUserDetails((string)data.username);
-
-                Utilities.Email.Send(userDetails.email,"Password reset", "Your password has been reset. New password: " + (string)data.new_password + "");
-                return Request.CreateResponse(HttpStatusCode.OK, "password reset");
+                password = Utilities.Generator.GeneratePassword();
             }
             else
             {
-                return Request.CreateResponse(HttpStatusCode.Unauthorized, "invalid key");
+                password = (string)data.new_password;
             }
+
+            manager.ResetPassword((string)data.username, password);
+            UserDetails userDetails = db.GetUserDetails((string)data.username);
+
+            if (userDetails == null)
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, "user not found");
+            }
+            else
+            {
+                Utilities.Email.Send(userDetails.email, "Password reset", "Your password has been reset. New password: " + password + "");
+                return Request.CreateResponse(HttpStatusCode.OK, "password reset");
+            }
+            
         }
 
         [HttpPost]
