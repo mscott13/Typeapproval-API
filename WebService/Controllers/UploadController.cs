@@ -66,7 +66,7 @@ namespace WebService.Controllers
                 form.status = Commons.Constants.SUBMITTED_TYPE;
                 db.SaveApplication(form);
                 db.NewUnassignedTask(form.application_id, form.username, DateTime.Now);
-                Email.SendEmailAdmins("New Application", "A new application has been submitted: <b>"+form.application_id+"<b>");
+                Email.SendEmailAdmins("New Application", "A new application has been submitted: "+form.application_id+"");
 
                 Commons.UserActivity.Record(new UserActivity(form.username, Commons.Constants.ACTIVITY_SUBMISSION_TYPE, form.application_id, form.status));
                 foreach (MultipartFileData file in provider.FileData)
