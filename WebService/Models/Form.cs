@@ -16,29 +16,15 @@ namespace WebService.Models
             applicant_tel = "";
             applicant_address = "";
             applicant_fax = "";
-            applicant_city_town = "";
             applicant_contact_person = "";
-            applicant_nationality = "";
             manufacturer_name = "";
-            grantee_tel = "";
             grantee_address = "";
-            grantee_fax = "";
-            grantee_contact_person = "";
             manufacturer_name = "";
             equipment_type = "";
             equipment_description = "";
             product_identification = "";
-            refNum = "";
             make = "";
-            software = "";
-            type_of_equipment = "";
-            other = "";
-            antenna_type = "";
-            antenna_gain = "";
-            channel = "";
-            separation = "";
             category = "";
-            additional_info = "";
             name_of_test = "";
             country = "";
 
@@ -52,27 +38,14 @@ namespace WebService.Models
         public string applicant_tel { get; set; }
         public string applicant_address { get; set; }
         public string applicant_fax { get; set; }
-        public string applicant_city_town { get; set; }
         public string applicant_contact_person { get; set; }
-        public string applicant_nationality { get; set; }
         public string grantee_name { get; set; }
-        public string grantee_tel { get; set; }
         public string grantee_address { get; set; }
-        public string grantee_fax { get; set; }
-        public string grantee_contact_person { get; set; }
         public string equipment_type { get; set; }
         public string equipment_description { get; set; }
         public string product_identification { get; set; }
-        public string refNum { get; set; }
         public string make { get; set; }
-        public string software { get; set; }
-        public string type_of_equipment { get; set; }
-        public string other { get; set; }
-        public string antenna_type { get; set; }
-        public string antenna_gain { get; set; }
-        public string channel { get; set; }
-        public string separation { get; set; }
-        public string additional_info { get; set; }
+       
         public List<Frequency> frequencies { get; set; }
         public string status { get; set; }
         public string category { get; set; }

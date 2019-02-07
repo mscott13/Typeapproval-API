@@ -132,7 +132,7 @@ namespace WebService.Database
             {
                 while (reader.Read())
                 {
-                    manufacturers.Add(new Grantee(reader["Dealer"].ToString(), reader["Address2"].ToString(), reader["TelNum"].ToString(), reader["FaxNum"].ToString(), ""));
+                    manufacturers.Add(new Grantee(reader["Dealer"].ToString(), reader["Address2"].ToString()));
                 }
             }
             reader.Close();
@@ -309,7 +309,7 @@ namespace WebService.Database
 
             for (int i = 0; i < remarks.Count; i++)
             {
-                items.Add(new SearchCategory(remarks[i], "http://localhost:3348/search?dealer=&remarks=" + Uri.EscapeUriString(remarks[i]), "", "Remarks"));
+                items.Add(new SearchCategory(remarks[i], "http://localhost:3348/search?dealer=&remarks=" + Uri.EscapeUriString(remarks[i]), "", "Authorization Notes"));
             }
 
             for (int i = 0; i < make.Count; i++)
@@ -836,12 +836,10 @@ namespace WebService.Database
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
             cmd.CommandText = "sp_saveFormDetails @applicationId, @username, @applicant_name, @applicant_tel, @applicant_address," +
-                              "@applicant_fax, @applicant_city_town, @applicant_contact_person, @applicant_nationality, " +
-                              "@grantee_name, @grantee_tel, @grantee_address, @grantee_fax," +
-                              "@grantee_contact_person," +
+                              "@applicant_fax, @applicant_contact_person, " +
+                              "@grantee_name, @grantee_address," +
                               "@equipment_type, @equipment_description," +
-                              "@product_identification, @ref#, @make, @software, @type_of_equipment," +
-                              "@other, @antenna_type, @antenna_gain, @channel,@separation, @additional_info, @name_of_test, @country, @status, @category, @manufacturer_name";
+                              "@product_identification, @make, @name_of_test, @country, @status, @category, @manufacturer_name";
 
             cmd.Parameters.AddWithValue("@applicationId", form.application_id);
             cmd.Parameters.AddWithValue("@username", form.username);
@@ -849,32 +847,18 @@ namespace WebService.Database
             cmd.Parameters.AddWithValue("@applicant_tel", form.applicant_tel);
             cmd.Parameters.AddWithValue("@applicant_address", form.applicant_address);
             cmd.Parameters.AddWithValue("@applicant_fax", form.applicant_fax);
-            cmd.Parameters.AddWithValue("@applicant_city_town", form.applicant_city_town);
             cmd.Parameters.AddWithValue("@applicant_contact_person", form.applicant_contact_person);
-            cmd.Parameters.AddWithValue("@applicant_nationality", form.applicant_nationality);
             cmd.Parameters.AddWithValue("@grantee_name", form.grantee_name);
-            cmd.Parameters.AddWithValue("@grantee_tel", form.grantee_tel);
             cmd.Parameters.AddWithValue("@grantee_address", form.grantee_address);
-            cmd.Parameters.AddWithValue("@grantee_fax", form.grantee_fax);
-            cmd.Parameters.AddWithValue("@grantee_contact_person", form.grantee_contact_person);
             cmd.Parameters.AddWithValue("@manufacturer_name", form.manufacturer_name);
             cmd.Parameters.AddWithValue("@equipment_type", form.equipment_type);
             cmd.Parameters.AddWithValue("@equipment_description", form.equipment_description);
             cmd.Parameters.AddWithValue("@product_identification", form.product_identification);
-            cmd.Parameters.AddWithValue("@ref#", form.refNum);
             cmd.Parameters.AddWithValue("@make", form.make);
-            cmd.Parameters.AddWithValue("@software", form.software);
-            cmd.Parameters.AddWithValue("@type_of_equipment", form.type_of_equipment);
-            cmd.Parameters.AddWithValue("@other", form.other);
-            cmd.Parameters.AddWithValue("@antenna_type", form.antenna_type);
-            cmd.Parameters.AddWithValue("@antenna_gain", form.antenna_gain);
-            cmd.Parameters.AddWithValue("@channel", form.channel);
-            cmd.Parameters.AddWithValue("@separation", form.separation);
-            cmd.Parameters.AddWithValue("@additional_info", form.additional_info);
             cmd.Parameters.AddWithValue("@name_of_test", form.name_of_test);
             cmd.Parameters.AddWithValue("@country", form.country);
             cmd.Parameters.AddWithValue("@status", form.status);
-            cmd.Parameters.AddWithValue("category", form.category);
+            cmd.Parameters.AddWithValue("@category", form.category);
 
             cmd.Connection = conn;
             conn.Open();
@@ -897,7 +881,7 @@ namespace WebService.Database
             DeleteFrequencies(frequencies[0].application_id);
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
-            cmd.CommandText = "sp_saveFrequencyDetails @applicationId, @sequence, @lower_freq, @upper_freq, @power, @tolerance, @emmission_desig, @freq_type";
+            cmd.CommandText = "sp_saveFrequencyDetails @applicationId, @sequence, @lower_freq, @upper_freq, @power, @tolerance, @emmission_desig";
             cmd.Connection = conn;
             conn.Open();
 
@@ -910,7 +894,6 @@ namespace WebService.Database
                 cmd.Parameters.AddWithValue("@power", frequencies[i].power);
                 cmd.Parameters.AddWithValue("@emmission_desig", frequencies[i].emmission_desig);
                 cmd.Parameters.AddWithValue("@tolerance", frequencies[i].tolerance);
-                cmd.Parameters.AddWithValue("@freq_type", frequencies[i].freq_type);
 
                 cmd.ExecuteNonQuery();
                 cmd.Parameters.Clear();
@@ -1060,29 +1043,15 @@ namespace WebService.Database
                 form.applicant_address = reader["applicant_address"].ToString();
                 form.applicant_fax = reader["applicant_fax"].ToString();
                 form.applicant_contact_person = reader["applicant_contact_person"].ToString();
-                form.applicant_city_town = reader["applicant_city_town"].ToString();
-                form.applicant_nationality = reader["applicant_nationality"].ToString();
                 form.manufacturer_name = reader["manufacturer_name"].ToString();
                 form.grantee_name = reader["grantee_name"].ToString();
-                form.grantee_tel = reader["grantee_tel"].ToString();
                 form.grantee_address = reader["grantee_address"].ToString();
-                form.grantee_fax = reader["grantee_fax"].ToString();
-                form.grantee_contact_person = reader["grantee_contact_person"].ToString();
                 form.equipment_type = reader["equipment_type"].ToString();
                 form.equipment_description = reader["equipment_description"].ToString();
                 form.product_identification = reader["product_identifiation"].ToString();
-                form.refNum = reader["ref#"].ToString();
                 form.make = reader["make"].ToString();
-                form.software = reader["software"].ToString();
-                form.type_of_equipment = reader["type_of_equipment"].ToString();
-                form.other = reader["other"].ToString();
-                form.antenna_type = reader["antenna_type"].ToString();
-                form.antenna_gain = reader["antenna_gain"].ToString();
-                form.channel = reader["channel"].ToString();
-                form.separation = reader["separation"].ToString();
                 form.status = reader["current_status"].ToString();
                 form.category = reader["category"].ToString();
-                form.additional_info = reader["additional_info"].ToString();
                 form.name_of_test = reader["name_of_test"].ToString();
                 form.country = reader["country"].ToString();
                 form.name_of_test = reader["name_of_test"].ToString();
@@ -1164,9 +1133,7 @@ namespace WebService.Database
                     string power = reader["power"].ToString();
                     string tolerance = reader["tolerance"].ToString();
                     string emmision_desig = reader["emmision_desig"].ToString();
-                    string freq_type = reader["freq_type"].ToString();
-
-                    frequencies.Add(new Frequency("", application_id, sequence, lower_freq, upper_freq, power, tolerance, emmision_desig, freq_type));
+                    frequencies.Add(new Frequency("", application_id, sequence, lower_freq, upper_freq, power, tolerance, emmision_desig));
                 }
             }
             conn.Close();
@@ -1199,10 +1166,8 @@ namespace WebService.Database
                     string power = reader["PowerOutput"].ToString();
                     string tolerance = reader["FrequencyTolerance"].ToString();
                     string emmision_desig = reader["EmissionClass"].ToString();
-                    string freq_type = "";
 
-
-                    frequencies.Add(new Frequency("", approval_id, sequence, lower_freq, upper_freq, power, tolerance, emmision_desig, freq_type));
+                    frequencies.Add(new Frequency("", approval_id, sequence, lower_freq, upper_freq, power, tolerance, emmision_desig));
                 }
             }
             conn.Close();
@@ -1417,7 +1382,7 @@ namespace WebService.Database
                 certificate.manufacturer_address = reader["manufacturer_address"].ToString();
                 certificate.product_identification = reader["product_identifiation"].ToString();
                 certificate.equipment_description = reader["equipment_description"].ToString();
-                certificate.remarks = form.additional_info;
+                certificate.remarks = "";
             }
 
             certificate.frequencies = GetPersonalFrequencies(application_id);
@@ -2053,12 +2018,9 @@ namespace WebService.Database
             SqlDataReader reader = null;
             Grantee _grantee = new Grantee();
 
-            cmd.CommandText = "sp_newGrantee @dealer, @address, @telephone, @fax, @contact_person";
+            cmd.CommandText = "sp_newGrantee @dealer, @address";
             cmd.Parameters.AddWithValue("@dealer", grantee.name);
             cmd.Parameters.AddWithValue("@address", grantee.address);
-            cmd.Parameters.AddWithValue("@telephone", grantee.telephone);
-            cmd.Parameters.AddWithValue("@fax", grantee.fax);
-            cmd.Parameters.AddWithValue("@contact_person", grantee.contact_person);
             cmd.Connection = conn;
 
             conn.Open();
@@ -2067,9 +2029,6 @@ namespace WebService.Database
 
             grantee.name = reader["dealer"].ToString();
             grantee.address = reader["address"].ToString();
-            grantee.telephone = reader["telephone"].ToString();
-            grantee.fax = reader["fax"].ToString();
-            grantee.contact_person = reader["fax"].ToString();
             conn.Close();
             return grantee;
         }
@@ -2090,7 +2049,7 @@ namespace WebService.Database
             if (reader.HasRows)
             {
                 while (reader.Read()) {
-                    manufacturers.Add(new Grantee(reader["dealer"].ToString(), reader["address"].ToString(), reader["telephone"].ToString(), reader["fax"].ToString(), reader["contact_person"].ToString()));
+                    manufacturers.Add(new Grantee(reader["dealer"].ToString(), reader["address"].ToString()));
                 }
             }
 

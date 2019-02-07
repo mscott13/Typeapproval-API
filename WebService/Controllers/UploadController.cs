@@ -66,7 +66,10 @@ namespace WebService.Controllers
                 form.status = Commons.Constants.SUBMITTED_TYPE;
                 db.SaveApplication(form);
                 db.NewUnassignedTask(form.application_id, form.username, DateTime.Now);
-                Email.SendEmailAdmins("New Application", "A new application has been submitted: "+form.application_id+"");
+                Email.SendEmailAdmins("New Type Application Application", "Type approval application "+form.application_id+" for Device with Model number "+form.product_identification+" from "+form.applicant_name+" has been submitted for processing.");
+
+                UserDetails userDetail = db.GetUserDetails(form.username);
+                Email.Send(userDetail.email, "Submitted Type Approval Application", "Type Approval application "+form.application_id+" for Device with Model number "+form.product_identification+" has been received by our internal team and processing will commence once payment has been received.");
 
                 Commons.UserActivity.Record(new UserActivity(form.username, Commons.Constants.ACTIVITY_SUBMISSION_TYPE, form.application_id, form.status));
                 foreach (MultipartFileData file in provider.FileData)
