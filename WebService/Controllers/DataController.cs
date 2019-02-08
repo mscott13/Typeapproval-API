@@ -17,7 +17,12 @@ namespace WebService.Controllers
         public HttpResponseMessage ClientCompanyList([FromUri]string q)
         {
             SLW_DatabaseInfo db = new SLW_DatabaseInfo();
-            return Request.CreateResponse(HttpStatusCode.OK, db.GetClientDetails(q));
+            List<ClientCompany> clientCompanies = db.GetClientDetails(q);
+            List<ClientCompany> localClientCompanies = db.GetLocalClientCompanies(q);
+            clientCompanies.AddRange(localClientCompanies);
+
+            List<ClientCompany> combinedCompanies = clientCompanies.OrderBy(i => i.name).ToList();
+            return Request.CreateResponse(HttpStatusCode.OK, combinedCompanies);
         }
 
         [HttpGet]

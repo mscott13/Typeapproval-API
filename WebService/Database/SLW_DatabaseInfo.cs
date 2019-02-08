@@ -287,6 +287,41 @@ namespace WebService.Database
             return group;
         }
 
+        public List<ClientCompany> FixDuplicates(List<ClientCompany> data)
+        {
+            List<ClientCompany> group = new List<ClientCompany>();
+            List<ClientCompany> duplicates = new List<ClientCompany>();
+            bool addToGroup = true;
+
+            for (int i = 0; i < data.Count; i++)
+            {
+                addToGroup = true;
+                if (group.Count == 0)
+                {
+                    group.Add(data[i]);
+                }
+                else
+                {
+                    for (int j = 0; j < group.Count; j++)
+                    {
+                        if (group[j].name.ToLower() == data[i].name.ToLower())
+                        {
+                            duplicates.Add(data[i]);
+                            j = group.Count;
+                            addToGroup = false;
+                        }
+                    }
+
+                    if (addToGroup)
+                    {
+                        group.Add(data[i]);
+                    }
+                }
+            }
+            group.Sort((a, b) => a.name.CompareTo(b.name));
+            return group;
+        }
+
         public ApplicationSearchResultMain GetMultiSearchApplicationResults(string q)
         {
             
@@ -772,7 +807,7 @@ namespace WebService.Database
                 }
             }
             conn.Close();
-            return clientCompanies;
+            return FixDuplicates(clientCompanies);
         }
 
         public ClientCompany GetClientDetail(int clientId)
@@ -2025,11 +2060,15 @@ namespace WebService.Database
 
             conn.Open();
             reader = cmd.ExecuteReader();
-            reader.Read();
 
-            grantee.name = reader["dealer"].ToString();
-            grantee.address = reader["address"].ToString();
-            conn.Close();
+            if (reader.HasRows)
+            {
+                reader.Read();
+                grantee.name = reader["dealer"].ToString();
+                grantee.address = reader["address"].ToString();
+                conn.Close();
+            }
+           
             return grantee;
         }
 
@@ -2104,7 +2143,32 @@ namespace WebService.Database
                 }
             }
             conn.Close();
-            return clientCompanies;
+            return FixDuplicates(clientCompanies);
+        }
+
+        public List<ClientCompany> GetLocalClientCompanies(string query)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            List<ClientCompany> clientCompanies = new List<ClientCompany>();
+            SqlDataReader reader = null;
+            cmd.CommandText = "sp_getLocalClientCompanies @clientCompany";
+            cmd.Parameters.AddWithValue("@clientCompany", query);
+            cmd.Connection = conn;
+
+            conn.Open();
+            reader = cmd.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    clientCompanies.Add(new ClientCompany(reader["client_id"].ToString(), reader["name"].ToString(), reader["telephone"].ToString(),
+                                                          reader["address"].ToString(), reader["fax"].ToString(), reader["cityTown"].ToString(), reader["contactPerson"].ToString(), reader["nationality"].ToString()));
+                }
+            }
+            conn.Close();
+            return FixDuplicates(clientCompanies);
         }
 
 
