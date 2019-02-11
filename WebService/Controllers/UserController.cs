@@ -31,7 +31,7 @@ namespace WebService.Controllers
         }
 
         [HttpPost]
-        public HttpResponseMessage Register([FromBody]Models.NewUser user)
+        public HttpResponseMessage RegisterCompanyUser([FromBody]CompanyUser user)
         {
             if (user != null)
             {
@@ -45,9 +45,10 @@ namespace WebService.Controllers
                 List<UserType> user_types = db.GetUserTypes();
                 for (int i = 0; i < user_types.Count; i++)
                 {
-                    if (user_types[i].user_type == user.user_type)
+                    if (user_types[i].user_type == user.user_role)
                     {
                         valid_user_type = true;
+                        break;
                     }
                 }
 
@@ -66,10 +67,11 @@ namespace WebService.Controllers
                         }
 
                         string hash = mgr.GetHash(user.password);
-                        int id = db.NewUser(user.username, user.first_name, user.last_name, DateTime.Now, user.user_type, DateTime.Now, (DateTime)System.Data.SqlTypes.SqlDateTime.MinValue, hash, false, user.email, user.company, user.clientId, source);
+                        user.user_type = "company";
+                        int id = db.NewCompanyUser(user.username, user.first_name, user.last_name, DateTime.Now, user.user_role, user.user_type, DateTime.Now, (DateTime)System.Data.SqlTypes.SqlDateTime.MinValue, hash, false, user.email, user.company, user.clientId, source);
                         db.SaveActivity(new UserActivity(user.username, Commons.Constants.ACTIVITY_CREATE_ACCOUNT, "", "", 0));
 
-                        Utilities.Email.Send(user.email, "New Account", "Your account was created sucessfully. Username: <b>" + user.username + "</b>");
+                        Utilities.Email.Send(user.email, "New Account", "Your account was created sucessfully. Username: " + user.username + "");
                         return Request.CreateResponse(HttpStatusCode.OK, id);
                     }
                     else
@@ -88,8 +90,59 @@ namespace WebService.Controllers
             }
         }
 
+
         [HttpPost]
-        public HttpResponseMessage RegisterV2([FromBody]Models.NewUser user)
+        public HttpResponseMessage RegisterIndividualUser([FromBody]IndividualUser user)
+        {
+            if (user != null)
+            {
+                //can be used to call client functions
+                var connection = GlobalHost.ConnectionManager.GetHubContext<CrossDomainHub>();
+
+                Utilities.PasswordManager mgr = new Utilities.PasswordManager();
+                SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+                bool valid_user_type = false;
+
+                List<UserType> user_types = db.GetUserTypes();
+                for (int i = 0; i < user_types.Count; i++)
+                {
+                    if (user_types[i].user_type == user.user_role)
+                    {
+                        valid_user_type = true;
+                        break;
+                    }
+                }
+
+                if (valid_user_type)
+                {
+                    if (!db.CheckUserExist(user.username))
+                    {
+                        string hash = mgr.GetHash(user.password);
+                        user.user_type = "individual";
+                        db.NewIndividuaUser(user.username, user.first_name, user.last_name, user.address, user.telephone, user.fax, user.email, DateTime.Now, user.user_role, user.user_type, DateTime.Now, (DateTime)System.Data.SqlTypes.SqlDateTime.MinValue, hash, false);
+                        db.SaveActivity(new UserActivity(user.username, Commons.Constants.ACTIVITY_CREATE_ACCOUNT, "", "", 0));
+
+                        Utilities.Email.Send(user.email, "New Account", "Your account was created sucessfully. Username: " + user.username + "");
+                        return Request.CreateResponse(HttpStatusCode.OK, "");
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.Unauthorized, "user exists");
+                    }
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.Unauthorized, "invalid user type");
+                }
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, "bad request");
+            }
+        }
+
+        [HttpPost]
+        public HttpResponseMessage RegisterCompanyUserV2([FromBody]Models.CompanyUser user)
         {
             if (user != null)
             {
@@ -107,7 +160,7 @@ namespace WebService.Controllers
                     List<UserType> user_types = db.GetUserTypes();
                     for (int i = 0; i < user_types.Count; i++)
                     {
-                        if (user_types[i].user_type == user.user_type)
+                        if (user_types[i].user_type == user.user_role)
                         {
                             valid_user_type = true;
                         }
@@ -128,7 +181,8 @@ namespace WebService.Controllers
                                 source = Commons.Constants.ASMS_SOURCE;
                             }
 
-                            db.NewUser(user.username, user.first_name, user.last_name, DateTime.Now, user.user_type, DateTime.Now, (DateTime)System.Data.SqlTypes.SqlDateTime.MinValue, hash, false, user.email, user.company, user.clientId, source);
+                            user.user_type = "company";
+                            db.NewCompanyUser(user.username, user.first_name, user.last_name, DateTime.Now, user.user_role, user.user_type, DateTime.Now, (DateTime)System.Data.SqlTypes.SqlDateTime.MinValue, hash, false, user.email, user.company, user.clientId, source);
                             db.SaveActivity(new UserActivity(user.username, Commons.Constants.ACTIVITY_CREATE_ACCOUNT, "", "", 0));
                             return Request.CreateResponse(HttpStatusCode.OK, db.GetUserDetails(user.username));
                         }
@@ -174,7 +228,7 @@ namespace WebService.Controllers
                         db.SetNewAccessKey(login.username, access_key);
                         db.SaveActivity(new UserActivity(login.username, Commons.Constants.ACTIVITY_LOGIN, "login successful", "", 1));
                         db.CheckForApplicationUpdates(login.username);
-                        return Request.CreateResponse(HttpStatusCode.OK, new Models.LoginResult("credentials verified", access_key, credentials.user_type, credentials.name, login.username));
+                        return Request.CreateResponse(HttpStatusCode.OK, new Models.LoginResult("credentials verified", access_key, credentials.user_role, credentials.name, login.username));
                     }
                     else
                     {

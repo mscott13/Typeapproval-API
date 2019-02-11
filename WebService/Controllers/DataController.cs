@@ -36,25 +36,41 @@ namespace WebService.Controllers
         public HttpResponseMessage ApplicantInfo([FromBody]dynamic data)
         {
             SLW_DatabaseInfo db = new SLW_DatabaseInfo();
-            AssignedCompany company = db.GetAssignedCompany(db.GetKeyDetail((string)data.access_key).username);
-            ClientCompany clientCompany = new ClientCompany();
+            ClientCompany clientCompany = null;
+            KeyDetail keyDetail = db.GetKeyDetail((string)data.access_key);
 
-            if (company == null)
+            if (keyDetail.data_present)
             {
-                return Request.CreateResponse(HttpStatusCode.OK, "empty");
-            }
-            else
-            {
-                if (company.source == Commons.Constants.LOCAL_SOURCE)
+                if (keyDetail.user_type == "company")
                 {
-                    clientCompany = db.GetLocalClientCompany(company.clientId);
+                    AssignedCompany company = db.GetAssignedCompany(keyDetail.username);
+                    if (company == null)
+                    {
+                        return Request.CreateResponse(HttpStatusCode.OK, "empty");
+                    }
+                    else
+                    {
+                        if (company.source == Commons.Constants.LOCAL_SOURCE)
+                        {
+                            clientCompany = db.GetLocalClientCompany(company.clientId);
+                        }
+                        else
+                        {
+                            clientCompany = db.GetClientDetail(company.clientId);
+                        }
+
+                        return Request.CreateResponse(HttpStatusCode.OK, clientCompany);
+                    }
                 }
                 else
                 {
-                    clientCompany = db.GetClientDetail(company.clientId);
+                    clientCompany = db.GetIndividualDetail(keyDetail.username);
+                    return Request.CreateResponse(HttpStatusCode.OK, clientCompany);
                 }
-
-                return Request.CreateResponse(HttpStatusCode.OK, clientCompany);
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, "unauthorized");
             }
         }
 
@@ -70,7 +86,6 @@ namespace WebService.Controllers
             List<Grantee> data = db.GetManufacturers(q);
             return Request.CreateResponse(HttpStatusCode.OK, data);
         }
-
 
         [HttpPost]
         public HttpResponseMessage CreateApplication([FromBody] Form data)
@@ -556,7 +571,7 @@ namespace WebService.Controllers
             SLW_DatabaseInfo db = new SLW_DatabaseInfo();
             try
             {
-                int client_id = db.NewLocalClient(data);
+                int client_id = db.NewLocalClientCompany(data);
                 return Request.CreateResponse(HttpStatusCode.OK, client_id);
             }
             catch (Exception e)

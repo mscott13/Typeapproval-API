@@ -272,6 +272,7 @@
     <Compile Include="Models\EngineerUser.cs" />
     <Compile Include="Models\Form.cs" />
     <Compile Include="Models\Frequency.cs" />
+    <Compile Include="Models\IndividualUser.cs" />
     <Compile Include="Models\KeyDetail.cs" />
     <Compile Include="Models\LicensedApplication.cs" />
     <Compile Include="Models\Login.cs" />

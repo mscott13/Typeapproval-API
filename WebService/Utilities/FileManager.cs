@@ -25,7 +25,7 @@ namespace WebService.Utilities
                 }
                 catch (Exception e)
                 {
-                    //do logging here...
+                    
                 }
             }
         }

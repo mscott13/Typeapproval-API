@@ -441,7 +441,7 @@ namespace WebService.Database
             if (reader.HasRows)
             {
                 reader.Read();
-                UserCredentials credentials = new UserCredentials(reader["hash"].ToString(), Convert.ToBoolean(reader["password_reset_required"]), Convert.ToInt32(reader["user_type"]), reader["name"].ToString());
+                UserCredentials credentials = new UserCredentials(reader["hash"].ToString(), Convert.ToBoolean(reader["password_reset_required"]), Convert.ToInt32(reader["user_role"]), reader["name"].ToString());
                 conn.Close();
                 return credentials;
             }
@@ -572,19 +572,20 @@ namespace WebService.Database
             }
         }
 
-        public int NewUser(string username, string first_name, string last_name, DateTime created_date, int user_type, DateTime last_password_change_date,
+        public int NewCompanyUser(string username, string first_name, string last_name, DateTime created_date, int user_role, string user_type, DateTime last_password_change_date,
                                   DateTime last_login_date, string hash, bool password_reset_required, string email, string company, int clientId, string source)
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlDataReader reader = null;
             SqlCommand cmd = new SqlCommand();
-            cmd.CommandText = "sp_createUser @username, @first_name, @last_name, @created_date, @user_type, @last_password_change_date, " +
+            cmd.CommandText = "sp_createCompanyUser @username, @first_name, @last_name, @created_date, @user_role, @user_type, @last_password_change_date, " +
                               "@last_login_date, @hash, @password_reset_required, @email, @company, @clientId, @source";
 
             cmd.Parameters.AddWithValue("@username", username);
             cmd.Parameters.AddWithValue("@first_name", first_name);
             cmd.Parameters.AddWithValue("@last_name", last_name);
             cmd.Parameters.AddWithValue("@created_date", created_date);
+            cmd.Parameters.AddWithValue("@user_role", user_role);
             cmd.Parameters.AddWithValue("@user_type", user_type);
             cmd.Parameters.AddWithValue("@last_password_change_date", last_password_change_date);
             cmd.Parameters.AddWithValue("@last_login_date", last_login_date);
@@ -603,6 +604,37 @@ namespace WebService.Database
             int id = Convert.ToInt32(reader["client_id"]);
             conn.Close();
             return id;
+        }
+
+        public void NewIndividuaUser(string username, string first_name, string last_name, string address, string telephone, string fax, string email, DateTime created_date, int user_role, string user_type, DateTime last_password_change_date,
+                                  DateTime last_login_date, string hash, bool password_reset_required)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+
+            cmd.CommandText = "sp_createIndividualUser @username, @first_name, @last_name, @created_date, @user_role, @user_type, @last_password_change, @last_login_date, @hash, @password_reset_required, @email, @address, @telephone, @fax";
+
+            cmd.Parameters.AddWithValue("@username", username);
+            cmd.Parameters.AddWithValue("@first_name", first_name);
+            cmd.Parameters.AddWithValue("@last_name", last_name);
+            cmd.Parameters.AddWithValue("@address", address);
+            cmd.Parameters.AddWithValue("@telephone", telephone);
+            cmd.Parameters.AddWithValue("@fax", fax);
+            cmd.Parameters.AddWithValue("@email", email);
+            cmd.Parameters.AddWithValue("@password", hash);
+            cmd.Parameters.AddWithValue("@created_date", created_date);
+            cmd.Parameters.AddWithValue("@user_role", user_role);
+            cmd.Parameters.AddWithValue("@user_type", user_type);
+            cmd.Parameters.AddWithValue("@hash", hash);
+            cmd.Parameters.AddWithValue("@last_password_change", last_password_change_date);
+            cmd.Parameters.AddWithValue("@last_login_date", last_login_date);
+            cmd.Parameters.AddWithValue("@password_reset_required", password_reset_required);
+            cmd.Connection = conn;
+
+            conn.Open();
+            cmd.ExecuteNonQuery();
+            conn.Close();
+
         }
 
         public bool CheckLocalClientExist(int client_id)
@@ -712,8 +744,8 @@ namespace WebService.Database
             if (reader.HasRows)
             {
                 reader.Read();
-
-                KeyDetail key_detail = new KeyDetail(Convert.ToInt32(reader["user_id"]), reader["username"].ToString(), reader["access_key"].ToString(), Convert.ToDateTime(reader["last_detected_activity"]), Convert.ToInt32(reader["max_inactivity_mins"]));
+                int uid = Convert.ToInt32(reader["user_id"]);
+                KeyDetail key_detail = new KeyDetail(Convert.ToInt32(reader["user_id"]), reader["username"].ToString(), reader["access_key"].ToString(), Convert.ToDateTime(reader["last_detected_activity"]), Convert.ToInt32(reader["max_inactivity_mins"]), Convert.ToInt32(reader["user_role"]), reader["user_type"].ToString());
                 conn.Close();
                 return key_detail;
             }
@@ -803,11 +835,39 @@ namespace WebService.Database
                 while (reader.Read())
                 {
                     clientCompanies.Add(new ClientCompany(reader["clientId"].ToString(), reader["clientCompany"].ToString(), reader["clientTelNum"].ToString(),
-                                                          reader["address"].ToString(), reader["clientFaxNum"].ToString(), "", "", reader["nationality"].ToString()));
+                                                          reader["address"].ToString(), reader["clientFaxNum"].ToString(), ""));
                 }
             }
             conn.Close();
             return FixDuplicates(clientCompanies);
+        }
+
+        public ClientCompany GetIndividualDetail(string username)
+        {
+            SqlConnection conn = new SqlConnection(SLW_dbConn);
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader reader = null;
+            ClientCompany individualDetail = new ClientCompany("individual");
+
+            cmd.CommandText = "sp_getIndividualDetail @username";
+            cmd.Parameters.AddWithValue("@username", username);
+            cmd.Connection = conn;
+
+            conn.Open();
+            reader = cmd.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                reader.Read();
+                individualDetail.name = reader["first_name"].ToString() + " " + reader["last_name"].ToString();
+                individualDetail.address = reader["address"].ToString();
+                individualDetail.telephone = reader["telephone"].ToString();
+                individualDetail.fax = reader["fax"].ToString();
+                return individualDetail;
+            }
+
+            conn.Close();
+            return individualDetail;
         }
 
         public ClientCompany GetClientDetail(int clientId)
@@ -826,7 +886,7 @@ namespace WebService.Database
             if (reader.HasRows)
             {
                 reader.Read();
-                clientCompany = new ClientCompany(reader["clientId"].ToString(), reader["clientCompany"].ToString(), reader["clientTelNum"].ToString(), reader["address"].ToString(), reader["clientFaxNum"].ToString(), "", "", reader["nationality"].ToString());
+                clientCompany = new ClientCompany(reader["clientId"].ToString(), reader["clientCompany"].ToString(), reader["clientTelNum"].ToString(), reader["address"].ToString(), reader["clientFaxNum"].ToString(), "");
                 conn.Close();
                 return clientCompany;
             }
@@ -2100,7 +2160,7 @@ namespace WebService.Database
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
-            ClientCompany clientCompany = new ClientCompany();
+            ClientCompany clientCompany = new ClientCompany("company");
             SqlDataReader reader = null;
             cmd.CommandText = "sp_getLocalClientCompany @client_id";
             cmd.Parameters.AddWithValue("@client_id", client_id);
@@ -2114,7 +2174,7 @@ namespace WebService.Database
                 reader.Read();
 
                 clientCompany = new ClientCompany(reader["client_id"].ToString(), reader["name"].ToString(), reader["telephone"].ToString(),
-                                                      reader["address"].ToString(), reader["fax"].ToString(), reader["cityTown"].ToString(), reader["contactPerson"].ToString(), reader["nationality"].ToString());
+                                                      reader["address"].ToString(), reader["fax"].ToString(), reader["contactPerson"].ToString());
 
             }
             conn.Close();
@@ -2139,7 +2199,7 @@ namespace WebService.Database
                 while (reader.Read())
                 {
                     clientCompanies.Add(new ClientCompany(reader["client_id"].ToString(), reader["name"].ToString(), reader["telephone"].ToString(),
-                                                          reader["address"].ToString(), reader["fax"].ToString(), reader["cityTown"].ToString(), reader["contactPerson"].ToString(), reader["nationality"].ToString()));
+                                                          reader["address"].ToString(), reader["fax"].ToString(), reader["contactPerson"].ToString()));
                 }
             }
             conn.Close();
@@ -2164,7 +2224,7 @@ namespace WebService.Database
                 while (reader.Read())
                 {
                     clientCompanies.Add(new ClientCompany(reader["client_id"].ToString(), reader["name"].ToString(), reader["telephone"].ToString(),
-                                                          reader["address"].ToString(), reader["fax"].ToString(), reader["cityTown"].ToString(), reader["contactPerson"].ToString(), reader["nationality"].ToString()));
+                                                          reader["address"].ToString(), reader["fax"].ToString(), reader["contactPerson"].ToString()));
                 }
             }
             conn.Close();
@@ -2172,20 +2232,18 @@ namespace WebService.Database
         }
 
 
-        public int NewLocalClient(ClientCompany client)
+        public int NewLocalClientCompany(ClientCompany client)
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
             SqlDataReader reader = null;
 
-            cmd.CommandText = "sp_newClientCompany @name, @telephone, @address, @fax, @cityTown, @contactPerson, @nationality";
+            cmd.CommandText = "sp_newClientCompany @name, @telephone, @address, @fax, @contactPerson";
             cmd.Parameters.AddWithValue("@name", client.name);
             cmd.Parameters.AddWithValue("@telephone", client.telephone);
             cmd.Parameters.AddWithValue("@address", client.address);
             cmd.Parameters.AddWithValue("@fax", client.fax);
-            cmd.Parameters.AddWithValue("@cityTown", client.cityTown);
             cmd.Parameters.AddWithValue("@contactPerson", client.contactPerson);
-            cmd.Parameters.AddWithValue("@nationality", client.nationality);
             cmd.Connection = conn;
             
 
