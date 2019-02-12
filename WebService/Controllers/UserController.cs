@@ -163,6 +163,7 @@ namespace WebService.Controllers
                         if (user_types[i].user_type == user.user_role)
                         {
                             valid_user_type = true;
+                            break;
                         }
                     }
 
@@ -301,7 +302,6 @@ namespace WebService.Controllers
                 Utilities.Email.Send(userDetails.email, "Password reset", "Your password has been reset. New password: " + password + "");
                 return Request.CreateResponse(HttpStatusCode.OK, "password reset");
             }
-            
         }
 
         [HttpPost]

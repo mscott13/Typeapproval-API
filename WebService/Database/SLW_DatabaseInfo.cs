@@ -863,6 +863,8 @@ namespace WebService.Database
                 individualDetail.address = reader["address"].ToString();
                 individualDetail.telephone = reader["telephone"].ToString();
                 individualDetail.fax = reader["fax"].ToString();
+                individualDetail.contactPerson = "";
+                individualDetail.clientId = "";
                 return individualDetail;
             }
 

@@ -391,7 +391,9 @@ namespace WebService.Controllers
                 UserDetails userDetails = db.GetUserDetails(ongoing.assigned_to);
                 ongoing.assigned_to = userDetails.fullname;
                 db.SaveActivity(new UserActivity(detail.username, Commons.Constants.ACTIVITY_NEW_ONGOING, (string)data.application_id, (string)data.assigned_to, 1));
-                Email.Send(userDetails.email, "New Type Approval Application", "A new application has been assigned to you for processing.");
+                Form form = db.GetApplication((string)data.application_id);
+
+                Email.Send(userDetails.email, "New Type Approval Application", "Type approval application " + form.application_id + " for Device with Model number " + form.product_identification + " from " + ongoing.submitted_by + " is assigned to you for processing.");
                 return Request.CreateResponse(HttpStatusCode.OK, ongoing);
             }
             else
@@ -454,11 +456,13 @@ namespace WebService.Controllers
                 OngoingTask ongoing = db.GetSingleOngoingTask((string)data.application_id);
                 UserDetails prevUserDetails = db.GetUserDetails(prev_ongoing.assigned_to);
                 UserDetails userDetails = db.GetUserDetails(ongoing.assigned_to);
+                
+                Form form = db.GetApplication((string)data.application_id);
                 ongoing.assigned_to = userDetails.fullname;
                 db.SaveActivity(new UserActivity(detail.username, Commons.Constants.ACTIVITY_REASSIGN_TASK, (string)data.application_id, (string)data.assign_to, 1));
 
-                Email.Send(userDetails.email, "New Type Approval Application", "A new application has been assigned to you for processing.");
-                Email.Send(prevUserDetails.email, "Assigned Type Approval Application", "An application that had been assigned to you has been reassigned.");
+                Email.Send(userDetails.email, "New Type Approval Application", "Type approval application "+form.application_id+" for Device with Model number "+form.product_identification+" from "+ ongoing.submitted_by + " is assigned to you for processing.");
+                Email.Send(prevUserDetails.email, "Assigned Type Approval Application", "Application "+form.application_id+" that had been assigned to you has been reassigned.");
 
                 return Request.CreateResponse(HttpStatusCode.OK, ongoing);
             }

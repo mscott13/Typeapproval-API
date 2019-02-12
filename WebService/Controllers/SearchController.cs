@@ -65,6 +65,32 @@ namespace WebService.Controllers
         }
 
         [HttpGet]
+        public HttpResponseMessage Remarks([FromUri]string q)
+        {
+            if (q == null)
+            {
+                q = "";
+            }
+
+            SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+            List<string> remarks = db.GetRemarks(q);
+            return Request.CreateResponse(HttpStatusCode.OK, remarks);
+        }
+
+        [HttpGet]
+        public HttpResponseMessage Make([FromUri]string q)
+        {
+            if (q == null)
+            {
+                q = "";
+            }
+
+            SLW_DatabaseInfo db = new SLW_DatabaseInfo();
+            List<string> make = db.GetMake(q);
+            return Request.CreateResponse(HttpStatusCode.OK, make);
+        }
+
+        [HttpGet]
         public HttpResponseMessage AllCategories([FromUri]string q)
         {
             if (q == null)

@@ -65,7 +65,7 @@ namespace WebService.Commons
         public const string ASMS_SOURCE = "Asms";
 
         //other
-        public const bool SEND_EMAIL = false;
+        public const bool SEND_EMAIL = true;
 
     }
 }
