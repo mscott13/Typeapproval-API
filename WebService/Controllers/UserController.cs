@@ -71,7 +71,7 @@ namespace WebService.Controllers
                         int id = db.NewCompanyUser(user.username, user.first_name, user.last_name, DateTime.Now, user.user_role, user.user_type, DateTime.Now, (DateTime)System.Data.SqlTypes.SqlDateTime.MinValue, hash, false, user.email, user.company, user.clientId, source);
                         db.SaveActivity(new UserActivity(user.username, Commons.Constants.ACTIVITY_CREATE_ACCOUNT, "", "", 0));
 
-                        Utilities.Email.Send(user.email, "New Account", "Your account was created sucessfully. Username: " + user.username + "");
+                        //Utilities.Email.Send(user.email, "New Account", "Your account was created sucessfully. Username: " + user.username + "");
                         return Request.CreateResponse(HttpStatusCode.OK, id);
                     }
                     else

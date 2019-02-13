@@ -29,6 +29,8 @@ namespace WebService.Models
             this.user_type = user_type;
         }
 
+        public ClientCompany() { }
+
         public string clientId { get; set; }
         public string name { get; set; }
         public string telephone { get; set; }
