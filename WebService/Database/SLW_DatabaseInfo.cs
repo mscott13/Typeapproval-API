@@ -1475,11 +1475,11 @@ namespace WebService.Database
             if (reader.HasRows)
             {
                 reader.Read();
-                certificate.manufacturer_name = reader["manufacturer_name"].ToString();
-                certificate.manufacturer_address = reader["manufacturer_address"].ToString();
+                certificate.manufacturer_name = reader["grantee_name"].ToString();
+                certificate.manufacturer_address = reader["grantee_address"].ToString();
                 certificate.product_identification = reader["product_identifiation"].ToString();
                 certificate.equipment_description = reader["equipment_description"].ToString();
-                certificate.remarks = "";
+                certificate.remarks = reader["remarks"].ToString();
             }
 
             certificate.frequencies = GetPersonalFrequencies(application_id);
