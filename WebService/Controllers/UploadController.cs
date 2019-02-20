@@ -78,38 +78,41 @@ namespace WebService.Controllers
                     if (type == "application/pdf")
                     {
                         var purpose = file.Headers.ContentDisposition.Name.Replace("\"", "");
+                        string path = file.Headers.ContentDisposition.FileName.Replace("\"", "");
+                        string name = Path.GetFileName(path);
                         switch (purpose)
                         {
+
                             case "tech_spec":
-                                rename = root + @"\" + form.username + @"\" + application_id + @"\" + "technical_specifications" + @"\" + file.Headers.ContentDisposition.FileName.Replace("\"", "");
+                                rename = root + @"\" + form.username + @"\" + application_id + @"\" + "technical_specifications" + @"\" + Path.GetFileName(file.Headers.ContentDisposition.FileName.Replace("\"", ""));
                                 if (!Directory.Exists(root + @"\" + form.username + @"\" + application_id + @"\" + "technical_specifications"))
                                 {
                                     Directory.CreateDirectory(root + @"\" + form.username + @"\" + application_id + @"\" + "technical_specifications");
                                 }
                                 break;
                             case "test_report":
-                                rename = root + @"\" + form.username + @"\" + application_id + @"\" + "test_report" + @"\" + file.Headers.ContentDisposition.FileName.Replace("\"", "");
+                                rename = root + @"\" + form.username + @"\" + application_id + @"\" + "test_report" + @"\" + Path.GetFileName(file.Headers.ContentDisposition.FileName.Replace("\"", ""));
                                 if (!Directory.Exists(root + @"\" + form.username + @"\" + application_id + @"\" + "test_report"))
                                 {
                                     Directory.CreateDirectory(root + @"\" + form.username + @"\" + application_id + @"\" + "test_report");
                                 }
                                 break;
                             case "accreditation":
-                                rename = root + @"\" + form.username + @"\" + application_id + @"\" + "accreditation" + @"\" + file.Headers.ContentDisposition.FileName.Replace("\"", "");
+                                rename = root + @"\" + form.username + @"\" + application_id + @"\" + "accreditation" + @"\" + Path.GetFileName(file.Headers.ContentDisposition.FileName.Replace("\"", ""));
                                 if (!Directory.Exists(root + @"\" + form.username + @"\" + application_id + @"\" + "accreditation"))
                                 {
                                     Directory.CreateDirectory(root + @"\" + form.username + @"\" + application_id + @"\" + "accreditation");
                                 }
                                 break;
                             case "letter_auth":
-                                rename = root + @"\" + form.username + @"\" + application_id + @"\" + "letter of authorization" + @"\" + file.Headers.ContentDisposition.FileName.Replace("\"", "");
+                                rename = root + @"\" + form.username + @"\" + application_id + @"\" + "letter of authorization" + @"\" + Path.GetFileName(file.Headers.ContentDisposition.FileName.Replace("\"", ""));
                                 if (!Directory.Exists(root + @"\" + form.username + @"\" + application_id + @"\" + "letter of authorization"))
                                 {
                                     Directory.CreateDirectory(root + @"\" + form.username + @"\" + application_id + @"\" + "letter of authorization");
                                 }
                                 break;
                             case "user_man":
-                                rename = root + @"\" + form.username + @"\" + application_id + @"\" + "user manual" + @"\" + file.Headers.ContentDisposition.FileName.Replace("\"", "");
+                                rename = root + @"\" + form.username + @"\" + application_id + @"\" + "user manual" + @"\" + Path.GetFileName(file.Headers.ContentDisposition.FileName.Replace("\"", ""));
                                 if (!Directory.Exists(root + @"\" + form.username + @"\" + application_id + @"\" + "user manual"))
                                 {
                                     Directory.CreateDirectory(root + @"\" + form.username + @"\" + application_id + @"\" + "user manual");
