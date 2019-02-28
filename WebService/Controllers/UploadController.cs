@@ -127,19 +127,19 @@ namespace WebService.Controllers
                             switch (purpose)
                             {
                                 case "tech_spec":
-                                    db.AddFileReference(Generator.guid(), file.Headers.ContentDisposition.FileName.Replace("\"", ""), DateTime.Now, rename, application_id, form.name_of_test, form.country, form.username, Commons.Constants.TECHNICAL_SPECIFICATION_FILE);
+                                    db.AddFileReference(Generator.guid(), Path.GetFileName(file.Headers.ContentDisposition.FileName.Replace("\"", "")), DateTime.Now, rename, application_id, form.name_of_test, form.country, form.username, Commons.Constants.TECHNICAL_SPECIFICATION_FILE);
                                     break;
                                 case "test_report":
-                                    db.AddFileReference(Generator.guid(), file.Headers.ContentDisposition.FileName.Replace("\"", ""), DateTime.Now, rename, application_id, form.name_of_test, form.country, form.username, Commons.Constants.TEST_REPORT_FILE);
+                                    db.AddFileReference(Generator.guid(), Path.GetFileName(file.Headers.ContentDisposition.FileName.Replace("\"", "")), DateTime.Now, rename, application_id, form.name_of_test, form.country, form.username, Commons.Constants.TEST_REPORT_FILE);
                                     break;
                                 case "accreditation":
-                                    db.AddFileReference(Generator.guid(), file.Headers.ContentDisposition.FileName.Replace("\"", ""), DateTime.Now, rename, application_id, form.name_of_test, form.country, form.username, Commons.Constants.ACCREDITATION_FILE);
+                                    db.AddFileReference(Generator.guid(), Path.GetFileName(file.Headers.ContentDisposition.FileName.Replace("\"", "")), DateTime.Now, rename, application_id, form.name_of_test, form.country, form.username, Commons.Constants.ACCREDITATION_FILE);
                                     break;
                                 case "letter_auth":
-                                    db.AddFileReference(Generator.guid(), file.Headers.ContentDisposition.FileName.Replace("\"", ""), DateTime.Now, rename, application_id, form.name_of_test, form.country, form.username, Commons.Constants.LETTER_AUTHORIZATION_FILE);
+                                    db.AddFileReference(Generator.guid(), Path.GetFileName(file.Headers.ContentDisposition.FileName.Replace("\"", "")), DateTime.Now, rename, application_id, form.name_of_test, form.country, form.username, Commons.Constants.LETTER_AUTHORIZATION_FILE);
                                     break;
                                 case "user_man":
-                                    db.AddFileReference(Generator.guid(), file.Headers.ContentDisposition.FileName.Replace("\"", ""), DateTime.Now, rename, application_id, form.name_of_test, form.country, form.username, Commons.Constants.USER_MANUAL_FILE);
+                                    db.AddFileReference(Generator.guid(), Path.GetFileName(file.Headers.ContentDisposition.FileName.Replace("\"", "")), DateTime.Now, rename, application_id, form.name_of_test, form.country, form.username, Commons.Constants.USER_MANUAL_FILE);
                                     break;
                             }
                         }
@@ -151,19 +151,19 @@ namespace WebService.Controllers
                             switch (purpose)
                             {
                                 case "tech_spec":
-                                    db.AddFileReference(Generator.guid(), file.Headers.ContentDisposition.FileName.Replace("\"", ""), DateTime.Now, rename, application_id, form.name_of_test, form.country, form.username, Commons.Constants.TECHNICAL_SPECIFICATION_FILE);
+                                    db.AddFileReference(Generator.guid(), Path.GetFileName(file.Headers.ContentDisposition.FileName.Replace("\"", "")), DateTime.Now, rename, application_id, form.name_of_test, form.country, form.username, Commons.Constants.TECHNICAL_SPECIFICATION_FILE);
                                     break;
                                 case "test_report":
-                                    db.AddFileReference(Generator.guid(), file.Headers.ContentDisposition.FileName.Replace("\"", ""), DateTime.Now, rename, application_id, form.name_of_test, form.country, form.username, Commons.Constants.TEST_REPORT_FILE);
+                                    db.AddFileReference(Generator.guid(), Path.GetFileName(file.Headers.ContentDisposition.FileName.Replace("\"", "")), DateTime.Now, rename, application_id, form.name_of_test, form.country, form.username, Commons.Constants.TEST_REPORT_FILE);
                                     break;
                                 case "accreditation":
-                                    db.AddFileReference(Generator.guid(), file.Headers.ContentDisposition.FileName.Replace("\"", ""), DateTime.Now, rename, application_id, form.name_of_test, form.country, form.username, Commons.Constants.ACCREDITATION_FILE);
+                                    db.AddFileReference(Generator.guid(), Path.GetFileName(file.Headers.ContentDisposition.FileName.Replace("\"", "")), DateTime.Now, rename, application_id, form.name_of_test, form.country, form.username, Commons.Constants.ACCREDITATION_FILE);
                                     break;
                                 case "letter_auth":
-                                    db.AddFileReference(Generator.guid(), file.Headers.ContentDisposition.FileName.Replace("\"", ""), DateTime.Now, rename, application_id, form.name_of_test, form.country, form.username, Commons.Constants.LETTER_AUTHORIZATION_FILE);
+                                    db.AddFileReference(Generator.guid(), Path.GetFileName(file.Headers.ContentDisposition.FileName.Replace("\"", "")), DateTime.Now, rename, application_id, form.name_of_test, form.country, form.username, Commons.Constants.LETTER_AUTHORIZATION_FILE);
                                     break;
                                 case "user_man":
-                                    db.AddFileReference(Generator.guid(), file.Headers.ContentDisposition.FileName.Replace("\"", ""), DateTime.Now, rename, application_id, form.name_of_test, form.country, form.username, Commons.Constants.USER_MANUAL_FILE);
+                                    db.AddFileReference(Generator.guid(), Path.GetFileName(file.Headers.ContentDisposition.FileName.Replace("\"", "")), DateTime.Now, rename, application_id, form.name_of_test, form.country, form.username, Commons.Constants.USER_MANUAL_FILE);
                                     break;
                             }
                         }
