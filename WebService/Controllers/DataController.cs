@@ -341,7 +341,7 @@ namespace WebService.Controllers
                 db.DeleteOngoingTask((string)data.application_id);
                 db.NewUnassignedTask((string)data.application_id, (string)data.submitted_by, ongoing.created_date_raw);
 
-                db.UpdateApplicationStatus((string)data.application_id, Commons.Constants.SUBMITTED_TYPE);
+                db.UpdateApplicationStatus((string)data.application_id, Commons.Constants.SUBMITTED_TYPE, DateTime.Now);
                 UnassignedTask unassigned = db.GetSingleUnassignedTask((string)data.application_id);
                 db.SaveActivity(new UserActivity(detail.username, Commons.Constants.ACTIVITY_NEW_UNASSIGNED, (string)data.application_id, "", 1));
                 return Request.CreateResponse(HttpStatusCode.OK, unassigned);
@@ -363,7 +363,7 @@ namespace WebService.Controllers
                 OngoingTask ongoing = db.GetSingleOngoingTask((string)data.application_id);
                 db.DeleteOngoingTask((string)data.application_id);
                 db.NewUnassignedTask(ongoing.application_id, ongoing.submitted_by_username, ongoing.created_date_raw);
-                db.UpdateApplicationStatus((string)data.application_id, Commons.Constants.SUBMITTED_TYPE);
+                db.UpdateApplicationStatus((string)data.application_id, Commons.Constants.SUBMITTED_TYPE, DateTime.Now);
                 db.SaveActivity(new UserActivity(detail.username, Commons.Constants.ACTIVITY_MOVE_UNASSAIGNED, (string)data.application_id, "", 1));
                 return Request.CreateResponse(HttpStatusCode.OK, new UnassignedTask(ongoing.application_id, ongoing.created_date, ongoing.created_date_raw, ongoing.submitted_by, ongoing.submitted_by_username));
             }
@@ -386,7 +386,7 @@ namespace WebService.Controllers
 
                 UserDetails userDetailsAdmin = db.GetUserDetails(detail.username);
                 db.NewOngoingTask((string)data.application_id, (string)data.assigned_to, unassigned.username, (string)data.status, unassigned.created_date_raw, userDetailsAdmin.fullname, userDetailsAdmin.username);
-                db.UpdateApplicationStatus((string)data.application_id, Commons.Constants.PENDING_TYPE);
+                db.UpdateApplicationStatus((string)data.application_id, Commons.Constants.PENDING_TYPE, DateTime.Now);
                 OngoingTask ongoing = db.GetSingleOngoingTask((string)data.application_id);
                 UserDetails userDetails = db.GetUserDetails(ongoing.assigned_to);
                 ongoing.assigned_to = userDetails.fullname;
@@ -412,7 +412,7 @@ namespace WebService.Controllers
             if (detail.data_present)
             {
                 db.DeleteUnassignedTask((string)data.application_id);
-                db.UpdateApplicationStatus((string)data.application_id, Commons.Constants.REJECTED);
+                db.UpdateApplicationStatus((string)data.application_id, Commons.Constants.REJECTED, DateTime.Now);
                 FileManager.DeleteFiles((string)data.application_id);
                 db.SaveActivity(new UserActivity(detail.username, Commons.Constants.ACTIVITY_REJECT_UNASSIGNED, (string)data.application_id, "", 1));
                 return Request.CreateResponse(HttpStatusCode.OK, "deleted");
@@ -432,7 +432,7 @@ namespace WebService.Controllers
             if (detail.data_present)
             {
                 db.DeleteOngoingTask((string)data.application_id);
-                db.UpdateApplicationStatus((string)data.application_id, Commons.Constants.REJECTED);
+                db.UpdateApplicationStatus((string)data.application_id, Commons.Constants.REJECTED, DateTime.Now);
                 FileManager.DeleteFiles((string)data.application_id);
                 db.SaveActivity(new UserActivity(detail.username, Commons.Constants.ACTIVITY_REJECT_UNASSIGNED, (string)data.application_id, "", 1));
                 return Request.CreateResponse(HttpStatusCode.OK, "deleted");

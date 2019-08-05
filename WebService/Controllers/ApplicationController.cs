@@ -43,7 +43,7 @@ namespace WebService.Controllers
 
             if (keyDetail.data_present)
             {
-                db.UpdateApplicationStatus((string)data.application_id, Commons.Constants.PENDING_RESUBMISSION);
+                db.UpdateApplicationStatus((string)data.application_id, Commons.Constants.PENDING_RESUBMISSION, DateTime.Now);
                 Utilities.FileManager.DeleteFiles((string)data.application_id);
                 db.DeleteOngoingTask((string)data.application_id);
                 db.DeleteUnassignedTask((string)data.application_id);

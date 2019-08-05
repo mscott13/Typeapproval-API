@@ -13,7 +13,7 @@ namespace WebService.Commons
         //@"Data Source=server-erp2\asmsdev;Initial Catalog=SLW_Database;Integrated Security=True";
         //@"Data Source=SMA-DBSRV\ASMSDEV;Initial Catalog=SLW_DATABASE;Integrated Security=True";
 
-        public const string databaseConnection = @"Data Source=DESKTOP-6DGAJN8\SQLEXPRESS;Initial Catalog=SLW_Database;Integrated Security=True";
+        public const string databaseConnection = @"Data Source=server-erp2\asmsdev;Initial Catalog=SLW_Database;Integrated Security=True";
         public const string notifyTypeApproval = "TYPE_APPROVAL";
         public const string notifyGeneral = "GENERAL";
 
@@ -66,7 +66,7 @@ namespace WebService.Commons
         public const string ASMS_SOURCE = "Asms";
 
         //other
-        public const bool SEND_EMAIL = false;
+        public const bool SEND_EMAIL = true;
 
     }
 }

@@ -1550,7 +1550,7 @@ namespace WebService.Database
             {
                 while (reader.Read())
                 {
-                    manufacturerModels.Add(new ManufacturerModel(reader["application_id"].ToString(), reader["manufacturer_name"].ToString(), reader["product_identifiation"].ToString(), reader["status"].ToString()));
+                    manufacturerModels.Add(new ManufacturerModel(reader["application_id"].ToString(), reader["manufacturer_name"].ToString(), reader["product_identifiation"].ToString(), reader["status"].ToString(), Convert.ToDateTime(reader["issueDate"])));
                 }
             }
             conn.Close();
@@ -1574,21 +1574,22 @@ namespace WebService.Database
             if (reader.HasRows)
             {
                 reader.Read();
-                manufacturerModel = new ManufacturerModel("", reader["manufacturer"].ToString(), reader["model"].ToString(), reader["Status"].ToString());
+                manufacturerModel = new ManufacturerModel("", reader["manufacturer"].ToString(), reader["model"].ToString(), reader["Status"].ToString(), Convert.ToDateTime(reader["issueDate"]));
             }
 
             conn.Close();
             return manufacturerModel;
         }
 
-        public void UpdateApplicationStatus(string application_id, string status)
+        public void UpdateApplicationStatus(string application_id, string status, DateTime date)
         {
             SqlConnection conn = new SqlConnection(SLW_dbConn);
             SqlCommand cmd = new SqlCommand();
-            cmd.CommandText = "sp_updateApplicationStatus @application_id, @status";
+            cmd.CommandText = "sp_updateApplicationStatus @application_id, @status, @date";
 
             cmd.Parameters.AddWithValue("@application_id", application_id);
             cmd.Parameters.AddWithValue("@status", status);
+            cmd.Parameters.AddWithValue("@date", date);
             cmd.Connection = conn;
 
             conn.Open();
@@ -1607,16 +1608,16 @@ namespace WebService.Database
                     switch (asmsManufacturerModel.status)
                     {
                         case "Licensed":
-                            UpdateApplicationStatus(currentManufacturerModels[i].application_id, Constants.LICENSED_TYPE);
+                            UpdateApplicationStatus(currentManufacturerModels[i].application_id, Constants.LICENSED_TYPE, asmsManufacturerModel.date);
                             break;
                         case "Pending":
-                            UpdateApplicationStatus(currentManufacturerModels[i].application_id, Constants.PENDING_TYPE);
+                            UpdateApplicationStatus(currentManufacturerModels[i].application_id, Constants.PENDING_TYPE, DateTime.Now);
                             break;
                         case "Rejected":
-                            UpdateApplicationStatus(currentManufacturerModels[i].application_id, Constants.REJECTED);
+                            UpdateApplicationStatus(currentManufacturerModels[i].application_id, Constants.REJECTED, DateTime.Now);
                             break;
                         case "Invoiced":
-                            UpdateApplicationStatus(currentManufacturerModels[i].application_id, Constants.INVOICED_TYPE);
+                            UpdateApplicationStatus(currentManufacturerModels[i].application_id, Constants.INVOICED_TYPE, DateTime.Now);
                             break;
                     }
                 }
