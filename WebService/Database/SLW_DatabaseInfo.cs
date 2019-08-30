@@ -1603,6 +1603,7 @@ namespace WebService.Database
             for (int i = 0; i < currentManufacturerModels.Count; i++)
             {
                 ManufacturerModel asmsManufacturerModel = GetASMSManufacturerModel(currentManufacturerModels[i].manufacturer, currentManufacturerModels[i].model);
+
                 if (asmsManufacturerModel != null)
                 {
                     switch (asmsManufacturerModel.status)
