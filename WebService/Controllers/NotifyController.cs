@@ -35,7 +35,7 @@ namespace WebService.Controllers
         [HttpPost]
         public HttpResponseMessage SendEmail()
         {
-            Utilities.Email.Send("a.markscott13@yahoo.com", "Testing Subject", "Using postmark is quite nice");
+            Utilities.Email.Send("info@sma.gov.jm", "Testing Subject", "Using postmark is quite nice");
             return Request.CreateResponse(HttpStatusCode.OK, "");
         }
     }
